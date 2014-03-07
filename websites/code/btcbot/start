@@ -7,6 +7,6 @@ if [ ! -f start ]; then
     exit 1
 fi
 
-bin/studygolang >> log/panic.log 2>&1 &
+bin/btcrobot >> log/panic.log 2>&1 &
 
 echo "start successfully"

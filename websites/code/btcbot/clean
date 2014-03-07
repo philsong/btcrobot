@@ -11,7 +11,7 @@ CURDIR=`pwd`
 OLDGOPATH="$GOPATH"
 export GOPATH="$CURDIR:$CURDIR/../thirdparty"
 
-go clean -i -r studygolang
+go clean -i -r btcbot
 
 rm -rf pid
 rm -rf bin

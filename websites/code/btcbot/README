@@ -1,5 +1,5 @@
 /*
- *BTC操盘手自动化交易引擎
+ *BTC操盘手自动化交易引擎*
   btcbot is a Bitcoin trading bot for HUOBI.com written
   in golang, it features multiple trading methods using
   technical analysis.

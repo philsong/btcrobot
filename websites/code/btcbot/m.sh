@@ -1,7 +1,6 @@
 #!/bin/sh 
 #===================== 
-#ni da ye
-#http://pingliwang.com:9090/
+#https://github.com/philsong/btcrobot
 #===================== 
 while : 
 do 
