@@ -86,7 +86,7 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 
 	//check indictor using history data, loop through data, get history samples
 	logger.OverrideStart(w.Peroid)
-	logger.Overridef("EMA 收益率分析[%d:[s=%d/m=%d/l=%d],stopPoints:%0.0f]\n", w.Peroid, shortEMA, middleEMA, longEMA, stopPoints)
+	logger.Overridef("EMA 收益率分析[%d:[s=%d/l=%d],stopPoints:%0.0f]\n", w.Peroid, shortEMA, longEMA, stopPoints)
 	var profit float64
 	var times int
 	var lastTrade float64
