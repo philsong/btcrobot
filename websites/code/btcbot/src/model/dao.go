@@ -11,7 +11,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql" //just register mysql driver to database/sql package,
 	_ "github.com/mattn/go-sqlite3"
 	"logger"
 	"sort"
@@ -20,6 +19,7 @@ import (
 )
 
 /*
+_ "github.com/go-sql-driver/mysql" //just register mysql driver to database/sql package,
 	"drive_name": "mysql",
     "dsn": "root:@tcp(localhost:3306)/btcrobot?charset=utf8",
 */

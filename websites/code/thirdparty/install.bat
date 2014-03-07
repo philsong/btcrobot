@@ -11,7 +11,6 @@ goto end
 set OLDGOPATH=%GOPATH%
 set GOPATH=%~dp0
 
-go install github.com/go-sql-driver/mysql
 go install github.com/studygolang/mux
 go install github.com/gorilla/sessions
 go install github.com/mattn/go-sqlite3

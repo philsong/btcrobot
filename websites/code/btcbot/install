@@ -17,7 +17,7 @@ fi
 
 gofmt -w src
 
-go install studygolang
+go install btcrobot
 
 export GOPATH="$OLDGOPATH"
 export PATH="$OLDPATH"
