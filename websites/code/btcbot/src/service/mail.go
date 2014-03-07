@@ -64,9 +64,9 @@ func SendWelcomeMail(emailaddr []string) {
 // 发重置密码邮件
 func SendResetpwdMail(emailaddr, uuid string) {
 	content := `您好，` + emailaddr + `,<br/><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;我们的系统收到一个请求，说您希望通过电子邮件重新设置您在 <a href="http://` + config.Config["domain"] + `">微言微语</a> 的密码。您可以点击下面的链接重设密码：<br/><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;我们的系统收到一个请求，说您希望通过电子邮件重新设置您在 <a href="http://pingliwang.com:8080">BTCROBOT</a> 的密码。您可以点击下面的链接重设密码：<br/><br/>
 
-&nbsp;&nbsp;&nbsp;&nbsp;http://` + config.Config["domain"] + `/account/resetpwd?code=` + uuid + ` <br/><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;http://pingliwang.com:8080/account/resetpwd?code=` + uuid + ` <br/><br/>
 
 如果这个请求不是由您发起的，那没问题，您不用担心，您可以安全地忽略这封邮件。<br/><br/>
 

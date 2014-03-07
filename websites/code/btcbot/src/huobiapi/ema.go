@@ -1,5 +1,4 @@
 /*
-
   btcbot is a Bitcoin trading bot for HUOBI.com written
   in golang, it features multiple trading methods using
   technical analysis.
@@ -14,11 +13,7 @@
   backtesting on historical data. Also look at the code to see what how
   it's working.
 
-
-  Author：Phil
-  Email: 78623269@qq.com
   Weibo:http://weibo.com/bocaicfa
-  code: https://github.com/philsong/
 */
 
 package huobiapi
@@ -30,14 +25,6 @@ import (
 	"service"
 	"strconv"
 )
-
-/*
-"compounding" is finance mumbo-jumbo that means when your system says to be "long",
- multiply your previous account balance by the percent change + 1 in the given time period.
-  When actually short (not flat),
-  multiply the previous account balance times the percent change + 1 x -1 in the given time period.
-  If flat, make your current account balance equal to the previous account balance in a given time period.
-*/
 
 func (w *Huobi) doEMA(xData []string, yData []float64) {
 	if len(yData) == 0 {
@@ -92,8 +79,8 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 	var lastTrade float64
 	var entryPrice float64
 	var totaltimes int
-	//EMA cross
 
+	//EMA cross
 	for i := 1; i < length; i++ {
 		if EMAdif[i-1] < 0 && EMAdif[i] > 0 { //enter
 			w.lastAction = "enter"
@@ -192,8 +179,8 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 	logger.Overridef("totaltimes[%d] profit=%0.02f, entryPrice=%0.02f, rate=%0.02f%%\n", totaltimes, profit, entryPrice, 100*profit/entryPrice)
 
 	if false {
-		// current trend
-		//trade according indictor
+		//current trend
+		//trade according trend indictor
 		if w.latestSolidTrend == 0 {
 			w.findLatestSolidTrend(emaShort, emaLong, EMAMinThreshold,
 				TresholdLevel, length)

@@ -1,5 +1,4 @@
 {
-    "domain": "pingliwang.com",
     "host": "0.0.0.0:9090",
     "drive_name": "sqlite3",
     "dsn": "btcrobot.s3db",
