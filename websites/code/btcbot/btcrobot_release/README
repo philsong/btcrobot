@@ -1,0 +1,45 @@
+﻿/*
+ *BTC操盘手自动化交易引擎*
+  btcbot is a Bitcoin trading bot for HUOBI.com written
+  in golang, it features multiple trading methods using
+  technical analysis.
+
+  Disclaimer:
+
+  USE AT YOUR OWN RISK!
+
+  The author of this project is NOT responsible for any damage or loss caused
+  by this software. There can be bugs and the bot may not perform as expected
+  or specified. Please consider testing it first with paper trading /
+  backtesting on historical data. Also look at the code to see what how
+  it's working.
+
+
+ *@feedback http://weibo.com/bocaicfa
+ *@Version 0.10
+ *@time 2014-01-06 support auto process: login/buy/sell/update/cancel/delegation query/auto trade
+ *@Version 0.11
+ *@time 2014-01-09 support query details transaction data:buy/sell/trade/topsell/topbuy/new/high/low/last/...
+  @Version 0.12
+ *@time 2014-01-10 support query my trade info, 5min/1day/1week/... kline data and real trx data
+ 				   support okcoin.com K-line via highchart
+ *@Version 0.13
+ *@time 2014-01-13 support EMA line to indict the time to buy and sell simulately, support diff factor
+ 				   support web interface to display MA/EMA/MACD/Trender line too
+ *@Version 0.14
+ *@time 2014-01-14 support EMA line to indict the time to buy and sell in huobi.com
+ *@Version 0.15
+ *@time 2014-01-16 support send alert email when triger buy/sell point
+ *@Version 0.16
+ *@time 2014-01-27 support huibi official API,optimize MACD enter point
+ *@Version 0.17
+ *@time 2014-02-08 support the 5mintes momentum theory in fx
+ *@Version 0.18
+ *@time 2014-02-10 simplify the 5mintes momentum theory, only keep three key points:"enter"/"stop"/"exit" 
+ *@Version 0.19
+ *@time 2014-03-01 add the web UI to config option
+ *
+ *
+ *@go语言(模拟登陆huobi.com平台)+(官方API)实现自动化套利
+ *
+ */
