@@ -25,3 +25,9 @@ _testmain.go
 secret.json
 log
 pid
+bin
+pkg
+websites/code/thirdparty/src
+src/github.com
+src/code.google.com
+src/labix.org
