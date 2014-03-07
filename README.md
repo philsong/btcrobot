@@ -22,7 +22,7 @@ BTC操盘手自动化交易引擎
 先编译
 
 	// 接着上一步
-	cd ../btcrobot/
+	cd ../btcbot/
 	// windows 下执行
 	install.bat
 	// linux/mac 下执行
@@ -48,6 +48,8 @@ BTC操盘手自动化交易引擎
 运行起来了，但没有建数据库。源码中有一个 databases 文件夹，里面有建表和初始化的sql语句。之前这些sql之前，在mysql数据库中建立一个数据库：btcrobot，之后执行这些sql语句。
 
 根据你的数据库设置，修改上面提到的 `config/config.json` 对应的配置，重新启动 btcrobot.（通过restart脚本重新启动）
+
+支持sqlite3和MySql
 
 
 /*
