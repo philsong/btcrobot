@@ -22,7 +22,7 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 	// linux/mac 下执行
 	sh getpkg
 
-3、编译并运行 btcrobot
+3、编译 btcrobot
 
 先编译
 
@@ -33,7 +33,13 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 	// linux/mac 下执行
 	sh install
 	
-这样便编译好了 btcrobot，下面运行 btcrobot。（运行前可以根据需要修改 config/ 配置）
+这样便编译好了 btcrobot
+
+4、配置秘钥API文件
+
+修改btcrobot/websites/code/btcbot/conf目录下的secret.sample文件名为secret.json
+
+5、运行 btcrobot。
 
 	// windows 下执行
 	start.bat
@@ -42,15 +48,21 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
 一切顺利的话，btcrobot应该就启动了。
 
-4、浏览器中查看
+6、浏览器中查看
 
 在浏览器中输入：http://127.0.0.1:9090
 
 应该就能看到了。
 
+此时，你可以通过WEB界面配置各种参数，参数实时生效。
+
+
+注：在第5步运行前可以根据需要修改 conf目录里的 配置，亦可在第6步配置。
 
 /*
+
  *BTC操盘手自动化交易引擎
+
   btcbot is a Bitcoin trading bot for HUOBI.com written
   in golang, it features multiple trading methods using
   technical analysis.
@@ -99,6 +111,7 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
  *@Version 0.19
  *@time 2014-03-01 add the web UI to config option
+ 
  *
  *
  *@go语言(模拟登陆huobi.com平台)+(官方API)实现自动化套利
