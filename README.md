@@ -1,6 +1,9 @@
 BTC Robot
 ===========
 BTC操盘手自动化交易引擎
+
+原理来自Goomboo的分析,EMA crossover：https://bitcointalk.org/index.php?topic=60501.0
+
 BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
 注：WEB部分基于studygolang框架。
@@ -93,7 +96,7 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
  *@Version 0.18
  *@time 2014-02-10 simplify the 5mintes momentum theory, only keep three key points:"enter"/"stop"/"exit" 
- 
+
  *@Version 0.19
  *@time 2014-03-01 add the web UI to config option
  *
