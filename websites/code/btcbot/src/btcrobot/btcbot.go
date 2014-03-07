@@ -8,11 +8,8 @@ package main
 
 import (
 	. "config"
-	"console"
-
 	"fmt"
 	"huobiapi"
-
 	"logger"
 	"strconv"
 	"time"
@@ -22,7 +19,6 @@ func doTradeDelegation() {
 	huobi := huobiapi.NewHuobi()
 	logger.Infoln("doTradeDelegation start....")
 	if huobi.Login() == true {
-		console.SetColor(console.FOREGROUND_GREEN)
 		logger.Debugln("Login successfully.")
 
 		huobi.TradeDelegation()
