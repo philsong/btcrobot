@@ -1,9 +1,0 @@
-{
-	"access_key": "",
-	"disable_trading": "0",
-	"longEMA": "23",
-	"secret_key": "",
-	"shortEMA": "12",
-	"tick_interval": "1",
-	"tradeAmount": "1"
-}
