@@ -3,6 +3,8 @@ BTC Robot
 BTC操盘手自动化交易引擎
 BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
+注：WEB部分基于studygolang框架。
+
 # 本地搭建 #
 
 1、下载 btcrobot 代码
