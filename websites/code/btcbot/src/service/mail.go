@@ -1,8 +1,20 @@
-// Copyright 2013 The StudyGolang Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-// https://github.com/philsong
-// Author：Btcrobot
+/*
+  btcbot is a Bitcoin trading bot for HUOBI.com written
+  in golang, it features multiple trading methods using
+  technical analysis.
+
+  Disclaimer:
+
+  USE AT YOUR OWN RISK!
+
+  The author of this project is NOT responsible for any damage or loss caused
+  by this software. There can be bugs and the bot may not perform as expected
+  or specified. Please consider testing it first with paper trading /
+  backtesting on historical data. Also look at the code to see what how
+  it's working.
+
+  Weibo:http://weibo.com/bocaicfa
+*/
 
 package service
 
@@ -51,26 +63,4 @@ func TriggerPrice(price float64) error {
 	}
 
 	return nil
-}
-
-func SendWelcomeMail(emailaddr []string) {
-	content := `Welcome to BTC预警网.<br><br>
-				欢迎您，成功注册成为 BTC预警网 会员<br><br>
-				前往 <a href="http://pingliwang.com:8080">BTC预警网</a><br>
-				<div style="text-align:right;">&copy;2013 BTC预警网</div>`
-	email.SendMail("BTC预警网 注册成功通知", content, emailaddr)
-}
-
-// 发重置密码邮件
-func SendResetpwdMail(emailaddr, uuid string) {
-	content := `您好，` + emailaddr + `,<br/><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;我们的系统收到一个请求，说您希望通过电子邮件重新设置您在 <a href="http://pingliwang.com:8080">BTCROBOT</a> 的密码。您可以点击下面的链接重设密码：<br/><br/>
-
-&nbsp;&nbsp;&nbsp;&nbsp;http://pingliwang.com:8080/account/resetpwd?code=` + uuid + ` <br/><br/>
-
-如果这个请求不是由您发起的，那没问题，您不用担心，您可以安全地忽略这封邮件。<br/><br/>
-
-如果您有任何疑问，可以回复这封邮件向我们提问。谢谢！<br/><br/>`
-
-	email.SendMail("重设密码 ", content, []string{emailaddr})
 }

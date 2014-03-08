@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 // https://github.com/philsong/
-// Author：Phil	78623269@qq.com
 
 $(function() {
 	myTimer();

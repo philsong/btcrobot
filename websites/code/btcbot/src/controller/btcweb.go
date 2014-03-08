@@ -1,5 +1,4 @@
 /*
-
   btcbot is a Bitcoin trading bot for HUOBI.com written
   in golang, it features multiple trading methods using
   technical analysis.
@@ -14,11 +13,7 @@
   backtesting on historical data. Also look at the code to see what how
   it's working.
 
-
-  Author：Phil
-  Email: 78623269@qq.com
   Weibo:http://weibo.com/bocaicfa
-  code: https://github.com/philsong/
 */
 
 package controller

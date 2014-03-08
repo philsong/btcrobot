@@ -12,7 +12,6 @@ export GOPATH=`pwd`
 
 go get -u github.com/studygolang/mux
 go get -u github.com/gorilla/sessions
-go get -u github.com/mattn/go-sqlite3
 
 export GOPATH="$OLDGOPATH"
 export PATH="$OLDPATH"

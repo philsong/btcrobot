@@ -13,7 +13,6 @@ set GOPATH=%~dp0
 
 go get -u github.com/studygolang/mux
 go get -u github.com/gorilla/sessions
-go get -u github.com/mattn/go-sqlite3
 
 set GOPATH=%OLDGOPATH%
 

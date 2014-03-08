@@ -1,14 +1,25 @@
-// Copyright 2013 The StudyGolang Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-// https://github.com/philsong
-// Author：Btcrobot
+/*
+  btcbot is a Bitcoin trading bot for HUOBI.com written
+  in golang, it features multiple trading methods using
+  technical analysis.
+
+  Disclaimer:
+
+  USE AT YOUR OWN RISK!
+
+  The author of this project is NOT responsible for any damage or loss caused
+  by this software. There can be bugs and the bot may not perform as expected
+  or specified. Please consider testing it first with paper trading /
+  backtesting on historical data. Also look at the code to see what how
+  it's working.
+
+  Weibo:http://weibo.com/bocaicfa
+*/
 
 package filter
 
 import (
 	"config"
-	"fmt"
 	"github.com/gorilla/context"
 	"github.com/studygolang/mux"
 	"html/template"
@@ -22,15 +33,6 @@ import (
 
 // 自定义模板函数
 var funcMap = template.FuncMap{
-	// 获取gravatar头像
-	"gravatar": func(emailI interface{}, size uint16) string {
-		email, ok := emailI.(string)
-		if !ok {
-			// TODO:给一个默认的？
-			return ""
-		}
-		return fmt.Sprintf("http://www.gravatar.com/avatar/%s?s=%d", util.Md5(email), size)
-	},
 	// 转为前端显示需要的时间格式
 	"formatTime": func(i interface{}) string {
 		ctime, ok := i.(string)
@@ -126,9 +128,6 @@ func (this *ViewFilter) PostFilter(rw http.ResponseWriter, req *http.Request) bo
 	}
 
 	data := GetData(req)
-	// 当前用户信息
-	me, _ := CurrentUser(req)
-	data["me"] = me
 
 	err = tpl.Execute(rw, data)
 	if err != nil {
