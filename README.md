@@ -6,7 +6,6 @@ BTC操盘手自动化交易引擎
 
 BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
-注：WEB部分基于studygolang框架。
 
 # 本地搭建 #
 
@@ -112,8 +111,7 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
  *@Version 0.19
  *@time 2014-03-01 add the web UI to config option
  
- *
- *
+
  *@go语言(模拟登陆huobi.com平台)+(官方API)实现自动化套利
- *
+
  */
