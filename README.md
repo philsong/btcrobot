@@ -23,6 +23,10 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
 # 本地搭建 #
 
+0、首先装golang开发运行环境，选择适合自己电脑操作系统的安装包
+  
+  http://code.google.com/p/go/downloads/list
+
 1、下载 btcrobot 代码
 	
 	git clone https://github.com/philsong/btcrobot
