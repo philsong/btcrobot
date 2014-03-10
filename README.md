@@ -16,7 +16,8 @@ BTC操盘手自动化交易引擎
   backtesting on historical data. Also look at the code to see what how
   it's working.
 
-原理来自Goomboo的分析,EMA crossover：https://bitcointalk.org/index.php?topic=60501.0
+用前必读！！！！
+使用指南：https://github.com/philsong/btcrobot.wiki.git
 
 BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
