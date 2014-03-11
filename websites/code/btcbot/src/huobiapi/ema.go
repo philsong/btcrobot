@@ -22,9 +22,18 @@ import (
 	. "config"
 	"fmt"
 	"logger"
+	"os"
 	"service"
 	"strconv"
 )
+
+//for backup the kline file to detect the huobi bug
+func (w *Huobi) backup(xData string) {
+
+	oldFile := "cache/TradeKLine_minute.data"
+	newFile := fmt.Sprintf("%s_%s", oldFile, xData)
+	os.Rename(oldFile, newFile)
+}
 
 func (w *Huobi) doEMA(xData []string, yData []float64) {
 	if len(yData) == 0 {
@@ -119,6 +128,8 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 				if Option["disable_trading"] != "1" {
 					w.Do_buy(w.getTradePrice("buy"), tradeAmount)
 				}
+
+				w.backup(xData[i])
 			}
 		} else if (w.lastAction != "exit" || w.lastAction != "stop") && EMAdif[i-1] > 0 && EMAdif[i] < 0 { //exit
 			w.lastAction = "exit"
@@ -137,6 +148,8 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 						w.Do_sell(w.getTradePrice("sell"), MACDtradeAmount)
 					}
 				}
+
+				w.backup(xData[i])
 			}
 
 			if times != 0 {

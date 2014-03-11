@@ -114,7 +114,7 @@ func (w *Huobi) Login() bool {
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
 			body = string(bodyByte)
-			ioutil.WriteFile("login.html", bodyByte, os.ModeAppend)
+			ioutil.WriteFile("cache/login.html", bodyByte, os.ModeAppend)
 		}
 
 		logger.Traceln(resp.Header.Get("Content-Type"))
@@ -185,7 +185,7 @@ func (w *Huobi) TradeAdd(a, price, amount string) bool {
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
 			body = string(bodyByte)
-			ioutil.WriteFile("TradeAdd.json", bodyByte, os.ModeAppend)
+			ioutil.WriteFile("cache/TradeAdd.json", bodyByte, os.ModeAppend)
 		}
 
 		logger.Traceln(resp.Header.Get("Content-Type"))
@@ -341,7 +341,7 @@ func (w *Huobi) TradeUpdate(id, price, amount string) bool {
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
 			body = string(bodyByte)
-			ioutil.WriteFile("TradeUpdate.json", bodyByte, os.ModeAppend)
+			ioutil.WriteFile("cache/TradeUpdate.json", bodyByte, os.ModeAppend)
 		}
 
 		logger.Traceln(resp.Header.Get("Content-Type"))
@@ -425,7 +425,7 @@ func (w *Huobi) QueryMyTradeInfo() bool {
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
 			body = string(bodyByte)
-			ioutil.WriteFile("MyTradeInfo.json", bodyByte, os.ModeAppend)
+			ioutil.WriteFile("cache/MyTradeInfo.json", bodyByte, os.ModeAppend)
 		}
 
 		logger.Traceln(resp.Header.Get("Content-Type"))
@@ -488,7 +488,7 @@ func (w *Huobi) TradeCancel(id string) bool {
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
 			body = string(bodyByte)
-			ioutil.WriteFile("TradeCancel.json", bodyByte, os.ModeAppend)
+			ioutil.WriteFile("cache/TradeCancel.json", bodyByte, os.ModeAppend)
 		}
 
 		logger.Traceln(resp.Header.Get("Content-Type"))
@@ -571,7 +571,7 @@ func (w *Huobi) TradeDelegation() bool {
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
 			body = string(bodyByte)
-			ioutil.WriteFile("TradeDelegation.html", bodyByte, os.ModeAppend)
+			ioutil.WriteFile("cache/TradeDelegation.html", bodyByte, os.ModeAppend)
 		}
 
 		logger.Traceln(resp.Header.Get("Content-Type"))
@@ -692,7 +692,7 @@ func (w *Huobi) TradeDetail() (ret bool) {
 			} else {
 				body = string(bodyByte)
 
-				ioutil.WriteFile("TradeDetail.json", bodyByte, os.ModeAppend)
+				ioutil.WriteFile("cache/TradeDetail.json", bodyByte, os.ModeAppend)
 			}
 		}
 
@@ -776,7 +776,7 @@ func (w *Huobi) TradeKLinePeroid(peroid int) (ret bool) {
 			} else {
 				body = string(bodyByte)
 
-				ioutil.WriteFile(fmt.Sprintf("TradeKLine_%03d.data", peroid), bodyByte, os.ModeAppend)
+				ioutil.WriteFile(fmt.Sprintf("cache/TradeKLine_%03d.data", peroid), bodyByte, os.ModeAppend)
 			}
 		}
 
@@ -787,7 +787,7 @@ func (w *Huobi) TradeKLinePeroid(peroid int) (ret bool) {
 			logger.Traceln("您需要登录才能继续")
 			return false
 		} else {
-			return w.AnalyzePeroidLine(fmt.Sprintf("TradeKLine_%03d.data", peroid), body)
+			return w.AnalyzePeroidLine(fmt.Sprintf("cache/TradeKLine_%03d.data", peroid), body)
 		}
 
 	} else {
@@ -835,7 +835,7 @@ func (w *Huobi) TradeKLineMinute() (ret bool) {
 			} else {
 				body = string(bodyByte)
 
-				ioutil.WriteFile(fmt.Sprintf("TradeKLine_minute.data"), bodyByte, os.ModeAppend)
+				ioutil.WriteFile(fmt.Sprintf("cache/TradeKLine_minute.data"), bodyByte, os.ModeAppend)
 			}
 		}
 
@@ -846,7 +846,7 @@ func (w *Huobi) TradeKLineMinute() (ret bool) {
 			logger.Traceln("您需要登录才能继续")
 			return false
 		} else {
-			return w.AnalyzeMinuteLine(fmt.Sprintf("TradeKLine_minute.data"), body)
+			return w.AnalyzeMinuteLine(fmt.Sprintf("cache/TradeKLine_minute.data"), body)
 		}
 
 	} else {

@@ -75,7 +75,7 @@ func (w *Huobi) TradeDetailAnalyze(body string) bool {
 
 	logger.Traceln("TradeDetailAnalyze json....")
 	logger.Traceln(body)
-	ioutil.WriteFile("TradeDetailAnalyze.json", []byte(body), os.ModeAppend)
+	ioutil.WriteFile("cache/TradeDetailAnalyze.json", []byte(body), os.ModeAppend)
 	logger.Traceln("---------------------------")
 
 	/*
