@@ -55,7 +55,7 @@ func main() {
 	fmt.Println("[ ---------------------------------------------------------->>> ")
 	fmt.Println(" BTC robot version ", version)
 	fmt.Println(" *BTC操盘手自动化交易引擎*")
-	fmt.Println(" btcbot is a Bitcoin trading bot for HUOBI.com written")
+	fmt.Println(" btcrobot is a Bitcoin trading bot for HUOBI.com written")
 	fmt.Println(" in golang, it features multiple trading methods using")
 	fmt.Println(" technical analysis.")
 	fmt.Println(" ")
@@ -68,7 +68,7 @@ func main() {
 	fmt.Println(" or specified. Please consider testing it first with paper trading /")
 	fmt.Println(" backtesting on historical data. Also understand what how it's working.")
 	fmt.Println("")
-	fmt.Println(" *@author 幻影[btcrobot]")
+	fmt.Println(" *@author [btcrobot Team]")
 	fmt.Println(" *@feedback http://weibo.com/bocaicfa")
 	if AuthLicence() {
 		fmt.Println(" *Licence授权:", Licence["user_email"])
@@ -77,7 +77,7 @@ func main() {
 	}
 
 	fmt.Println(" *@Open http://127.0.0.1:9090 in browser to config the robot")
-	fmt.Println(" *@机器人运行中，更多惊喜请在浏览器中打开 http://127.0.0.1:9090")
+	fmt.Println(" *@机器人运行中，请在浏览器中打开 http://127.0.0.1:9090 配置相关参数")
 	fmt.Println(" *@警告：API key和密码存放在conf/secret.json文件内，共享给他人前请务必删除，注意账号安全！！")
 	fmt.Println(" <<<----------------------------------------------------------] ")
 	SavePid()
