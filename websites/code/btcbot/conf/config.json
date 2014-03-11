@@ -40,7 +40,5 @@
 
 	"stopPoints": "50",
 
-	"backtesting": "false",
-
 	"env": "product"
 }

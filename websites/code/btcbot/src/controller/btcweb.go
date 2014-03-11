@@ -152,11 +152,20 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 			config.Option["disable_trading"] = "0"
 		}
 
+		logger.Debugln("===[", req.FormValue("disable_backtesting"), "]")
+		if req.FormValue("disable_backtesting") == "on" {
+			config.Option["disable_backtesting"] = "1"
+		} else {
+			config.Option["disable_backtesting"] = "0"
+		}
+
 		config.Option["tick_interval"] = req.FormValue("tick_interval")
 		config.Option["shortEMA"] = req.FormValue("shortEMA")
 		config.Option["longEMA"] = req.FormValue("longEMA")
 
 		config.Option["tradeAmount"] = req.FormValue("tradeAmount")
+
+		config.Option["totalHour"] = req.FormValue("totalHour")
 
 		// 更新个人信息
 		err := config.SaveOption()

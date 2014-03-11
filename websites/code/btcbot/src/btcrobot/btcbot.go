@@ -41,7 +41,7 @@ func doTradeDelegation() {
 	logger.Infoln("doTradeDelegation end-----")
 }
 
-func backtesting(done chan bool) {
+func backtesting() {
 	fmt.Println("back testing begin...")
 	huobi := huobiapi.NewHuobi()
 
@@ -54,16 +54,21 @@ func backtesting(done chan bool) {
 			logger.Errorln("TradeKLine failed.")
 		}
 	}
+
+	fmt.Println("生成 1/5/15/30/60分钟及1天 周期的后向测试报告于log/reportxxx.log文件中,请查看")
+
 	fmt.Println("back testing end ...")
-	done <- true
 }
 
 func testKLineAPI(done chan bool) {
-	ticker := time.NewTicker(time.Millisecond * 2000)
+	ticker := time.NewTicker(2000 * time.Millisecond) //2s
 
 	huobi := huobiapi.NewHuobi()
 	huobi.Peroid, _ = strconv.Atoi(Option["tick_interval"])
-
+	totalHour, _ := strconv.ParseInt(Option["totalHour"], 0, 64)
+	if totalHour < 1 {
+		totalHour = 1
+	}
 	slippage, err := strconv.ParseFloat(Config["slippage"], 64)
 	if err != nil {
 		logger.Debugln("config item slippage is not float")
@@ -80,10 +85,15 @@ func testKLineAPI(done chan bool) {
 			}
 		}
 	}()
-	time.Sleep(time.Millisecond * 24 * 60 * 60 * 1000)
+
+	oneHour := 60 * 60 * 1000 * time.Millisecond
+
+	logger.Infof("程序将持续运行%d小时后停止", time.Duration(totalHour))
+
+	time.Sleep(time.Duration(totalHour) * oneHour)
 
 	ticker.Stop()
-	fmt.Println("Ticker stopped")
+	fmt.Println("程序到达设定时长%d小时，停止运行。", time.Duration(totalHour))
 	done <- true
 }
 
@@ -114,16 +124,13 @@ func TestTradeAPI() {
 func tradeService() {
 
 	done := make(chan bool, 1)
-	fmt.Println("working...")
 
-	if Config["backtesting"] == "true" {
-		go backtesting(done)
-		<-done
-	} else {
-		fmt.Println("trade monitor...")
-		go testKLineAPI(done)
-		<-done
-	}
+	fmt.Println("robot working...")
+
+	backtesting()
+
+	go testKLineAPI(done)
+	<-done
 
 	fmt.Println("done")
 
