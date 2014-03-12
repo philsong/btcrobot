@@ -44,6 +44,7 @@ func doTradeDelegation() {
 func backtesting() {
 	fmt.Println("back testing begin...")
 	huobi := huobiapi.NewHuobi()
+	huobi.Disable_trading = 1
 
 	peroids := []int{1, 5, 15, 30, 60, 100}
 	for _, v := range peroids {
@@ -75,6 +76,8 @@ func testKLineAPI(done chan bool) {
 		slippage = 0
 	}
 	huobi.Slippage = slippage
+
+	huobi.Disable_trading = 0
 
 	go func() {
 		for _ = range ticker.C {

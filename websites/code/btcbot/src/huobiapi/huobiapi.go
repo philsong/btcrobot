@@ -61,6 +61,8 @@ type Huobi struct {
 
 	lastAction string
 
+	Disable_trading int
+
 	Peroid   int
 	Slippage float64
 	xData    []string

@@ -125,7 +125,7 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 				logger.Infoln("EMA has switched, 探测到买入点", w.getTradePrice(""))
 				go service.TriggerTrender("EMA has switched, 探测到买入点")
 
-				if Option["disable_trading"] != "1" {
+				if Option["disable_trading"] != "1" && w.Disable_trading != 1 {
 					w.Do_buy(w.getTradePrice("buy"), tradeAmount)
 				}
 
@@ -142,7 +142,7 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 				w.latestMACDTrend = -1
 				logger.Infoln("EMA has switched, 探测到卖出点", w.getTradePrice(""))
 				go service.TriggerTrender("EMA has switched, 探测到卖出点")
-				if Option["disable_trading"] != "1" {
+				if Option["disable_trading"] != "1" && w.Disable_trading != 1 {
 					ret := w.Do_sell(w.getTradePrice("sell"), tradeAmount)
 					if ret == false {
 						w.Do_sell(w.getTradePrice("sell"), MACDtradeAmount)
