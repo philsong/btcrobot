@@ -28,26 +28,26 @@ import (
 )
 
 //for backup the kline file to detect the huobi bug
-func (w *Huobi) backup(xData string) {
+func (w *Huobi) backup(Time string) {
 
 	oldFile := "cache/TradeKLine_minute.data"
-	newFile := fmt.Sprintf("%s_%s", oldFile, xData)
+	newFile := fmt.Sprintf("%s_%s", oldFile, Time)
 	os.Rename(oldFile, newFile)
 }
 
-func (w *Huobi) checkException(yPrevData, yData, Volumn float64) bool {
-	if yData > yPrevData+10 && Volumn < 1 {
+func (w *Huobi) checkException(yPrevPrice, Price, Volumn float64) bool {
+	if Price > yPrevPrice+10 && Volumn < 1 {
 		return false
 	}
 
-	if yData < yPrevData-10 && Volumn < 1 {
+	if Price < yPrevPrice-10 && Volumn < 1 {
 		return false
 	}
 
 	return true
 }
-func (w *Huobi) doEMA(xData []string, yData []float64, Volumn []float64) {
-	if len(yData) == 0 {
+func (w *Huobi) doEMA(Time []string, Price []float64, Volumn []float64) {
+	if len(Price) == 0 {
 		logger.Errorln("no data is prepared!")
 		return
 	}
@@ -85,11 +85,11 @@ func (w *Huobi) doEMA(xData []string, yData []float64, Volumn []float64) {
 	MACDtradeAmount := fmt.Sprintf("%0.02f", f_tradeAmount/2.0)
 
 	//compute the indictor
-	emaShort := EMA(yData, shortEMA)
-	emaLong := EMA(yData, longEMA)
+	emaShort := EMA(Price, shortEMA)
+	emaLong := EMA(Price, longEMA)
 	EMAdif := getEMAdif(emaShort, emaLong)
 
-	length := len(yData)
+	length := len(Price)
 
 	//check indictor using history data, loop through data, get history samples
 	logger.OverrideStart(w.Peroid)
@@ -100,6 +100,12 @@ func (w *Huobi) doEMA(xData []string, yData []float64, Volumn []float64) {
 	var entryPrice float64
 	var totaltimes int
 
+	if w.Disable_trading != 1 {
+		if Config["env"] == "dev" {
+			logger.Infoln(Time[length-1], Price[length-1], Volumn[length-1])
+		}
+	}
+
 	//EMA cross
 	for i := 1; i < length; i++ {
 		if EMAdif[i-1] < 0 && EMAdif[i] > 0 { //up cross
@@ -108,13 +114,13 @@ func (w *Huobi) doEMA(xData []string, yData []float64, Volumn []float64) {
 			logger.Overrideln(totaltimes)
 
 			if times == 0 {
-				entryPrice = yData[i]
+				entryPrice = Price[i]
 			}
 			times++
-			profit -= yData[i]
-			lastTrade = yData[i]
+			profit -= Price[i]
+			lastTrade = Price[i]
 
-			w.lastBuyprice = yData[i]
+			w.lastBuyprice = Price[i]
 
 			var samplesBegin int
 			if i > longEMA {
@@ -122,18 +128,18 @@ func (w *Huobi) doEMA(xData []string, yData []float64, Volumn []float64) {
 			} else {
 				samplesBegin = 0
 			}
-			periodArr := yData[samplesBegin:i]
+			periodArr := Price[samplesBegin:i]
 
 			w.lastLowestprice = arrayLowest(periodArr)
 
 			if EMAdif[i] >= EMAMinThreshold {
-				logger.Overrideln("++ buyIn", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]), w.lastLowestprice, 2*w.lastBuyprice-w.lastLowestprice)
+				logger.Overrideln("++ buyIn", i, Time[i], Price[i], fmt.Sprintf("%0.04f", EMAdif[i]), w.lastLowestprice, 2*w.lastBuyprice-w.lastLowestprice)
 			} else {
-				logger.Overrideln(" + buyIn", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]), w.lastLowestprice, 2*w.lastBuyprice-w.lastLowestprice)
+				logger.Overrideln(" + buyIn", i, Time[i], Price[i], fmt.Sprintf("%0.04f", EMAdif[i]), w.lastLowestprice, 2*w.lastBuyprice-w.lastLowestprice)
 			}
 
-			if w.checkException(yData[i-1], yData[i], Volumn[i]) == false {
-				logger.Infoln("detect exception data in huobi.com", yData[i-1], yData[i], Volumn[i])
+			if w.checkException(Price[i-1], Price[i], Volumn[i]) == false {
+				logger.Infoln("detect exception data in huobi.com", Price[i-1], Price[i], Volumn[i])
 				continue
 			}
 			if i == length-1 && w.latestMACDTrend != 1 {
@@ -145,18 +151,18 @@ func (w *Huobi) doEMA(xData []string, yData []float64, Volumn []float64) {
 					w.Do_buy(w.getTradePrice("buy"), tradeAmount)
 				}
 
-				w.backup(xData[i])
+				w.backup(Time[i])
 			}
 		} else if (w.lastAction != "sellOut" || w.lastAction != "stop") && EMAdif[i-1] > 0 && EMAdif[i] < 0 { //down cross
 			w.lastAction = "sellOut"
 			if EMAdif[i] <= -EMAMinThreshold {
-				logger.Overrideln("-- sellOut", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]))
+				logger.Overrideln("-- sellOut", i, Time[i], Price[i], fmt.Sprintf("%0.04f", EMAdif[i]))
 			} else {
-				logger.Overrideln(" - sellOut", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]))
+				logger.Overrideln(" - sellOut", i, Time[i], Price[i], fmt.Sprintf("%0.04f", EMAdif[i]))
 			}
 
-			if w.checkException(yData[i-1], yData[i], Volumn[i]) == false {
-				logger.Infoln("detect exception data in huobi.com", yData[i-1], yData[i], Volumn[i])
+			if w.checkException(Price[i-1], Price[i], Volumn[i]) == false {
+				logger.Infoln("detect exception data in huobi.com", Price[i-1], Price[i], Volumn[i])
 				continue
 			}
 
@@ -171,20 +177,20 @@ func (w *Huobi) doEMA(xData []string, yData []float64, Volumn []float64) {
 					}
 				}
 
-				w.backup(xData[i])
+				w.backup(Time[i])
 			}
 
 			if times != 0 {
 				times++
-				profit += yData[i]
-				lastTrade = yData[i]
+				profit += Price[i]
+				lastTrade = Price[i]
 				if times != 0 && times%2 == 0 {
-					logger.Overridef("profit=%0.02f, rate=%0.02f%%\n", yData[i]-w.lastBuyprice, 100*(yData[i]-w.lastBuyprice)/w.lastBuyprice)
+					logger.Overridef("profit=%0.02f, rate=%0.02f%%\n", Price[i]-w.lastBuyprice, 100*(Price[i]-w.lastBuyprice)/w.lastBuyprice)
 				}
 			}
-		} /* else if (w.lastAction != "exit" || w.lastAction != "stop") && yData[i] < emaMiddle[i]-stopPoints { //stop
+		} /* else if (w.lastAction != "exit" || w.lastAction != "stop") && Price[i] < emaMiddle[i]-stopPoints { //stop
 			w.lastAction = "stop"
-			logger.Overrideln("-- stop", i, xData[i], yData[i], fmt.Sprintf("%0.04f", emaMiddle[i]))
+			logger.Overrideln("-- stop", i, Time[i], Price[i], fmt.Sprintf("%0.04f", emaMiddle[i]))
 			if i == length-1 && w.latestMACDTrend != -1 {
 				logger.Infoln("保守止损位", w.getTradePrice(""))
 				go service.TriggerTrender("保守止损位")
@@ -197,10 +203,10 @@ func (w *Huobi) doEMA(xData []string, yData []float64, Volumn []float64) {
 
 			if times != 0 {
 				times++
-				profit += yData[i]
-				lastTrade = yData[i]
+				profit += Price[i]
+				lastTrade = Price[i]
 				if times != 0 && times%2 == 0 {
-					logger.Overridef("profit=%0.02f, rate=%0.02f%%\n", yData[i]-w.lastBuyprice, 100*(yData[i]-w.lastBuyprice)/w.lastBuyprice)
+					logger.Overridef("profit=%0.02f, rate=%0.02f%%\n", Price[i]-w.lastBuyprice, 100*(Price[i]-w.lastBuyprice)/w.lastBuyprice)
 				}
 			}
 		}*/
@@ -253,12 +259,12 @@ func getEMAdif(emaShort, emaLong []float64) []float64 {
  * Formula: EMA = Price(t) * k + EMA(y) * (1 - k)
  * t = today y = yesterday N = number of days in EMA k = 2/(2N+1)
  *
- * @param yData : array of y variables.
- * @param xData : array of x variables.
+ * @param Price : array of y variables.
+ * @param Time : array of x variables.
  * @param periods : The amount of "days" to average from.
  * @return an array containing the EMA.
 **/
-func EMA(yData []float64, periods int) []float64 {
+func EMA(Price []float64, periods int) []float64 {
 
 	var t float64
 	y := 0.0
@@ -269,12 +275,12 @@ func EMA(yData []float64, periods int) []float64 {
 
 	var periodArr []float64
 	var startpos int
-	length := len(yData)
+	length := len(Price)
 	var emLine []float64 = make([]float64, length)
 
 	// loop through data
 	for i := 0; i < length; i++ {
-		if yData[i] != 0 {
+		if Price[i] != 0 {
 			startpos = i + 1
 			break
 		} else {
@@ -283,7 +289,7 @@ func EMA(yData []float64, periods int) []float64 {
 	}
 
 	for i := startpos; i < length; i++ {
-		periodArr = append(periodArr, yData[i])
+		periodArr = append(periodArr, Price[i])
 
 		// 0: runs if the periodArr has enough points.
 		// 1: set currentvalue (today).
@@ -291,7 +297,7 @@ func EMA(yData []float64, periods int) []float64 {
 		// 3: calculate todays ema.
 		if periods == len(periodArr) {
 
-			t = yData[i]
+			t = Price[i]
 
 			if y == 0 {
 				y = arrayAvg(periodArr)

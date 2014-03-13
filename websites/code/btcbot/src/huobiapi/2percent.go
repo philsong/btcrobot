@@ -22,33 +22,33 @@ import (
 	"logger"
 )
 
-func (w *Huobi) do2Percent(xData []string, yData []float64) {
-	lowpoint := yData[0]
-	highpoint := yData[0]
+func (w *Huobi) do2Percent(Time []string, Price []float64) {
+	lowpoint := Price[0]
+	highpoint := Price[0]
 	lastTrade := "init"
 
 	factor := 0.001
 	logger.OverrideStart(w.Peroid)
 	logger.Overrideln("start")
-	for i := 0; i < len(yData); i++ {
-		//logger.Overrideln("", i, lastTrade, xData[i], yData[i])
-		if lastTrade != "buy" && yData[i]-lowpoint > 0 && yData[i]-lowpoint > factor*lowpoint {
-			logger.Overrideln("++", i, xData[i], yData[i], lowpoint, highpoint, yData[i]-lowpoint, factor*lowpoint)
+	for i := 0; i < len(Price); i++ {
+		//logger.Overrideln("", i, lastTrade, Time[i], Price[i])
+		if lastTrade != "buy" && Price[i]-lowpoint > 0 && Price[i]-lowpoint > factor*lowpoint {
+			logger.Overrideln("++", i, Time[i], Price[i], lowpoint, highpoint, Price[i]-lowpoint, factor*lowpoint)
 
-			highpoint = yData[i]
-			lowpoint = yData[i]
+			highpoint = Price[i]
+			lowpoint = Price[i]
 			lastTrade = "buy"
-		} else if lastTrade != "sell" && yData[i]-highpoint < 0 && yData[i]-highpoint < -factor*highpoint {
-			logger.Overrideln("--", i, xData[i], yData[i], lowpoint, highpoint, yData[i]-highpoint, -factor*highpoint)
+		} else if lastTrade != "sell" && Price[i]-highpoint < 0 && Price[i]-highpoint < -factor*highpoint {
+			logger.Overrideln("--", i, Time[i], Price[i], lowpoint, highpoint, Price[i]-highpoint, -factor*highpoint)
 
-			highpoint = yData[i]
-			lowpoint = yData[i]
+			highpoint = Price[i]
+			lowpoint = Price[i]
 			lastTrade = "sell"
 		} else {
-			if highpoint < yData[i] {
-				highpoint = yData[i]
-			} else if lowpoint > yData[i] {
-				lowpoint = yData[i]
+			if highpoint < Price[i] {
+				highpoint = Price[i]
+			} else if lowpoint > Price[i] {
+				lowpoint = Price[i]
 			}
 		}
 	}

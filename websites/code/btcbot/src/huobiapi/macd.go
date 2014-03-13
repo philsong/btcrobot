@@ -73,8 +73,8 @@ func getMACDHistogram(MACDdif, MACDSignal []float64) []float64 {
 	return MACDHistogram
 }
 
-func (w *Huobi) doMACD(xData []string, yData []float64) {
-	if len(yData) == 0 {
+func (w *Huobi) doMACD(Time []string, Price []float64) {
+	if len(Price) == 0 {
 		return
 	}
 	//read config
@@ -92,14 +92,14 @@ func (w *Huobi) doMACD(xData []string, yData []float64) {
 	tradeAmount := Config["MACDtradeAmount"]
 
 	//compute the indictor
-	emaShort := EMA(yData, shortEMA)
-	emaMiddle := EMA(yData, middleEMA)
-	emaLong := EMA(yData, longEMA)
+	emaShort := EMA(Price, shortEMA)
+	emaMiddle := EMA(Price, middleEMA)
+	emaLong := EMA(Price, longEMA)
 	MACDdif := getMACDdif(emaShort, emaLong)
 	MACDSignal := getMACDSignal(MACDdif, signalPeriod)
 	MACDHistogram := getMACDHistogram(MACDdif, MACDSignal)
 
-	length := len(yData)
+	length := len(Price)
 
 	logger.OverrideStart(w.Peroid)
 
@@ -107,10 +107,10 @@ func (w *Huobi) doMACD(xData []string, yData []float64) {
 	//macd cross
 	for i := 1; i < length; i++ {
 		if MACDHistogram[i-1] < 0 && MACDHistogram[i] > 0 {
-			if MACDHistogram[i]-MACDHistogram[i-1] >= 0 && yData[i] > emaMiddle[i] {
-				logger.Overrideln("++", i, xData[i], yData[i], fmt.Sprintf("%0.02f", MACDSignal[i]))
+			if MACDHistogram[i]-MACDHistogram[i-1] >= 0 && Price[i] > emaMiddle[i] {
+				logger.Overrideln("++", i, Time[i], Price[i], fmt.Sprintf("%0.02f", MACDSignal[i]))
 			} else {
-				logger.Overrideln(" +", i, xData[i], yData[i], fmt.Sprintf("%0.02f", MACDSignal[i]))
+				logger.Overrideln(" +", i, Time[i], Price[i], fmt.Sprintf("%0.02f", MACDSignal[i]))
 			}
 			if i == length-1 && w.latestMACDTrend != 1 && MACDSignal[i] < -MACDMinThreshold {
 				w.latestMACDTrend = 1
@@ -120,10 +120,10 @@ func (w *Huobi) doMACD(xData []string, yData []float64) {
 				w.Do_buy(w.getTradePrice("buy"), tradeAmount)
 			}
 		} else if MACDHistogram[i-1] > 0 && MACDHistogram[i] < 0 {
-			if MACDHistogram[i]-MACDHistogram[i-1] <= 0 && yData[i] < emaMiddle[i] {
-				logger.Overrideln("--", i, xData[i], yData[i], fmt.Sprintf("%0.02f", MACDSignal[i]))
+			if MACDHistogram[i]-MACDHistogram[i-1] <= 0 && Price[i] < emaMiddle[i] {
+				logger.Overrideln("--", i, Time[i], Price[i], fmt.Sprintf("%0.02f", MACDSignal[i]))
 			} else {
-				logger.Overrideln(" -", i, xData[i], yData[i], fmt.Sprintf("%0.02f", MACDSignal[i]))
+				logger.Overrideln(" -", i, Time[i], Price[i], fmt.Sprintf("%0.02f", MACDSignal[i]))
 			}
 			if i == length-1 && w.latestMACDTrend != -1 && MACDSignal[i] > MACDMinThreshold {
 				w.latestMACDTrend = -1

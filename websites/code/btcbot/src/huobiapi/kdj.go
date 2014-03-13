@@ -90,15 +90,15 @@ func kd(records []PeroidRecord, periods int) ([]float64, []float64) {
 	return k, d
 }
 
-func Highest(yData []float64, periods int) []float64 {
+func Highest(Price []float64, periods int) []float64 {
 	var periodArr []float64
-	length := len(yData)
+	length := len(Price)
 	var HighestLine []float64 = make([]float64, length)
 
 	// Loop through the entire array.
 	for i := 0; i < length; i++ {
 		// add points to the array.
-		periodArr = append(periodArr, yData[i])
+		periodArr = append(periodArr, Price[i])
 		// 1: Check if array is "filled" else create null point in line.
 		// 2: Calculate average.
 		// 3: Remove first value.
@@ -115,15 +115,15 @@ func Highest(yData []float64, periods int) []float64 {
 	return HighestLine
 }
 
-func Lowest(yData []float64, periods int) []float64 {
+func Lowest(Price []float64, periods int) []float64 {
 	var periodArr []float64
-	length := len(yData)
+	length := len(Price)
 	var LowestLine []float64 = make([]float64, length)
 
 	// Loop through the entire array.
 	for i := 0; i < length; i++ {
 		// add points to the array.
-		periodArr = append(periodArr, yData[i])
+		periodArr = append(periodArr, Price[i])
 		// 1: Check if array is "filled" else create null point in line.
 		// 2: Calculate average.
 		// 3: Remove first value.
@@ -141,19 +141,19 @@ func Lowest(yData []float64, periods int) []float64 {
 }
 
 /* Function based on the idea of a simple moving average.
- * @param yData : array of y variables.
+ * @param Price : array of y variables.
  * @param periods : The amount of "days" to average from.
  * @return an array containing the SMA.
 **/
-func SMA(yData []float64, periods int) []float64 {
+func SMA(Price []float64, periods int) []float64 {
 	var periodArr []float64
-	length := len(yData)
+	length := len(Price)
 	var smLine []float64 = make([]float64, length)
 
 	// Loop through the entire array.
 	for i := 0; i < length; i++ {
 		// add points to the array.
-		periodArr = append(periodArr, yData[i])
+		periodArr = append(periodArr, Price[i])
 
 		// 1: Check if array is "filled" else create null point in line.
 		// 2: Calculate average.
@@ -171,28 +171,28 @@ func SMA(yData []float64, periods int) []float64 {
 	return smLine
 }
 
-func arrayLowest(yData []float64) float64 {
-	length := len(yData)
-	var lowest = yData[0]
+func arrayLowest(Price []float64) float64 {
+	length := len(Price)
+	var lowest = Price[0]
 
 	// Loop through the entire array.
 	for i := 1; i < length; i++ {
-		if yData[i] < lowest {
-			lowest = yData[i]
+		if Price[i] < lowest {
+			lowest = Price[i]
 		}
 	}
 
 	return lowest
 }
 
-func arrayHighest(yData []float64) float64 {
-	length := len(yData)
-	var highest = yData[0]
+func arrayHighest(Price []float64) float64 {
+	length := len(Price)
+	var highest = Price[0]
 
 	// Loop through the entire array.
 	for i := 1; i < length; i++ {
-		if yData[i] > highest {
-			highest = yData[i]
+		if Price[i] > highest {
+			highest = Price[i]
 		}
 	}
 

@@ -33,14 +33,14 @@ func getROC(closeToday, closeNDaysAgo float64) float64 {
 	return roc
 }
 
-func getUD(yData []float64) ([]float64, []float64) {
-	length := len(yData)
+func getUD(Price []float64) ([]float64, []float64) {
+	length := len(Price)
 	var u []float64 = make([]float64, length)
 	var d []float64 = make([]float64, length)
 
 	// Loop through the entire array.
 	for i := 1; i < length; i++ {
-		diff := yData[i] - yData[i-1]
+		diff := Price[i] - Price[i-1]
 		if diff > 0 {
 			u[i] = diff
 			d[i] = 0
@@ -53,15 +53,15 @@ func getUD(yData []float64) ([]float64, []float64) {
 	return u, d
 }
 
-func getRSI(yData []float64, periods int) []float64 {
+func getRSI(Price []float64, periods int) []float64 {
 	var periodArr []float64
-	length := len(yData)
+	length := len(Price)
 	var rsi []float64 = make([]float64, length)
 
 	// Loop through the entire array.
 	for i := 0; i < length; i++ {
 		// add points to the array.
-		periodArr = append(periodArr, yData[i])
+		periodArr = append(periodArr, Price[i])
 
 		// 1: Check if array is "filled" else create null point in line.
 		// 2: Calculate average.
@@ -82,9 +82,9 @@ func getRSI(yData []float64, periods int) []float64 {
 	return rsi
 }
 
-func rsi(yData []float64) {
-	rsShort := getRSI(yData, 6)
-	rsLong := getRSI(yData, 12)
+func rsi(Price []float64) {
+	rsShort := getRSI(Price, 6)
+	rsLong := getRSI(Price, 12)
 
 	length := len(rsShort)
 

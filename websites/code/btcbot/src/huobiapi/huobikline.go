@@ -55,23 +55,23 @@ func (w *Huobi) AnalyzePeroidLine(filename string, content string) bool {
 	//logger.Infoln(filename)
 	PeroidRecords := ParsePeroidCSV(filename)
 
-	var xData []string
-	var yData []float64
+	var Time []string
+	var Price []float64
 	var Volumn []float64
 	for _, v := range PeroidRecords {
-		xData = append(xData, v.Date+" "+v.Time)
-		yData = append(yData, v.Close)
+		Time = append(Time, v.Date+" "+v.Time)
+		Price = append(Price, v.Close)
 		Volumn = append(Volumn, v.Volumn)
-		//yData = append(yData, (v.Close+v.Open+v.High+v.Low)/4.0)
-		//yData = append(yData, v.Low)
+		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
+		//Price = append(Price, v.Low)
 	}
-	w.xData = xData
-	w.yData = yData
+	w.Time = Time
+	w.Price = Price
 	w.Volumn = Volumn
 
-	//rsi(yData)
+	//rsi(Price)
 	if Config["env"] == "test" {
-		w.do2Percent(xData, yData)
+		w.do2Percent(Time, Price)
 		return true
 
 		k, d, j := doKDJ(PeroidRecords)
@@ -81,7 +81,7 @@ func (w *Huobi) AnalyzePeroidLine(filename string, content string) bool {
 			logger.Infof("[%s-%s]%d/%d/%d\n", PeroidRecords[i].Date, PeroidRecords[i].Time, int(k[i]), int(d[i]), int(j[i]))
 		}
 	} else {
-		w.doEMA(xData, yData, Volumn)
+		w.doEMA(Time, Price, Volumn)
 		return true
 	}
 
@@ -92,40 +92,40 @@ func (w *Huobi) AnalyzeMinuteLine(filename string, content string) bool {
 	//logger.Infoln(content)
 	logger.Debugln(filename)
 	MinuteRecords := ParseMinuteCSV(filename)
-	var xData []string
-	var yData []float64
+	var Time []string
+	var Price []float64
 	var Volumn []float64
 	for _, v := range MinuteRecords {
-		xData = append(xData, v.Time)
-		yData = append(yData, v.Price)
+		Time = append(Time, v.Time)
+		Price = append(Price, v.Price)
 		Volumn = append(Volumn, v.Volumn)
 	}
 
-	w.xData = xData
-	w.yData = yData
+	w.Time = Time
+	w.Price = Price
 	w.Volumn = Volumn
 
 	if Config["env"] == "test" {
-		w.do2Percent(xData, yData)
+		w.do2Percent(Time, Price)
 		return true
 	} else {
-		w.doEMA(xData, yData, Volumn)
+		w.doEMA(Time, Price, Volumn)
 		return true
 	}
 }
 
 func (w *Huobi) getTradePrice(tradeDirection string) string {
-	if len(w.yData) == 0 {
+	if len(w.Price) == 0 {
 		logger.Errorln("get price failed, array len=0")
 		return "false"
 	}
 	var finalTradePrice float64
 	if tradeDirection == "buy" {
-		finalTradePrice = w.yData[len(w.yData)-1] + w.Slippage
+		finalTradePrice = w.Price[len(w.Price)-1] + w.Slippage
 	} else if tradeDirection == "sell" {
-		finalTradePrice = w.yData[len(w.yData)-1] - w.Slippage
+		finalTradePrice = w.Price[len(w.Price)-1] - w.Slippage
 	} else {
-		finalTradePrice = w.yData[len(w.yData)-1]
+		finalTradePrice = w.Price[len(w.Price)-1]
 	}
 	return fmt.Sprintf("%0.02f", finalTradePrice)
 }

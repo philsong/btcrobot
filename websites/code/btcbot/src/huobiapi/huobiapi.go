@@ -65,8 +65,8 @@ type Huobi struct {
 
 	Peroid   int
 	Slippage float64
-	xData    []string
-	yData    []float64
+	Time     []string
+	Price    []float64
 	Volumn   []float64
 }
 
