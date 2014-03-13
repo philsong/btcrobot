@@ -67,6 +67,7 @@ type Huobi struct {
 	Slippage float64
 	xData    []string
 	yData    []float64
+	Volumn   []float64
 }
 
 func NewHuobi() *Huobi {

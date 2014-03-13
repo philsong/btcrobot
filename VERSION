@@ -40,6 +40,8 @@
  *@time 2014-03-01 add the web UI to config option
  *@Version 0.20
  *@time 2014-03-13 add backtesting and fix crash bug
+ *@Version 0.21
+ *@time 2014-03-13 解决规避火币网K线数据一阳指的问题
  *
  *
  *@go语言(模拟登陆huobi.com平台)+(官方API)实现自动化套利

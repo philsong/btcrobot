@@ -35,7 +35,18 @@ func (w *Huobi) backup(xData string) {
 	os.Rename(oldFile, newFile)
 }
 
-func (w *Huobi) doEMA(xData []string, yData []float64) {
+func (w *Huobi) checkException(yPrevData, yData, Volumn float64) bool {
+	if yData > yPrevData+10 && Volumn < 1 {
+		return false
+	}
+
+	if yData < yPrevData-10 && Volumn < 1 {
+		return false
+	}
+
+	return true
+}
+func (w *Huobi) doEMA(xData []string, yData []float64, Volumn []float64) {
 	if len(yData) == 0 {
 		logger.Errorln("no data is prepared!")
 		return
@@ -91,8 +102,8 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 
 	//EMA cross
 	for i := 1; i < length; i++ {
-		if EMAdif[i-1] < 0 && EMAdif[i] > 0 { //enter
-			w.lastAction = "enter"
+		if EMAdif[i-1] < 0 && EMAdif[i] > 0 { //up cross
+			w.lastAction = "buyIn"
 			totaltimes++
 			logger.Overrideln(totaltimes)
 
@@ -116,14 +127,19 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 			w.lastLowestprice = arrayLowest(periodArr)
 
 			if EMAdif[i] >= EMAMinThreshold {
-				logger.Overrideln("++enter", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]), w.lastLowestprice, 2*w.lastBuyprice-w.lastLowestprice)
+				logger.Overrideln("++ buyIn", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]), w.lastLowestprice, 2*w.lastBuyprice-w.lastLowestprice)
 			} else {
-				logger.Overrideln(" +enter", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]), w.lastLowestprice, 2*w.lastBuyprice-w.lastLowestprice)
+				logger.Overrideln(" + buyIn", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]), w.lastLowestprice, 2*w.lastBuyprice-w.lastLowestprice)
+			}
+
+			if w.checkException(yData[i-1], yData[i], Volumn[i]) == false {
+				logger.Infoln("detect exception data in huobi.com", yData[i-1], yData[i], Volumn[i])
+				continue
 			}
 			if i == length-1 && w.latestMACDTrend != 1 {
 				w.latestMACDTrend = 1
-				logger.Infoln("EMA has switched, 探测到买入点", w.getTradePrice(""))
-				go service.TriggerTrender("EMA has switched, 探测到买入点")
+				logger.Infoln("EMA up cross, 买入buyIn", w.getTradePrice(""))
+				go service.TriggerTrender("EMA up cross, 买入buyIn")
 
 				if Option["disable_trading"] != "1" && w.Disable_trading != 1 {
 					w.Do_buy(w.getTradePrice("buy"), tradeAmount)
@@ -131,17 +147,23 @@ func (w *Huobi) doEMA(xData []string, yData []float64) {
 
 				w.backup(xData[i])
 			}
-		} else if (w.lastAction != "exit" || w.lastAction != "stop") && EMAdif[i-1] > 0 && EMAdif[i] < 0 { //exit
-			w.lastAction = "exit"
+		} else if (w.lastAction != "sellOut" || w.lastAction != "stop") && EMAdif[i-1] > 0 && EMAdif[i] < 0 { //down cross
+			w.lastAction = "sellOut"
 			if EMAdif[i] <= -EMAMinThreshold {
-				logger.Overrideln("-- exit", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]))
+				logger.Overrideln("-- sellOut", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]))
 			} else {
-				logger.Overrideln(" - exit", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]))
+				logger.Overrideln(" - sellOut", i, xData[i], yData[i], fmt.Sprintf("%0.04f", EMAdif[i]))
 			}
+
+			if w.checkException(yData[i-1], yData[i], Volumn[i]) == false {
+				logger.Infoln("detect exception data in huobi.com", yData[i-1], yData[i], Volumn[i])
+				continue
+			}
+
 			if i == length-1 && w.latestMACDTrend != -1 {
 				w.latestMACDTrend = -1
-				logger.Infoln("EMA has switched, 探测到卖出点", w.getTradePrice(""))
-				go service.TriggerTrender("EMA has switched, 探测到卖出点")
+				logger.Infoln("EMA down cross, 卖出sellOut", w.getTradePrice(""))
+				go service.TriggerTrender("EMA down cross, 卖出sellOut")
 				if Option["disable_trading"] != "1" && w.Disable_trading != 1 {
 					ret := w.Do_sell(w.getTradePrice("sell"), tradeAmount)
 					if ret == false {

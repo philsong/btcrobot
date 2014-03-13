@@ -57,14 +57,18 @@ func (w *Huobi) AnalyzePeroidLine(filename string, content string) bool {
 
 	var xData []string
 	var yData []float64
+	var Volumn []float64
 	for _, v := range PeroidRecords {
 		xData = append(xData, v.Date+" "+v.Time)
 		yData = append(yData, v.Close)
+		Volumn = append(Volumn, v.Volumn)
 		//yData = append(yData, (v.Close+v.Open+v.High+v.Low)/4.0)
 		//yData = append(yData, v.Low)
 	}
 	w.xData = xData
 	w.yData = yData
+	w.Volumn = Volumn
+
 	//rsi(yData)
 	if Config["env"] == "test" {
 		w.do2Percent(xData, yData)
@@ -77,7 +81,7 @@ func (w *Huobi) AnalyzePeroidLine(filename string, content string) bool {
 			logger.Infof("[%s-%s]%d/%d/%d\n", PeroidRecords[i].Date, PeroidRecords[i].Time, int(k[i]), int(d[i]), int(j[i]))
 		}
 	} else {
-		w.doEMA(xData, yData)
+		w.doEMA(xData, yData, Volumn)
 		return true
 	}
 
@@ -90,27 +94,22 @@ func (w *Huobi) AnalyzeMinuteLine(filename string, content string) bool {
 	MinuteRecords := ParseMinuteCSV(filename)
 	var xData []string
 	var yData []float64
+	var Volumn []float64
 	for _, v := range MinuteRecords {
 		xData = append(xData, v.Time)
 		yData = append(yData, v.Price)
-	}
-
-	if Config["env"] == "test" {
-		price, ret := w.getNewPrice()
-		if ret == false {
-			return false
-		}
-		xData = append(xData, "now")
-		yData = append(yData, price)
+		Volumn = append(Volumn, v.Volumn)
 	}
 
 	w.xData = xData
 	w.yData = yData
+	w.Volumn = Volumn
+
 	if Config["env"] == "test" {
 		w.do2Percent(xData, yData)
 		return true
 	} else {
-		w.doEMA(xData, yData)
+		w.doEMA(xData, yData, Volumn)
 		return true
 	}
 }
