@@ -36,34 +36,6 @@ func WelcomeHandler(rw http.ResponseWriter, req *http.Request) {
 	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/indictor.html")
 }
 
-func LicenceHandler(rw http.ResponseWriter, req *http.Request) {
-	if req.Method != "POST" {
-		// 获取用户信息
-		err := config.LoadLicence()
-		if err != nil {
-			logger.Errorln(err)
-			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "读取Licence配置数据失败", `"}`)
-			return
-		}
-		// 设置模板数据
-		filter.SetData(req, map[string]interface{}{"config": config.Licence})
-		req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/licence.html")
-		return
-	} else {
-		config.Licence["user_email"] = req.FormValue("user_email")
-		config.Licence["licence"] = req.FormValue("licence")
-
-		// 更新个人信息
-		err := config.SaveLicence()
-		if err != nil {
-			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "写入Licence配置数据失败", `"}`)
-			return
-		}
-
-		fmt.Fprint(rw, `{"errno": 0, "msg":"更新Licence配置成功!"}`)
-	}
-}
-
 func TradeHandler(rw http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 

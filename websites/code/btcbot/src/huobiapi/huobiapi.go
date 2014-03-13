@@ -85,6 +85,7 @@ func (w *Huobi) Login() bool {
 	req, err := http.NewRequest("POST", login_url, strings.NewReader(post_arg.Encode()))
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -100,6 +101,7 @@ func (w *Huobi) Login() bool {
 	resp, err := w.client.Do(req)
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 	defer resp.Body.Close()
 	logger.Tracef("Login resp StatusCode=%v", resp.StatusCode)
@@ -159,6 +161,7 @@ func (w *Huobi) TradeAdd(a, price, amount string) bool {
 	req, err := http.NewRequest("POST", Config["trade_add_url"], strings.NewReader(post_arg.Encode()))
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -172,6 +175,7 @@ func (w *Huobi) TradeAdd(a, price, amount string) bool {
 	resp, err := w.client.Do(req)
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 	defer resp.Body.Close()
 
@@ -315,6 +319,7 @@ func (w *Huobi) TradeUpdate(id, price, amount string) bool {
 	req, err := http.NewRequest("POST", Config["trade_update_url"], strings.NewReader(post_arg.Encode()))
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -361,6 +366,7 @@ func (w *Huobi) TradeUpdate(id, price, amount string) bool {
 				logger.Traceln(err)
 			} else if err != nil {
 				logger.Fatal(err)
+				return false
 			}
 
 			logger.Traceln(m)
@@ -399,6 +405,7 @@ func (w *Huobi) QueryMyTradeInfo() bool {
 	req, err := http.NewRequest("GET", fmt.Sprintf(Config["my_trade_info"], rand.Float64()), nil)
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -412,6 +419,7 @@ func (w *Huobi) QueryMyTradeInfo() bool {
 	resp, err := w.client.Do(req)
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 	defer resp.Body.Close()
 
@@ -545,6 +553,7 @@ func (w *Huobi) TradeDelegation() bool {
 	req, err := http.NewRequest("GET", Config["trade_delegation"], nil)
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -558,6 +567,7 @@ func (w *Huobi) TradeDelegation() bool {
 	resp, err := w.client.Do(req)
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 	defer resp.Body.Close()
 
@@ -713,6 +723,7 @@ func (w *Huobi) TradeDetail() (ret bool) {
 				logger.Traceln(err)
 			} else if err != nil {
 				logger.Fatal(err)
+				return false
 			}
 			logger.Traceln(m)
 
@@ -744,6 +755,7 @@ func (w *Huobi) TradeKLinePeroid(peroid int) (ret bool) {
 	req, err := http.NewRequest("GET", fmt.Sprintf(Config["trade_kline_url"], peroid, rand.Float64()), nil)
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 
 	req.Header.Set("Referer", Config["trade_flash_url"])

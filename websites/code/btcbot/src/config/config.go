@@ -31,7 +31,6 @@ var ROOT string
 
 var Config map[string]string
 var Option map[string]string
-var Licence map[string]string
 var Remind map[string]string
 var TradeOption map[string]string
 var SecretOption map[string]string
@@ -39,7 +38,6 @@ var SecretOption map[string]string
 func init() {
 	LoadConfig()
 	LoadOption()
-	LoadLicence()
 	LoadRemind()
 	LoadSecretOption()
 	//fmt.Println(Config)
@@ -116,21 +114,6 @@ func LoadOption() error {
 
 func SaveOption() error {
 	return save_config("/conf/option.json", Option)
-}
-
-func LoadLicence() error {
-	_Licence, err := load_config("/conf/licence.dat")
-	if err != nil {
-		return err
-	}
-	Licence = make(map[string]string)
-	Licence = _Licence
-
-	return nil
-}
-
-func SaveLicence() error {
-	return save_config("/conf/licence.dat", Licence)
 }
 
 func LoadRemind() (err error) {
