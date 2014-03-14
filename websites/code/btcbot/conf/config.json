@@ -25,7 +25,7 @@
 	"debug": "1",
 	"errorconsole": "1",
 	"infoconsole": "1",
-	"debugconsole": "0",
+	"debugconsole": "1",
 
 	"EMAMinThreshold": "0.0025",
 

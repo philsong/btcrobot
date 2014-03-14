@@ -23,23 +23,10 @@ import (
 	"fmt"
 	"huobiapi"
 	"logger"
+	"okcoinapi"
 	"strconv"
 	"time"
 )
-
-func doTradeDelegation() {
-	huobi := huobiapi.NewHuobi()
-	logger.Infoln("doTradeDelegation start....")
-	if huobi.Login() == true {
-		logger.Debugln("Login successfully.")
-
-		huobi.TradeDelegation()
-	} else {
-		logger.Debugln("Login failed.")
-	}
-
-	logger.Infoln("doTradeDelegation end-----")
-}
 
 func backtesting() {
 	fmt.Println("back testing begin...")
@@ -127,6 +114,15 @@ func TestTradeAPI() {
 	fmt.Println(tradeAPI.Get_delegations())
 }
 
+func testOkcoin() {
+	tradeAPI := okcoinapi.NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+	accout_info, _ := tradeAPI.Get_account_info()
+	fmt.Println(accout_info)
+
+	buyret := tradeAPI.BuyBTC("1000", "0.01")
+	fmt.Println(buyret)
+
+}
 func tradeService() {
 
 	done := make(chan bool, 1)

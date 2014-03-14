@@ -19,9 +19,9 @@
 package huobiapi
 
 import (
-	. "config"
 	"fmt"
 	"logger"
+	"strategy"
 )
 
 /*
@@ -69,21 +69,7 @@ func (w *Huobi) AnalyzePeroidLine(filename string, content string) bool {
 	w.Price = Price
 	w.Volumn = Volumn
 
-	//rsi(Price)
-	if Config["env"] == "test" {
-		w.do2Percent(Time, Price)
-		return true
-
-		k, d, j := doKDJ(PeroidRecords)
-		length := len(k)
-		// Loop through the entire array.
-		for i := 0; i < length; i++ {
-			logger.Infof("[%s-%s]%d/%d/%d\n", PeroidRecords[i].Date, PeroidRecords[i].Time, int(k[i]), int(d[i]), int(j[i]))
-		}
-	} else {
-		w.doEMA(Time, Price, Volumn)
-		return true
-	}
+	strategy.PerformEMA(*w, Time, Price, Volumn)
 
 	return true
 }
@@ -105,16 +91,11 @@ func (w *Huobi) AnalyzeMinuteLine(filename string, content string) bool {
 	w.Price = Price
 	w.Volumn = Volumn
 
-	if Config["env"] == "test" {
-		w.do2Percent(Time, Price)
-		return true
-	} else {
-		w.doEMA(Time, Price, Volumn)
-		return true
-	}
+	strategy.PerformEMA(*w, Time, Price, Volumn)
+	return true
 }
 
-func (w *Huobi) getTradePrice(tradeDirection string) string {
+func (w Huobi) GetTradePrice(tradeDirection string) string {
 	if len(w.Price) == 0 {
 		logger.Errorln("get price failed, array len=0")
 		return "false"

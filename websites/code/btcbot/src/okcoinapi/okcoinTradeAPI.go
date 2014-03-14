@@ -1,5 +1,5 @@
 /*
-  btcbot is a Bitcoin trading bot for HUOBI.com written
+  btcbot is a Bitcoin trading bot for Okcoin.com written
   in golang, it features multiple trading methods using
   technical analysis.
 
@@ -16,10 +16,11 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package huobiapi
+package okcoinapi
 
 import (
-	. "config"
+	"compress/gzip"
+	//. "config"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -30,31 +31,27 @@ import (
 	"net/url"
 	"os"
 	"sort"
-	"strconv"
 	"strings"
-	"time"
 	"util"
 )
 
 /*
-	http://www.huobi.com/help/index.php?a=api_help
+	http://www.Okcoin.com/help/index.php?a=api_help
 */
-type HuobiTrade struct {
+type OkcoinTrade struct {
 	client     *http.Client
-	access_key string
+	partner    string
 	secret_key string
 }
 
-func NewHuobiTrade(access_key, secret_key string) *HuobiTrade {
-	w := new(HuobiTrade)
-	w.access_key = access_key
+func NewOkcoinTrade(partner, secret_key string) *OkcoinTrade {
+	w := new(OkcoinTrade)
+	w.partner = partner
 	w.secret_key = secret_key
 	return w
 }
 
-func (w *HuobiTrade) createSign(pParams map[string]string) string {
-	pParams["secret_key"] = w.secret_key
-
+func (w *OkcoinTrade) createSign(pParams map[string]string) string {
 	ms := util.NewMapSorter(pParams)
 	sort.Sort(ms)
 
@@ -65,26 +62,29 @@ func (w *HuobiTrade) createSign(pParams map[string]string) string {
 
 	h := md5.New()
 
-	io.WriteString(h, v.Encode())
-	sign := fmt.Sprintf("%x", h.Sum(nil))
+	io.WriteString(h, v.Encode()+w.secret_key)
+	sign := fmt.Sprintf("%X", h.Sum(nil))
 
 	return sign
 }
 
-func (w *HuobiTrade) httpRequest(pParams map[string]string) (string, error) {
+func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (string, error) {
+	pParams["sign"] = w.createSign(pParams)
+
 	v := url.Values{}
 	for key, val := range pParams {
 		v.Add(key, val)
 	}
+	fmt.Println(v.Encode())
 
-	req, err := http.NewRequest("POST", Config["api_url"], strings.NewReader(v.Encode()))
+	req, err := http.NewRequest("POST", api_url, strings.NewReader(v.Encode()))
 	if err != nil {
 		logger.Fatal(err)
 		return "", err
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Referer", "https://www.huobi.com/")
+	req.Header.Set("Referer", "https://www.okcoin.com/")
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)
@@ -128,23 +128,29 @@ func (w *HuobiTrade) httpRequest(pParams map[string]string) (string, error) {
 }
 
 type ErrorMsg struct {
-	Code int
-	Msg  string
-	Time int
+	Result    bool
+	ErrorCode int
 }
 
-type DelegationsMsg struct {
-	Id               int
-	Type             int
-	order_price      string
-	order_amount     string
-	processed_amount string
-	order_time       int
+type Order struct {
+	Orders_id   int
+	Status      int
+	Symbol      string
+	Type        string
+	Rate        int
+	Amount      float64
+	Deal_amount float64
+	Avg_rate    int
 }
 
-func (w *HuobiTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool) {
-	if strings.Contains(body, "code") != true {
-		ret = true
+type OrderTable struct {
+	Result bool
+	Orders []Order
+}
+
+func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool) {
+	if strings.Contains(body, "result") != true {
+		ret = false
 		return
 	}
 
@@ -156,7 +162,7 @@ func (w *HuobiTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool
 		logger.Fatal(err)
 	}
 
-	if errorMsg.Code != 0 {
+	if errorMsg.Result != true {
 		logger.Errorln(errorMsg)
 		ret = false
 		return
@@ -166,28 +172,24 @@ func (w *HuobiTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool
 	return
 }
 
-func (w *HuobiTrade) Get_account_info() (string, error) {
+func (w *OkcoinTrade) Get_account_info() (string, error) {
+	api_url := "https://www.okcoin.com/api/userinfo.do"
 	pParams := make(map[string]string)
-	pParams["method"] = "get_account_info"
-	pParams["access_key"] = w.access_key
-	now := time.Now().Unix()
-	pParams["created"] = strconv.FormatInt(now, 10)
-	pParams["sign"] = w.createSign(pParams)
+	pParams["partner"] = w.partner
 
-	return w.httpRequest(pParams)
+	return w.httpRequest(api_url, pParams)
 }
 
-func (w *HuobiTrade) Get_delegations() (m []DelegationsMsg, ret bool) {
+func (w *OkcoinTrade) Get_order() (symbol, order_id string, m OrderTable, ret bool) {
+	api_url := "https://www.okcoin.com/api/getorder.do"
 	pParams := make(map[string]string)
-	pParams["method"] = "get_delegations"
-	pParams["access_key"] = w.access_key
-	now := time.Now().Unix()
-	pParams["created"] = strconv.FormatInt(now, 10)
-	pParams["sign"] = w.createSign(pParams)
+	pParams["partner"] = w.partner
+	pParams["symbol"] = symbol
+	pParams["order_id"] = order_id
 
 	ret = true
 
-	body, err := w.httpRequest(pParams)
+	body, err := w.httpRequest(api_url, pParams)
 	if err != nil {
 		ret = false
 		return
@@ -211,28 +213,14 @@ func (w *HuobiTrade) Get_delegations() (m []DelegationsMsg, ret bool) {
 	return
 }
 
-func (w *HuobiTrade) Get_delegation_info(id string) (string, error) {
+func (w *OkcoinTrade) Cancel_order(symbol, order_id string) bool {
+	api_url := "https://www.okcoin.com/api/cancelorder.do"
 	pParams := make(map[string]string)
-	pParams["method"] = "delegation_info"
-	pParams["access_key"] = w.access_key
-	pParams["id"] = id
-	now := time.Now().Unix()
-	pParams["created"] = strconv.FormatInt(now, 10)
-	pParams["sign"] = w.createSign(pParams)
+	pParams["partner"] = w.partner
+	pParams["symbol"] = symbol
+	pParams["order_id"] = order_id
 
-	return w.httpRequest(pParams)
-}
-
-func (w *HuobiTrade) Cancel_delegation(id string) bool {
-	pParams := make(map[string]string)
-	pParams["method"] = "cancel_delegation"
-	pParams["access_key"] = w.access_key
-	pParams["id"] = id
-	now := time.Now().Unix()
-	pParams["created"] = strconv.FormatInt(now, 10)
-	pParams["sign"] = w.createSign(pParams)
-
-	body, err := w.httpRequest(pParams)
+	body, err := w.httpRequest(api_url, pParams)
 	if err != nil {
 		return false
 	}
@@ -263,17 +251,16 @@ func (w *HuobiTrade) Cancel_delegation(id string) bool {
 	}
 }
 
-func (w *HuobiTrade) doTrade(method, price, amount string) int {
+func (w *OkcoinTrade) doTrade(symbol, method, rate, amount string) int {
+	api_url := "https://www.okcoin.com/api/trade.do"
 	pParams := make(map[string]string)
-	pParams["method"] = method
-	pParams["access_key"] = w.access_key
-	pParams["price"] = price
+	pParams["partner"] = w.partner
+	pParams["symbol"] = symbol
+	pParams["type"] = method
+	pParams["rate"] = rate
 	pParams["amount"] = amount
-	now := time.Now().Unix()
-	pParams["created"] = strconv.FormatInt(now, 10)
-	pParams["sign"] = w.createSign(pParams)
 
-	body, err := w.httpRequest(pParams)
+	body, err := w.httpRequest(api_url, pParams)
 	if err != nil {
 		return 0
 	}
@@ -305,12 +292,41 @@ func (w *HuobiTrade) doTrade(method, price, amount string) int {
 	}
 }
 
-func (w *HuobiTrade) Buy(price, amount string) string {
-	buyId := w.doTrade("buy", price, amount)
+func (w *OkcoinTrade) BuyBTC(price, amount string) string {
+	buyId := w.doTrade("btc_cny", "buy", price, amount)
 	return (fmt.Sprintf("%d", buyId))
 }
 
-func (w *HuobiTrade) Sell(price, amount string) string {
-	sellId := w.doTrade("sell", price, amount)
+func (w *OkcoinTrade) SellBTC(price, amount string) string {
+	sellId := w.doTrade("btc_cny", "sell", price, amount)
 	return (fmt.Sprintf("%d", sellId))
+}
+
+func (w *OkcoinTrade) BuyLTC(price, amount string) string {
+	buyId := w.doTrade("ltc_cny", "buy", price, amount)
+	return (fmt.Sprintf("%d", buyId))
+}
+
+func (w *OkcoinTrade) SellLTC(price, amount string) string {
+	sellId := w.doTrade("ltc_cny", "sell", price, amount)
+	return (fmt.Sprintf("%d", sellId))
+}
+
+func DumpGZIP(r io.Reader) string {
+	var body string
+	reader, _ := gzip.NewReader(r)
+	for {
+		buf := make([]byte, 1024)
+		n, err := reader.Read(buf)
+
+		if err != nil && err != io.EOF {
+			panic(err)
+		}
+
+		if n == 0 {
+			break
+		}
+		body += string(buf)
+	}
+	return body
 }

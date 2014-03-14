@@ -37,7 +37,10 @@ func init() {
 }
 
 func main() {
-	version := "0.21"
+
+	testOkcoin()
+	return
+	version := "0.30dev"
 	fmt.Println("[ ---------------------------------------------------------->>> ")
 	fmt.Println(" BTC robot version ", version)
 	fmt.Println(" *BTC操盘手自动化交易引擎*")
