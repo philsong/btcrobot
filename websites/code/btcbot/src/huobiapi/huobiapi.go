@@ -210,6 +210,7 @@ func (w *Huobi) TradeAdd(a, price, amount string) bool {
 				logger.Traceln(err)
 			} else if err != nil {
 				logger.Fatal(err)
+				return false
 			}
 
 			logger.Infoln(m)
@@ -334,6 +335,7 @@ func (w *Huobi) TradeUpdate(id, price, amount string) bool {
 	resp, err := w.client.Do(req)
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 	defer resp.Body.Close()
 
@@ -484,6 +486,7 @@ func (w *Huobi) TradeCancel(id string) bool {
 	resp, err := w.client.Do(req)
 	if err != nil {
 		logger.Fatal(err)
+		return false
 	}
 	defer resp.Body.Close()
 
@@ -517,6 +520,7 @@ func (w *Huobi) TradeCancel(id string) bool {
 				logger.Traceln(err)
 			} else if err != nil {
 				logger.Fatal(err)
+				return false
 			}
 			logger.Traceln(m)
 
@@ -604,6 +608,7 @@ func (w *Huobi) TradeDelegation() bool {
 					break
 				} else if err != nil {
 					logger.Fatal(err)
+					return false
 				}
 				logger.Traceln(m)
 

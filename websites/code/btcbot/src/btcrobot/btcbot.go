@@ -102,6 +102,9 @@ func testKLineAPI(done chan bool) {
 
 func TestTradeAPI() {
 	tradeAPI := huobiapi.NewHuobiTrade(SecretOption["access_key"], SecretOption["secret_key"])
+	accout_info, _ := tradeAPI.Get_account_info()
+	fmt.Println(accout_info)
+
 	//	fmt.Println(tradeAPI.Get_account_info())
 	if false {
 		buyId := tradeAPI.Buy("1000", "0.001")
@@ -131,6 +134,8 @@ func tradeService() {
 	fmt.Println("robot working...")
 
 	backtesting()
+
+	TestTradeAPI()
 
 	go testKLineAPI(done)
 	<-done

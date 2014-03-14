@@ -102,7 +102,7 @@ func (w *Huobi) doEMA(Time []string, Price []float64, Volumn []float64) {
 
 	if w.Disable_trading != 1 {
 		if Config["env"] == "dev" {
-			logger.Infoln(Time[length-1], Price[length-1], Volumn[length-1])
+			logger.Infof("%s\t%-6.2f\t%-6.2f\n", Time[length-1], Price[length-1], Volumn[length-1])
 		}
 	}
 
