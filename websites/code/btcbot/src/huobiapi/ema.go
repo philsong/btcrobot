@@ -143,11 +143,13 @@ func (w *Huobi) doEMA(Time []string, Price []float64, Volumn []float64) {
 				continue
 			}
 			if i == length-1 && w.latestMACDTrend != 1 {
-				w.latestMACDTrend = 1
-				logger.Infoln("EMA up cross, 买入buyIn", w.getTradePrice(""))
-				go service.TriggerTrender("EMA up cross, 买入buyIn")
+				if w.Disable_trading != 1 {
+					logger.Infoln("EMA up cross, 买入buyIn", w.getTradePrice(""))
+					go service.TriggerTrender("EMA up cross, 买入buyIn")
+				}
 
 				if Option["disable_trading"] != "1" && w.Disable_trading != 1 {
+					w.latestMACDTrend = 1
 					w.Do_buy(w.getTradePrice("buy"), tradeAmount)
 				}
 
@@ -167,10 +169,12 @@ func (w *Huobi) doEMA(Time []string, Price []float64, Volumn []float64) {
 			}
 
 			if i == length-1 && w.latestMACDTrend != -1 {
-				w.latestMACDTrend = -1
-				logger.Infoln("EMA down cross, 卖出sellOut", w.getTradePrice(""))
-				go service.TriggerTrender("EMA down cross, 卖出sellOut")
+				if w.Disable_trading != 1 {
+					logger.Infoln("EMA down cross, 卖出sellOut", w.getTradePrice(""))
+					go service.TriggerTrender("EMA down cross, 卖出sellOut")
+				}
 				if Option["disable_trading"] != "1" && w.Disable_trading != 1 {
+					w.latestMACDTrend = -1
 					ret := w.Do_sell(w.getTradePrice("sell"), tradeAmount)
 					if ret == false {
 						w.Do_sell(w.getTradePrice("sell"), MACDtradeAmount)
