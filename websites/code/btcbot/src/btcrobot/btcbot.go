@@ -135,7 +135,9 @@ func tradeService() {
 
 	backtesting()
 
-	TestTradeAPI()
+	if Config["env"] == "dev" {
+		TestTradeAPI()
+	}
 
 	go testKLineAPI(done)
 	<-done
