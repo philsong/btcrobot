@@ -87,7 +87,7 @@ func testKLineAPI(done chan bool) {
 	done <- true
 }
 
-func TestTradeAPI() {
+func testHuobiAPI() {
 	tradeAPI := huobiapi.NewHuobiTrade(SecretOption["access_key"], SecretOption["secret_key"])
 	accout_info, _ := tradeAPI.Get_account_info()
 	fmt.Println(accout_info)
@@ -114,14 +114,32 @@ func TestTradeAPI() {
 	fmt.Println(tradeAPI.Get_delegations())
 }
 
-func testOkcoin() {
+func testOkcoinAPI() {
 	tradeAPI := okcoinapi.NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 	accout_info, _ := tradeAPI.Get_account_info()
 	fmt.Println(accout_info)
 
 	buyret := tradeAPI.BuyBTC("1000", "0.01")
 	fmt.Println(buyret)
+	sellret := tradeAPI.SellBTC("10000", "0.01")
+	fmt.Println(sellret)
 
+	var orderTable okcoinapi.OrderTable
+	orderTable, ret := tradeAPI.Get_BTCorder("-1")
+	fmt.Println(ret, orderTable)
+
+	time.Sleep(2000 * time.Millisecond)
+
+	orderTable, ret = tradeAPI.Get_LTCorder("-1")
+	fmt.Println(ret, orderTable)
+
+	ret = tradeAPI.Cancel_BTCorder("-1")
+	fmt.Println(ret)
+
+	time.Sleep(2000 * time.Millisecond)
+
+	ret = tradeAPI.Cancel_LTCorder("-1")
+	fmt.Println(ret)
 }
 func tradeService() {
 
@@ -130,10 +148,6 @@ func tradeService() {
 	fmt.Println("robot working...")
 
 	backtesting()
-
-	if Config["env"] == "dev" {
-		TestTradeAPI()
-	}
 
 	go testKLineAPI(done)
 	<-done

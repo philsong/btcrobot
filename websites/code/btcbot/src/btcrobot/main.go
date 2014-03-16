@@ -38,15 +38,12 @@ func init() {
 
 func main() {
 
-	testOkcoin()
-	return
 	version := "0.30dev"
 	fmt.Println("[ ---------------------------------------------------------->>> ")
 	fmt.Println(" BTC robot version ", version)
 	fmt.Println(" *BTC操盘手自动化交易引擎*")
-	fmt.Println(" btcrobot is a Bitcoin trading bot for HUOBI.com written")
-	fmt.Println(" in golang, it features multiple trading methods using")
-	fmt.Println(" technical analysis.")
+	fmt.Println(" btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang")
+	fmt.Println(" it features multiple trading methods using technical analysis.")
 	fmt.Println(" ")
 	fmt.Println(" Disclaimer:")
 	fmt.Println(" ")
@@ -65,22 +62,28 @@ func main() {
 	fmt.Println(" *@警告：API key和密码存放在conf/secret.json文件内，共享给他人前请务必删除，注意账号安全！！")
 	fmt.Println(" <<<----------------------------------------------------------] ")
 	SavePid()
-
-	//TestTradeAPI()
-	go tradeService()
-
-	// 服务静态文件
-	http.Handle("/static/", http.FileServer(http.Dir(ROOT)))
-
-	router := initRouter()
-	http.Handle("/", router)
-	if Config["env"] == "test" {
-		logger.Infoln(http.ListenAndServe("0.0.0.0:8080", nil))
+	if Config["env"] == "dev" {
+		testHuobiAPI()
+		testOkcoinAPI()
+		return
 	} else {
-		logger.Infoln(http.ListenAndServe(Config["host"], nil))
-	}
+		go tradeService()
 
-	time.Sleep(time.Millisecond * 100 * 60 * 60 * 1000)
+		// 服务静态文件
+		http.Handle("/static/", http.FileServer(http.Dir(ROOT)))
+
+		router := initRouter()
+		http.Handle("/", router)
+		if Config["env"] == "test" {
+			logger.Infoln(http.ListenAndServe("0.0.0.0:9090", nil))
+		} else {
+			logger.Infoln(http.ListenAndServe(Config["host"], nil))
+		}
+
+		fmt.Println("[ ---------------------------------------------------------->>> ")
+		fmt.Println("start web server failed, please check if the port 9090 is already used.")
+		fmt.Println(" <<<----------------------------------------------------------] ")
+	}
 }
 
 // 保存PID

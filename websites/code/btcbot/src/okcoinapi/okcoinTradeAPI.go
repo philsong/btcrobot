@@ -1,7 +1,6 @@
 /*
-  btcbot is a Bitcoin trading bot for Okcoin.com written
-  in golang, it features multiple trading methods using
-  technical analysis.
+  btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
+  it features multiple trading methods using technical analysis.
 
   Disclaimer:
 
@@ -36,7 +35,31 @@ import (
 )
 
 /*
-	http://www.Okcoin.com/help/index.php?a=api_help
+	SEE DOC:
+	TRADE API
+	https://www.okcoin.com/t-1000097.html
+
+	行情API
+	https://www.okcoin.com/shequ/themeview.do?tid=1000052&currentPage=1
+
+	//non-official API :P
+	K线数据step单位为second
+	https://www.okcoin.com/kline/period.do?step=60&symbol=okcoinbtccny&nonce=1394955131098
+
+	https://www.okcoin.com/kline/trades.do?since=10625682&symbol=okcoinbtccny&nonce=1394955760557
+
+	https://www.okcoin.com/kline/depth.do?symbol=okcoinbtccny&nonce=1394955767484
+
+	https://www.okcoin.com/real/ticker.do?symbol=0&random=61
+
+	//old kline for btc
+	日数据
+	https://www.okcoin.com/klineData.do?type=3&marketFrom=0
+	5分钟数据
+	https://www.okcoin.com/klineData.do?type=1&marketFrom=0
+
+	/for ltc
+	https://www.okcoin.com/klineData.do?type=3&marketFrom=3
 */
 type OkcoinTrade struct {
 	client     *http.Client
@@ -180,7 +203,7 @@ func (w *OkcoinTrade) Get_account_info() (string, error) {
 	return w.httpRequest(api_url, pParams)
 }
 
-func (w *OkcoinTrade) Get_order() (symbol, order_id string, m OrderTable, ret bool) {
+func (w *OkcoinTrade) Get_order(symbol, order_id string) (m OrderTable, ret bool) {
 	api_url := "https://www.okcoin.com/api/getorder.do"
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
@@ -211,6 +234,14 @@ func (w *OkcoinTrade) Get_order() (symbol, order_id string, m OrderTable, ret bo
 	logger.Traceln(m)
 
 	return
+}
+
+func (w *OkcoinTrade) Get_BTCorder(order_id string) (m OrderTable, ret bool) {
+	return w.Get_order("btc_cny", order_id)
+}
+
+func (w *OkcoinTrade) Get_LTCorder(order_id string) (m OrderTable, ret bool) {
+	return w.Get_order("ltc_cny", order_id)
 }
 
 func (w *OkcoinTrade) Cancel_order(symbol, order_id string) bool {
@@ -249,6 +280,14 @@ func (w *OkcoinTrade) Cancel_order(symbol, order_id string) bool {
 	} else {
 		return false
 	}
+}
+
+func (w *OkcoinTrade) Cancel_BTCorder(order_id string) (ret bool) {
+	return w.Cancel_order("btc_cny", order_id)
+}
+
+func (w *OkcoinTrade) Cancel_LTCorder(order_id string) (ret bool) {
+	return w.Cancel_order("ltc_cny", order_id)
 }
 
 func (w *OkcoinTrade) doTrade(symbol, method, rate, amount string) int {
