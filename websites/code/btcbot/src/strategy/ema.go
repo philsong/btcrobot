@@ -77,7 +77,7 @@ func PerformEMA(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []floa
 	//EMA cross
 	if (EMAdif[length-2] < 0 && EMAdif[length-1] > 0) || (EMAdif[length-2] > 0 && EMAdif[length-1] < 0) { //up cross
 		if checkException(Price[length-2], Price[length-1], Volumn[length-1]) == false {
-			logger.Infoln("detect exception data in huobi.com", Price[length-2], Price[length-1], Volumn[length-1])
+			logger.Infoln("detect exception data", Price[length-2], Price[length-1], Volumn[length-1])
 			return
 		}
 
@@ -90,7 +90,7 @@ func PerformEMA(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []floa
 
 		if EMAdif[length-2] > 0 && EMAdif[length-1] < 0 {
 			if Option["disable_trading"] != "1" {
-				logger.Infoln("EMA up cross, 买入buyIn", tradeAPI.GetTradePrice(""))
+				logger.Infoln("EMA down cross, 卖出Sellout", tradeAPI.GetTradePrice(""))
 				tradeAPI.Do_sell(tradeAPI.GetTradePrice("sell"), tradeAmount)
 			}
 		}

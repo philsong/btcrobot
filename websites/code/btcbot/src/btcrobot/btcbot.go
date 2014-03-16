@@ -147,7 +147,7 @@ func tradeService() {
 
 	fmt.Println("robot working...")
 
-	backtesting()
+	//backtesting()
 
 	go testKLineAPI(done)
 	<-done

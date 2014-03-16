@@ -76,7 +76,7 @@ func (w *Huobi) AnalyzePeroidLine(filename string, content string) bool {
 
 func (w *Huobi) AnalyzeMinuteLine(filename string, content string) bool {
 	//logger.Infoln(content)
-	logger.Debugln(filename)
+	//logger.Debugln(filename)
 	MinuteRecords := ParseMinuteCSV(filename)
 	var Time []string
 	var Price []float64
