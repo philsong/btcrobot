@@ -19,6 +19,16 @@
             </div>
           </div>
 
+          <div class="control-group string optional">
+            <label class="string optional control-label" for="strategy"><abbr title="required">*</abbr>交易策略</label>
+            <div class="controls">
+                <select name="strategy" id="strategy" class="select-1" >
+                    <option value="EMA">EMA</option>
+                    <option value="">your own</option>
+                </select>
+            </div>
+          </div>
+          
           <div class="control-group string optional"><label class="string optional control-label" for="shortEMA"><abbr title="required">*</abbr>短期EMA</label><div class="controls"><input class=" string optional span1" id="shortEMA" name="shortEMA" size="50" type="text" value="{{.config.shortEMA}}"></div></div>
          
           <div class="control-group string optional"><label class="string optional control-label" for="longEMA"><abbr title="required">*</abbr>长期EMA</label><div class="controls"><input class="string optional span1" id="longEMA" name="longEMA" size="50" type="text" value="{{.config.longEMA}}"></div></div>
@@ -37,7 +47,30 @@
             </div>
           </div>
 
-          <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>BTC交易数量</label><div class="controls"><input class="string optional span1" id="tradeAmount" name="tradeAmount" size="50" type="text" value="{{.config.tradeAmount}}">BTC</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>交易数量</label><div class="controls"><input class="string optional span1" id="tradeAmount" name="tradeAmount" size="50" type="text" value="{{.config.tradeAmount}}">个</div></div>
+
+
+          <div class="control-group string optional">
+            <label class="string optional control-label" for="tradecenter"><abbr title="required">*</abbr>交易中心</label>
+            <div class="controls">
+                <select name="tradecenter" id="tradecenter" class="select-1" >
+                    <option value="huobi">火币网</option>
+                    <option value="okcoin">OKCoin</option>
+                </select>
+            </div>
+          </div>
+
+          <div class="control-group string optional">
+            <label class="string optional control-label" for="symbol"><abbr title="required">*</abbr>交易币种</label>
+            <div class="controls">
+                <select name="symbol" id="symbol" class="select-1" >
+                    <option value="btc_cny">btc_cny</option>
+                    <option value="ltc_cny">ltc_cny</option>
+                </select>
+            </div>
+          </div>
+
+
 
           <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>运行时长</label><div class="controls"><input class="string optional span1" id="totalHour" name="totalHour" size="50" type="text" value="{{.config.totalHour}}">小时</div></div>
 
@@ -61,6 +94,15 @@ $(function(){
     $.getJSON('/engineajax.json', function(data){
         if (data.tick_interval) {
           $('#tick_interval').val(data.tick_interval);
+        }
+        if (data.tick_interval) {
+          $('#tradecenter').val(data.tradecenter);
+        }
+        if (data.tick_interval) {
+          $('#symbol').val(data.symbol);
+        }
+        if (data.tick_interval) {
+          $('#strategy').val(data.strategy);
         }
 
         console.log(data.disable_trading)

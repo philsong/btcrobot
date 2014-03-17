@@ -15,7 +15,7 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package huobi
+package okcoin
 
 import (
 	. "config"
@@ -32,30 +32,27 @@ type TradeAPI interface {
 	GetTradePrice(tradeDirection string) string
 }
 
-type Huobi struct {
-	client   *http.Client
-	tradeAPI *TradeAPI
+type Okcoin struct {
+	client       *http.Client
+	tradeAPI     *TradeAPI
+	prevEMATrend string
 
 	Time   []string
 	Price  []float64
 	Volumn []float64
 }
 
-func NewHuobi() *Huobi {
-	w := new(Huobi)
+func NewOkcoin() *Okcoin {
+	w := new(Okcoin)
 	return w
 }
 
-func (w Huobi) AnalyzeKLine(peroid int) (ret bool) {
-	if peroid == 1 {
-		return w.AnalyzeKLineMinute()
-	} else {
-		return w.AnalyzeKLinePeroid(peroid)
-	}
+func (w Okcoin) AnalyzeKLine(peroid int) (ret bool) {
+	return w.AnalyzeKLinePeroid(peroid)
 }
 
-func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
-	tradeAPI := NewHuobiTrade(SecretOption["access_key"], SecretOption["secret_key"])
+func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
+	tradeAPI := NewOkcoinTrade(SecretOption["access_key"], SecretOption["secret_key"])
 
 	var buyId string
 	if Option["symbol"] == "btc_cny" {
@@ -64,9 +61,9 @@ func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
 		buyId = tradeAPI.BuyLTC(tradePrice, tradeAmount)
 	}
 
+	logger.Infoln("buyId", buyId)
 	if buyId != "0" {
 		logger.Infoln("执行买入委托成功", tradePrice, tradeAmount)
-
 		return true
 	} else {
 		logger.Infoln("执行买入委托失败", tradePrice, tradeAmount)
@@ -74,8 +71,8 @@ func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
 	}
 }
 
-func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
-	tradeAPI := NewHuobiTrade(SecretOption["access_key"], SecretOption["secret_key"])
+func (w Okcoin) Sell(tradePrice, tradeAmount string) bool {
+	tradeAPI := NewOkcoinTrade(SecretOption["access_key"], SecretOption["secret_key"])
 
 	var sellId string
 	if Option["symbol"] == "btc_cny" {
@@ -83,6 +80,7 @@ func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
 	} else if Option["TradeName"] == "ltc_cny" {
 		sellId = tradeAPI.SellLTC(tradePrice, tradeAmount)
 	}
+
 	logger.Infoln("sellId", sellId)
 	if sellId != "0" {
 		logger.Infoln("执行卖出委托成功", tradePrice, tradeAmount)
@@ -93,7 +91,7 @@ func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
 	}
 }
 
-func (w Huobi) GetTradePrice(tradeDirection string) string {
+func (w Okcoin) GetTradePrice(tradeDirection string) string {
 	if len(w.Price) == 0 {
 		logger.Errorln("get price failed, array len=0")
 		return "false"

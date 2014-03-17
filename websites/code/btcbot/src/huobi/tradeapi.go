@@ -304,12 +304,24 @@ func (w *HuobiTrade) doTrade(method, price, amount string) int {
 	}
 }
 
-func (w *HuobiTrade) Buy(price, amount string) string {
+func (w *HuobiTrade) BuyBTC(price, amount string) string {
 	buyId := w.doTrade("buy", price, amount)
 	return (fmt.Sprintf("%d", buyId))
 }
 
-func (w *HuobiTrade) Sell(price, amount string) string {
+func (w *HuobiTrade) SellBTC(price, amount string) string {
 	sellId := w.doTrade("sell", price, amount)
+	return (fmt.Sprintf("%d", sellId))
+}
+
+func (w *HuobiTrade) BuyLTC(price, amount string) string {
+	//todo
+	buyId := 0
+	return (fmt.Sprintf("%d", buyId))
+}
+
+func (w *HuobiTrade) SellLTC(price, amount string) string {
+	//todo
+	sellId := 0
 	return (fmt.Sprintf("%d", sellId))
 }

@@ -34,7 +34,7 @@ func initRouter() *mux.Router {
 	formValidateFilter := new(filter.FormValidateFilter)
 	router.FilterChain(mux.NewFilterChain([]mux.Filter{formValidateFilter, frontViewFilter}...))
 
-	router.HandleFunc("/", WelcomeHandler)
+	router.HandleFunc("/", IndictorHandler)
 	router.HandleFunc("/secret{json:(|.json)}", SecretHandler)
 	router.HandleFunc("/engine{msgtype:(|ajax|get|post)}{json:(|.json)}", EngineHandler)
 	router.HandleFunc("/trade{msgtype:(|ajax|dobuy|dosell)}{json:(|.json)}", TradeHandler)

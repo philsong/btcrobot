@@ -16,7 +16,7 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package main
+package entry
 
 import (
 	. "config"
@@ -28,8 +28,11 @@ import (
 	"time"
 )
 
-type MarketAPI interface {
+type TradeAPI interface {
 	AnalyzeKLine(peroid int) (ret bool)
+	Buy(price, amount string) bool
+	Sell(price, amount string) bool
+	GetTradePrice(tradeDirection string) string
 }
 
 /*
@@ -52,19 +55,35 @@ func backtesting() {
 }
 */
 
-func testKLineAPI(done chan bool) {
+func RunRobot() {
+	if Config["env"] == "dev" {
+		testHuobiAPI()
+		testOkcoinAPI()
+		return
+	}
+
 	ticker := time.NewTicker(2000 * time.Millisecond) //2s
 
-	huobi := huobi.NewHuobi()
+	var tradeAPI TradeAPI
+	if Option["tradecenter"] == "huobi" {
+		tradeAPI = huobi.NewHuobi()
+	} else if Option["tradecenter"] == "okcoin" {
+		tradeAPI = okcoin.NewOkcoin()
+	} else {
+		fmt.Println("Please set the tradecenter firstly...")
+		return
+	}
 	peroid, _ := strconv.Atoi(Option["tick_interval"])
 	totalHour, _ := strconv.ParseInt(Option["totalHour"], 0, 64)
 	if totalHour < 1 {
 		totalHour = 1
 	}
 
+	fmt.Println("robot working...")
+
 	go func() {
 		for _ = range ticker.C {
-			huobi.AnalyzeKLine(peroid)
+			tradeAPI.AnalyzeKLine(peroid)
 		}
 	}()
 
@@ -75,8 +94,7 @@ func testKLineAPI(done chan bool) {
 	time.Sleep(time.Duration(totalHour) * oneHour)
 
 	ticker.Stop()
-	fmt.Println("程序到达设定时长%d小时，停止运行。", time.Duration(totalHour))
-	done <- true
+	logger.Infof("程序到达设定时长%d小时，停止运行。", time.Duration(totalHour))
 }
 
 func testHuobiAPI() {
@@ -86,8 +104,8 @@ func testHuobiAPI() {
 
 	//	fmt.Println(tradeAPI.Get_account_info())
 	if false {
-		buyId := tradeAPI.Buy("1000", "0.001")
-		sellId := tradeAPI.Sell("10000", "0.001")
+		buyId := tradeAPI.BuyBTC("1000", "0.001")
+		sellId := tradeAPI.SellBTC("10000", "0.001")
 
 		//fmt.Println(tradeAPI.Get_delegations())
 		if tradeAPI.Cancel_delegation(buyId) {
@@ -132,20 +150,4 @@ func testOkcoinAPI() {
 
 	ret = tradeAPI.Cancel_LTCorder("-1")
 	fmt.Println(ret)
-}
-func tradeService() {
-
-	done := make(chan bool, 1)
-
-	fmt.Println("robot working...")
-
-	//backtesting()
-
-	go testKLineAPI(done)
-	<-done
-
-	fmt.Println("done")
-
-	return
-	//doTradeDelegation()
 }

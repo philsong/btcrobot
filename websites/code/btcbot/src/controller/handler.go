@@ -27,11 +27,19 @@ import (
 	"huobi"
 	"logger"
 	"net/http"
+	"okcoin"
 )
+
+type TradeAPI interface {
+	AnalyzeKLine(peroid int) (ret bool)
+	Buy(price, amount string) bool
+	Sell(price, amount string) bool
+	GetTradePrice(tradeDirection string) string
+}
 
 // 用户个人首页
 // URI: /trade/{username}
-func WelcomeHandler(rw http.ResponseWriter, req *http.Request) {
+func IndictorHandler(rw http.ResponseWriter, req *http.Request) {
 	//util.Redirect(rw, req, "/static/trade")
 	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/indictor.html")
 }
@@ -72,12 +80,21 @@ func TradeHandler(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		huobi := huobi.NewHuobi()
+		var tradeAPI TradeAPI
+		if config.Option["tradecenter"] == "huobi" {
+			tradeAPI = huobi.NewHuobi()
+		} else if config.Option["tradecenter"] == "okcoin" {
+			tradeAPI = okcoin.NewOkcoin()
+		} else {
+			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "没有选择交易所名称", `"}`)
+			return
+		}
+
 		var ret bool
 		if msgtype == "dobuy" {
-			ret = huobi.BuyIn(config.TradeOption["buyprice"], config.TradeOption["buyamount"])
+			ret = tradeAPI.Buy(config.TradeOption["buyprice"], config.TradeOption["buyamount"])
 		} else if msgtype == "dosell" {
-			ret = huobi.SellOut(config.TradeOption["sellprice"], config.TradeOption["sellamount"])
+			ret = tradeAPI.Sell(config.TradeOption["sellprice"], config.TradeOption["sellamount"])
 		}
 
 		if ret != true {
@@ -132,6 +149,9 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		config.Option["tick_interval"] = req.FormValue("tick_interval")
+		config.Option["tradecenter"] = req.FormValue("tradecenter")
+		config.Option["symbol"] = req.FormValue("symbol")
+		config.Option["strategy"] = req.FormValue("strategy")
 		config.Option["shortEMA"] = req.FormValue("shortEMA")
 		config.Option["longEMA"] = req.FormValue("longEMA")
 
@@ -209,11 +229,11 @@ func SecretHandler(rw http.ResponseWriter, req *http.Request) {
 		req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/secret.html")
 		return
 	} else {
-		config.SecretOption["access_key"] = req.FormValue("access_key")
-		config.SecretOption["secret_key"] = req.FormValue("secret_key")
+		config.SecretOption["huobi_access_key"] = req.FormValue("huobi_access_key")
+		config.SecretOption["huobi_secret_key"] = req.FormValue("huobi_secret_key")
 
-		config.SecretOption["email"] = req.FormValue("email")
-		config.SecretOption["password"] = req.FormValue("password")
+		config.SecretOption["ok_partner"] = req.FormValue("ok_partner")
+		config.SecretOption["ok_secret_key"] = req.FormValue("ok_secret_key")
 
 		config.SecretOption["smtp_username"] = req.FormValue("smtp_username")
 		config.SecretOption["smtp_password"] = req.FormValue("smtp_password")

@@ -203,8 +203,8 @@ func (w *Huobi) analyzePeroidLine(filename string, content string) bool {
 	w.Time = Time
 	w.Price = Price
 	w.Volumn = Volumn
-
-	strategy.PerformEMA(*w, Time, Price, Volumn)
+	strategyName := Option["strategy"]
+	strategy.Perform(strategyName, *w, Time, Price, Volumn)
 
 	return true
 }
@@ -226,7 +226,8 @@ func (w *Huobi) analyzeMinuteLine(filename string, content string) bool {
 	w.Price = Price
 	w.Volumn = Volumn
 
-	strategy.PerformEMA(*w, Time, Price, Volumn)
+	strategyName := Option["strategy"]
+	strategy.Perform(strategyName, *w, Time, Price, Volumn)
 	return true
 }
 

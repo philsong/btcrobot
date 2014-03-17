@@ -20,6 +20,7 @@ package main
 
 import (
 	. "config"
+	"entry"
 	"fmt"
 	"logger"
 	"math/rand"
@@ -62,28 +63,24 @@ func main() {
 	fmt.Println(" *@警告：API key和密码存放在conf/secret.json文件内，共享给他人前请务必删除，注意账号安全！！")
 	fmt.Println(" <<<----------------------------------------------------------] ")
 	SavePid()
-	if Config["env"] == "dev" {
-		testHuobiAPI()
-		testOkcoinAPI()
-		return
+
+	go entry.RunRobot()
+
+	// 服务静态文件
+	http.Handle("/static/", http.FileServer(http.Dir(ROOT)))
+
+	router := initRouter()
+	http.Handle("/", router)
+	if Config["env"] == "test" {
+		logger.Infoln(http.ListenAndServe("0.0.0.0:9090", nil))
 	} else {
-		go tradeService()
-
-		// 服务静态文件
-		http.Handle("/static/", http.FileServer(http.Dir(ROOT)))
-
-		router := initRouter()
-		http.Handle("/", router)
-		if Config["env"] == "test" {
-			logger.Infoln(http.ListenAndServe("0.0.0.0:9090", nil))
-		} else {
-			logger.Infoln(http.ListenAndServe(Config["host"], nil))
-		}
-
-		fmt.Println("[ ---------------------------------------------------------->>> ")
-		fmt.Println("start web server failed, please check if the port 9090 is already used.")
-		fmt.Println(" <<<----------------------------------------------------------] ")
+		logger.Infoln(http.ListenAndServe(Config["host"], nil))
 	}
+
+	fmt.Println("[ ---------------------------------------------------------->>> ")
+	fmt.Println("start web server failed, please check if the port 9090 is already used.")
+	fmt.Println(" <<<----------------------------------------------------------] ")
+
 }
 
 // 保存PID

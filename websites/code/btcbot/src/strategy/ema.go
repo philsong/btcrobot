@@ -25,21 +25,22 @@ import (
 	"strconv"
 )
 
-type TradeAPI interface {
-	BuyIn(price, amount string) bool
-	SellOut(price, amount string) bool
-	GetTradePrice(tradeDirection string) string
-	GetPrevTrend() string
-	SetPrevTrend(trend string)
+type EMAStrategy struct {
+	PrevEMATrend string
+}
+
+func init() {
+	emaStrategy := EMAStrategy{}
+	Register("EMA", emaStrategy)
 }
 
 //EMA strategy
-func PerformEMA(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) {
+func (emaStrategy EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
 
 	//
 	if len(Time) == 0 || len(Price) == 0 || len(Volumn) == 0 {
 		logger.Errorln("detect exception data")
-		return
+		return false
 	}
 
 	//read config
@@ -49,7 +50,7 @@ func PerformEMA(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []floa
 	_, err := strconv.ParseFloat(Option["tradeAmount"], 64)
 	if err != nil {
 		logger.Debugln("config item tradeAmount is not float")
-		return
+		return false
 	}
 	tradeAmount := Option["tradeAmount"]
 
@@ -66,30 +67,32 @@ func PerformEMA(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []floa
 		//check exception data in trade center
 		if checkException(Price[length-2], Price[length-1], Volumn[length-1]) == false {
 			logger.Errorln("detect exception data of trade center", Price[length-2], Price[length-1], Volumn[length-1])
-			return
+			return false
 		}
 
 		//do buy when cross up
 		if EMAdif[length-2] < 0 && EMAdif[length-1] > 0 {
-			if Option["disable_trading"] != "1" && tradeAPI.GetPrevTrend() != "up" {
-				tradeAPI.SetPrevTrend("up")
+			if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrend != "up" {
+				emaStrategy.PrevEMATrend = "up"
 				logger.Infoln("EMA up cross, 买入buy In", tradeAPI.GetTradePrice(""))
-				tradeAPI.BuyIn(tradeAPI.GetTradePrice("buy"), tradeAmount)
+				tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount)
 			}
 		}
 
 		//do sell when cross down
 		if EMAdif[length-2] > 0 && EMAdif[length-1] < 0 {
-			if Option["disable_trading"] != "1" && tradeAPI.GetPrevTrend() != "down" {
-				tradeAPI.SetPrevTrend("down")
+			if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrend != "down" {
+				emaStrategy.PrevEMATrend = "down"
 				logger.Infoln("EMA down cross, 卖出Sell Out", tradeAPI.GetTradePrice(""))
-				tradeAPI.SellOut(tradeAPI.GetTradePrice("sell"), tradeAmount)
+				tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount)
 			}
 		}
 
 		//backup the kline data for analyze
 		backup(Time[length-1])
 	}
+
+	return true
 }
 
 //for backup the kline file to detect the huobi bug

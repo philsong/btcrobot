@@ -4,7 +4,8 @@
 	"dsn": "btcrobot.s3db",
 	"cookie_secret": "btcrobot",
 	"pid": "pid/btcrobot.pid",
-	"auid": "10000",
+	
+	"strageteyName":"EMA",
 
 	"from_email": "xxxx@gmail.com",
 
