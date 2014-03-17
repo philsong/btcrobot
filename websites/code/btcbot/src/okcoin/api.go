@@ -48,16 +48,18 @@ func NewOkcoin() *Okcoin {
 }
 
 func (w Okcoin) AnalyzeKLine(peroid int) (ret bool) {
-	return w.AnalyzeKLinePeroid(peroid)
+	symbol := Option["symbol"]
+	return w.AnalyzeKLinePeroid(symbol, peroid)
 }
 
 func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
 	tradeAPI := NewOkcoinTrade(SecretOption["access_key"], SecretOption["secret_key"])
 
 	var buyId string
-	if Option["symbol"] == "btc_cny" {
+	symbol := Option["symbol"]
+	if symbol == "btc_cny" {
 		buyId = tradeAPI.BuyBTC(tradePrice, tradeAmount)
-	} else if Option["symbol"] == "ltc_cny" {
+	} else if symbol == "ltc_cny" {
 		buyId = tradeAPI.BuyLTC(tradePrice, tradeAmount)
 	}
 
@@ -75,9 +77,10 @@ func (w Okcoin) Sell(tradePrice, tradeAmount string) bool {
 	tradeAPI := NewOkcoinTrade(SecretOption["access_key"], SecretOption["secret_key"])
 
 	var sellId string
-	if Option["symbol"] == "btc_cny" {
+	symbol := Option["symbol"]
+	if symbol == "btc_cny" {
 		sellId = tradeAPI.SellBTC(tradePrice, tradeAmount)
-	} else if Option["symbol"] == "ltc_cny" {
+	} else if symbol == "ltc_cny" {
 		sellId = tradeAPI.SellLTC(tradePrice, tradeAmount)
 	}
 

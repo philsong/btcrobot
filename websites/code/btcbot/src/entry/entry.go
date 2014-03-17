@@ -22,6 +22,7 @@ import (
 	. "config"
 	"fmt"
 	"huobi"
+	"log"
 	"logger"
 	"okcoin"
 	"strconv"
@@ -70,7 +71,7 @@ func RunRobot() {
 	} else if Option["tradecenter"] == "okcoin" {
 		tradeAPI = okcoin.NewOkcoin()
 	} else {
-		fmt.Println("Please set the tradecenter firstly...")
+		log.Fatalln("Please config the tradecenter firstly...")
 		return
 	}
 	peroid, _ := strconv.Atoi(Option["tick_interval"])
