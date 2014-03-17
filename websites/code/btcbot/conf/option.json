@@ -1,1 +1,9 @@
-{"disable_backtesting":"0","disable_trading":"0","longEMA":"21","secret_key":"","shortEMA":"10","tick_interval":"1","totalHour":"24","tradeAmount":"1"}
+{
+	"disable_backtesting": "0",
+	"disable_trading": "0",
+	"longEMA": "21",
+	"shortEMA": "10",
+	"tick_interval": "1",
+	"totalHour": "24",
+	"tradeAmount": "0.1"
+}

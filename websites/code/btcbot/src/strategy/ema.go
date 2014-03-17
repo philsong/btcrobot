@@ -1,7 +1,6 @@
 /*
-  btcbot is a Bitcoin trading bot for HUOBI.com written
-  in golang, it features multiple trading methods using
-  technical analysis.
+  btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
+  it features multiple trading methods using technical analysis.
 
   Disclaimer:
 
@@ -30,32 +29,19 @@ type TradeAPI interface {
 	Do_buy(price, amount string) bool
 	Do_sell(price, amount string) bool
 	GetTradePrice(tradeDirection string) string
+	GetPrevTrend() string
+	SetPrevTrend(trend string)
 }
 
-//for backup the kline file to detect the huobi bug
-func backup(Time string) {
-
-	oldFile := "cache/TradeKLine_minute.data"
-	newFile := fmt.Sprintf("%s_%s", oldFile, Time)
-	os.Rename(oldFile, newFile)
-}
-
-func checkException(yPrevPrice, Price, Volumn float64) bool {
-	if Price > yPrevPrice+10 && Volumn < 1 {
-		return false
-	}
-
-	if Price < yPrevPrice-10 && Volumn < 1 {
-		return false
-	}
-
-	return true
-}
+//EMA strategy
 func PerformEMA(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) {
-	if len(Price) == 0 {
-		logger.Errorln("no data is prepared!")
+
+	//
+	if len(Time) == 0 || len(Price) == 0 || len(Volumn) == 0 {
+		logger.Errorln("detect exception data")
 		return
 	}
+
 	//read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
@@ -76,27 +62,55 @@ func PerformEMA(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []floa
 
 	//EMA cross
 	if (EMAdif[length-2] < 0 && EMAdif[length-1] > 0) || (EMAdif[length-2] > 0 && EMAdif[length-1] < 0) { //up cross
+
+		//check exception data in trade center
 		if checkException(Price[length-2], Price[length-1], Volumn[length-1]) == false {
-			logger.Infoln("detect exception data", Price[length-2], Price[length-1], Volumn[length-1])
+			logger.Errorln("detect exception data of trade center", Price[length-2], Price[length-1], Volumn[length-1])
 			return
 		}
 
+		//do buy when cross up
 		if EMAdif[length-2] < 0 && EMAdif[length-1] > 0 {
-			if Option["disable_trading"] != "1" {
-				logger.Infoln("EMA up cross, 买入buyIn", tradeAPI.GetTradePrice(""))
+			if Option["disable_trading"] != "1" && tradeAPI.GetPrevTrend() != "up" {
+				tradeAPI.SetPrevTrend("up")
+				logger.Infoln("EMA up cross, 买入buy In", tradeAPI.GetTradePrice(""))
 				tradeAPI.Do_buy(tradeAPI.GetTradePrice("buy"), tradeAmount)
 			}
 		}
 
+		//do sell when cross down
 		if EMAdif[length-2] > 0 && EMAdif[length-1] < 0 {
-			if Option["disable_trading"] != "1" {
-				logger.Infoln("EMA down cross, 卖出Sellout", tradeAPI.GetTradePrice(""))
+			if Option["disable_trading"] != "1" && tradeAPI.GetPrevTrend() != "down" {
+				tradeAPI.SetPrevTrend("down")
+				logger.Infoln("EMA down cross, 卖出Sell Out", tradeAPI.GetTradePrice(""))
 				tradeAPI.Do_sell(tradeAPI.GetTradePrice("sell"), tradeAmount)
 			}
 		}
 
+		//backup the kline data for analyze
 		backup(Time[length-1])
 	}
+}
+
+//for backup the kline file to detect the huobi bug
+func backup(Time string) {
+
+	oldFile := "cache/TradeKLine_minute.data"
+	newFile := fmt.Sprintf("%s_%s", oldFile, Time)
+	os.Rename(oldFile, newFile)
+}
+
+//check exception data in trade center
+func checkException(yPrevPrice, Price, Volumn float64) bool {
+	if Price > yPrevPrice+10 && Volumn < 1 {
+		return false
+	}
+
+	if Price < yPrevPrice-10 && Volumn < 1 {
+		return false
+	}
+
+	return true
 }
 
 func getEMAdifAt(emaShort, emaLong []float64, idx int) float64 {
@@ -127,7 +141,6 @@ func getEMAdif(emaShort, emaLong []float64) []float64 {
  * t = today y = yesterday N = number of days in EMA k = 2/(2N+1)
  *
  * @param Price : array of y variables.
- * @param Time : array of x variables.
  * @param periods : The amount of "days" to average from.
  * @return an array containing the EMA.
 **/
@@ -143,7 +156,7 @@ func EMA(Price []float64, periods int) []float64 {
 	var periodArr []float64
 	var startpos int
 	length := len(Price)
-	var emLine []float64 = make([]float64, length)
+	var emaLine []float64 = make([]float64, length)
 
 	// loop through data
 	for i := 0; i < length; i++ {
@@ -151,7 +164,7 @@ func EMA(Price []float64, periods int) []float64 {
 			startpos = i + 1
 			break
 		} else {
-			emLine[i] = 0
+			emaLine[i] = 0
 		}
 	}
 
@@ -173,19 +186,19 @@ func EMA(Price []float64, periods int) []float64 {
 				y = ema
 			}
 
-			emLine[i] = y
+			emaLine[i] = y
 
 			// remove first value in array.
 			periodArr = periodArr[1:]
 
 		} else {
 
-			emLine[i] = 0
+			emaLine[i] = 0
 		}
 
 	}
 
-	return emLine
+	return emaLine
 }
 
 /* Function that returns average of an array's values.

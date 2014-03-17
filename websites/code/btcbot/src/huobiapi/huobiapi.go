@@ -55,7 +55,7 @@ type Huobi struct {
 	lastLowestprice  float64
 	lastBuyprice     float64
 
-	lastAction string
+	prevEMATrend string
 
 	Disable_trading int
 
@@ -78,6 +78,7 @@ func (w Huobi) Do_buy(tradePrice, tradeAmount string) bool {
 	logger.Infoln("buyId", buyId)
 	if buyId != "0" {
 		logger.Infoln("执行买入委托成功", tradePrice, tradeAmount)
+
 		return true
 	} else {
 		logger.Infoln("执行买入委托失败", tradePrice, tradeAmount)
@@ -91,6 +92,7 @@ func (w Huobi) Do_sell(tradePrice, tradeAmount string) bool {
 	logger.Infoln("sellId", sellId)
 	if sellId != "0" {
 		logger.Infoln("执行卖出委托成功", tradePrice, tradeAmount)
+		w.SetPrevTrend("down")
 		return true
 	} else {
 		logger.Infoln("执行卖出委托失败", tradePrice, tradeAmount)
@@ -98,6 +100,13 @@ func (w Huobi) Do_sell(tradePrice, tradeAmount string) bool {
 	}
 }
 
+func (w Huobi) SetPrevTrend(trend string) {
+	w.prevEMATrend = trend
+}
+
+func (w Huobi) GetPrevTrend() string {
+	return w.prevEMATrend
+}
 func (w *Huobi) getNewPrice() (float64, bool) {
 	if w.TradeDetail() == true {
 		logger.Traceln("new：", w.Detail_data.Vp_new)
