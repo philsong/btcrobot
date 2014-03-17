@@ -28,16 +28,19 @@ import (
 	"time"
 )
 
+type MarketAPI interface {
+	AnalyzeKLine(peroid int) (ret bool)
+}
+
+/*
 func backtesting() {
 	fmt.Println("back testing begin...")
 	huobi := huobi.NewHuobi()
 	huobi.Disable_trading = 1
 
 	peroids := []int{1, 5, 15, 30, 60, 100}
-	for _, v := range peroids {
-		huobi.Peroid = v
-		if huobi.TradeKLinePeroid(huobi.Peroid) == true {
-
+	for _, peroid := range peroids {
+		if huobi.AnalyzeKLine(peroid) == true {
 		} else {
 			logger.Errorln("TradeKLine failed.")
 		}
@@ -47,32 +50,21 @@ func backtesting() {
 
 	fmt.Println("back testing end ...")
 }
+*/
 
 func testKLineAPI(done chan bool) {
 	ticker := time.NewTicker(2000 * time.Millisecond) //2s
 
 	huobi := huobi.NewHuobi()
-	huobi.Peroid, _ = strconv.Atoi(Option["tick_interval"])
+	peroid, _ := strconv.Atoi(Option["tick_interval"])
 	totalHour, _ := strconv.ParseInt(Option["totalHour"], 0, 64)
 	if totalHour < 1 {
 		totalHour = 1
 	}
-	slippage, err := strconv.ParseFloat(Config["slippage"], 64)
-	if err != nil {
-		logger.Debugln("config item slippage is not float")
-		slippage = 0
-	}
-	huobi.Slippage = slippage
-
-	huobi.Disable_trading = 0
 
 	go func() {
 		for _ = range ticker.C {
-			if huobi.Peroid == 1 {
-				huobi.TradeKLineMinute()
-			} else {
-				huobi.TradeKLinePeroid(huobi.Peroid)
-			}
+			huobi.AnalyzeKLine(peroid)
 		}
 	}()
 

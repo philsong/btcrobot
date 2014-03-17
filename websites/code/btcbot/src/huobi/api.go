@@ -22,23 +22,42 @@ import (
 	"fmt"
 	"logger"
 	"net/http"
+	"strconv"
 )
 
-type Huobi struct {
-	client          *http.Client
-	prevEMATrend    string
-	Disable_trading int
+type MarketAPI interface {
+	AnalyzeKLine(peroid int) (ret bool)
+}
 
-	Peroid   int
-	Slippage float64
-	Time     []string
-	Price    []float64
-	Volumn   []float64
+type TradeAPI interface {
+	BuyIn(price, amount string) bool
+	SellOut(price, amount string) bool
+	GetTradePrice(tradeDirection string) string
+	GetPrevTrend() string
+	SetPrevTrend(trend string)
+}
+
+type Huobi struct {
+	client       *http.Client
+	tradeAPI     *HuobiTrade
+	prevEMATrend string
+
+	Time   []string
+	Price  []float64
+	Volumn []float64
 }
 
 func NewHuobi() *Huobi {
 	w := new(Huobi)
 	return w
+}
+
+func (w Huobi) AnalyzeKLine(peroid int) (ret bool) {
+	if peroid == 1 {
+		return w.AnalyzeKLineMinute()
+	} else {
+		return w.AnalyzeKLinePeroid(peroid)
+	}
 }
 
 func (w Huobi) BuyIn(tradePrice, tradeAmount string) bool {
@@ -69,26 +88,33 @@ func (w Huobi) SellOut(tradePrice, tradeAmount string) bool {
 	}
 }
 
+func (w Huobi) GetTradePrice(tradeDirection string) string {
+	if len(w.Price) == 0 {
+		logger.Errorln("get price failed, array len=0")
+		return "false"
+	}
+
+	slippage, err := strconv.ParseFloat(Config["slippage"], 64)
+	if err != nil {
+		logger.Debugln("config item slippage is not float")
+		slippage = 0
+	}
+
+	var finalTradePrice float64
+	if tradeDirection == "buy" {
+		finalTradePrice = w.Price[len(w.Price)-1] + slippage
+	} else if tradeDirection == "sell" {
+		finalTradePrice = w.Price[len(w.Price)-1] - slippage
+	} else {
+		finalTradePrice = w.Price[len(w.Price)-1]
+	}
+	return fmt.Sprintf("%0.02f", finalTradePrice)
+}
+
 func (w Huobi) SetPrevTrend(trend string) {
 	w.prevEMATrend = trend
 }
 
 func (w Huobi) GetPrevTrend() string {
 	return w.prevEMATrend
-}
-
-func (w Huobi) GetTradePrice(tradeDirection string) string {
-	if len(w.Price) == 0 {
-		logger.Errorln("get price failed, array len=0")
-		return "false"
-	}
-	var finalTradePrice float64
-	if tradeDirection == "buy" {
-		finalTradePrice = w.Price[len(w.Price)-1] + w.Slippage
-	} else if tradeDirection == "sell" {
-		finalTradePrice = w.Price[len(w.Price)-1] - w.Slippage
-	} else {
-		finalTradePrice = w.Price[len(w.Price)-1]
-	}
-	return fmt.Sprintf("%0.02f", finalTradePrice)
 }
