@@ -37,7 +37,7 @@
 	"TresholdLevel": "1",
 	"tradeOnlyAfterSwitch": "1",
 	"kdj": "9",
-	"slippage": "5",
+	"slippage": "2",
 
 	"stopPoints": "50",
 

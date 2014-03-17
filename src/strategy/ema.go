@@ -30,7 +30,7 @@ type EMAStrategy struct {
 }
 
 func init() {
-	emaStrategy := EMAStrategy{}
+	emaStrategy := new(EMAStrategy)
 	Register("EMA", emaStrategy)
 }
 
