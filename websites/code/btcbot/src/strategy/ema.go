@@ -26,8 +26,8 @@ import (
 )
 
 type TradeAPI interface {
-	Do_buy(price, amount string) bool
-	Do_sell(price, amount string) bool
+	BuyIn(price, amount string) bool
+	SellOut(price, amount string) bool
 	GetTradePrice(tradeDirection string) string
 	GetPrevTrend() string
 	SetPrevTrend(trend string)
@@ -74,7 +74,7 @@ func PerformEMA(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []floa
 			if Option["disable_trading"] != "1" && tradeAPI.GetPrevTrend() != "up" {
 				tradeAPI.SetPrevTrend("up")
 				logger.Infoln("EMA up cross, 买入buy In", tradeAPI.GetTradePrice(""))
-				tradeAPI.Do_buy(tradeAPI.GetTradePrice("buy"), tradeAmount)
+				tradeAPI.BuyIn(tradeAPI.GetTradePrice("buy"), tradeAmount)
 			}
 		}
 
@@ -83,7 +83,7 @@ func PerformEMA(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []floa
 			if Option["disable_trading"] != "1" && tradeAPI.GetPrevTrend() != "down" {
 				tradeAPI.SetPrevTrend("down")
 				logger.Infoln("EMA down cross, 卖出Sell Out", tradeAPI.GetTradePrice(""))
-				tradeAPI.Do_sell(tradeAPI.GetTradePrice("sell"), tradeAmount)
+				tradeAPI.SellOut(tradeAPI.GetTradePrice("sell"), tradeAmount)
 			}
 		}
 

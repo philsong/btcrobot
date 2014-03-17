@@ -75,9 +75,9 @@ func TradeHandler(rw http.ResponseWriter, req *http.Request) {
 		huobi := huobiapi.NewHuobi()
 		var ret bool
 		if msgtype == "dobuy" {
-			ret = huobi.Do_buy(config.TradeOption["buyprice"], config.TradeOption["buyamount"])
+			ret = huobi.BuyIn(config.TradeOption["buyprice"], config.TradeOption["buyamount"])
 		} else if msgtype == "dosell" {
-			ret = huobi.Do_sell(config.TradeOption["sellprice"], config.TradeOption["sellamount"])
+			ret = huobi.SellOut(config.TradeOption["sellprice"], config.TradeOption["sellamount"])
 		}
 
 		if ret != true {
