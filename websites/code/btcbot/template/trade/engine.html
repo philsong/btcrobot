@@ -28,13 +28,13 @@
                 </select>
             </div>
           </div>
-          
+
           <div class="control-group string optional"><label class="string optional control-label" for="shortEMA"><abbr title="required">*</abbr>短期EMA</label><div class="controls"><input class=" string optional span1" id="shortEMA" name="shortEMA" size="50" type="text" value="{{.config.shortEMA}}"></div></div>
          
           <div class="control-group string optional"><label class="string optional control-label" for="longEMA"><abbr title="required">*</abbr>长期EMA</label><div class="controls"><input class="string optional span1" id="longEMA" name="longEMA" size="50" type="text" value="{{.config.longEMA}}"></div></div>
           
           <div class="control-group string optional">
-            <label class="string optional control-label" for="tick_interval"><abbr title="required">*</abbr>探测周期</label>
+            <label class="string optional control-label" for="tick_interval"><abbr title="required">*</abbr>K线周期</label>
             <div class="controls">
                 <select name="tick_interval" id="tick_interval" class="select-1" >
                     <option value="100">1 天</option>
@@ -54,8 +54,8 @@
             <label class="string optional control-label" for="tradecenter"><abbr title="required">*</abbr>交易中心</label>
             <div class="controls">
                 <select name="tradecenter" id="tradecenter" class="select-1" >
-                    <option value="huobi">火币网</option>
-                    <option value="okcoin">OKCoin</option>
+                    <option value="huobi">huobi</option>
+                    <option value="okcoin">okcoin</option>
                 </select>
             </div>
           </div>
