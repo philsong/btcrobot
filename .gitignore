@@ -23,12 +23,12 @@ _testmain.go
 .idea
 *.exe
 secret.json
+cache
 log
 pid
 bin
 pkg
-websites/code/thirdparty/src
+thirdparty/src
 src/github.com
 src/code.google.com
 src/labix.org
-websites/code/btcbot/cache

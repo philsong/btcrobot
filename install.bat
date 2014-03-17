@@ -9,7 +9,7 @@ goto end
 :ok
 
 set OLDGOPATH=%GOPATH%
-set GOPATH=%~dp0;%~dp0..\thirdparty
+set GOPATH=%~dp0;%~dp0\thirdparty
 
 gofmt -w src
 

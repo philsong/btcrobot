@@ -146,42 +146,43 @@ func (w *Okcoin) analyzePeroidLine(filename string, content string) bool {
 	logger.Traceln("Okcoin analyzePeroidLine begin....")
 	content = strings.TrimPrefix(content, "[[")
 	content = strings.TrimSuffix(content, "]]")
+	/*
+		for _, value := range strings.Split(content, `],[`) {
 
-	for _, value := range strings.Split(content, `],[`) {
+				//logger.Traceln(value)
+				v := strings.Split(value, ",")
+				if len(valueItem) != 8 {
+					logger.Traceln("wrong data")
+					break
+				}
 
-		//logger.Traceln(value)
-		v := strings.Split(value, ",")
-		if len(valueItem) != 8 {
-			logger.Traceln("wrong data")
-			break
+					var peroidRecord PeroidRecord
+					_, err := strconv.ParseInt(v[0], 64)
+					if err != nil {
+						logger.Debugln("config item tradeAmount is not float")
+						return false
+					}
+
+					peroidRecord.Time = v[0]
+					peroidRecord.zero1 = v[1]
+					peroidRecord.zero2 = v[2]
+					_, err := strconv.ParseFloat(v[0], 64)
+					if err != nil {
+						logger.Debugln("config item tradeAmount is not float")
+						return false
+					}
+
+					peroidRecord.Open = v[3]
+					peroidRecord.High = v[4]
+					peroidRecord.Low = v[5]
+					peroidRecord.Close = v[6]
+					peroidRecord.Volumn = v[7].(float64)
+
+				logger.Traceln(peroidRecord)
+
+			//ids = append(ids, valueItem)
 		}
-
-		var peroidRecord PeroidRecord
-		_, err := strconv.ParseInt(v[0], 64)
-		if err != nil {
-			logger.Debugln("config item tradeAmount is not float")
-			return false
-		}
-
-		peroidRecord.Time = v[0]
-		peroidRecord.zero1 = v[1]
-		peroidRecord.zero2 = v[2]
-		_, err := strconv.ParseFloat(v[0], 64)
-		if err != nil {
-			logger.Debugln("config item tradeAmount is not float")
-			return false
-		}
-
-		peroidRecord.Open = v[3]
-		peroidRecord.High = v[4]
-		peroidRecord.Low = v[5]
-		peroidRecord.Close = v[6]
-		peroidRecord.Volumn = v[7].(float64)
-
-		logger.Traceln(peroidRecord)
-
-		//ids = append(ids, valueItem)
-	}
+	*/
 	logger.Traceln("Okcoin analyzePeroidLine end....")
 	return false
 

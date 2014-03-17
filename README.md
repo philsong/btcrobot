@@ -40,7 +40,7 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
 2、下载安装依赖库（如果依赖库下载不下来可以联系我）
 
-	cd btcrobot/websites/code/thirdparty
+	cd btcrobot/thirdparty
 	// windows 下执行
 	getpkg.bat
 	// linux/mac 下执行
@@ -51,7 +51,7 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 先编译
 
 	// 接着上一步
-	cd ../btcbot/
+	cd ../
 	// windows 下执行
 	install.bat
 	// linux/mac 下执行
