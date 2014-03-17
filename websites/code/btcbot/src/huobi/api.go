@@ -60,7 +60,7 @@ func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
 	var buyId string
 	if Option["symbol"] == "btc_cny" {
 		buyId = tradeAPI.BuyBTC(tradePrice, tradeAmount)
-	} else if Option["TradeName"] == "ltc_cny" {
+	} else if Option["symbol"] == "ltc_cny" {
 		buyId = tradeAPI.BuyLTC(tradePrice, tradeAmount)
 	}
 
@@ -80,7 +80,7 @@ func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
 	var sellId string
 	if Option["symbol"] == "btc_cny" {
 		sellId = tradeAPI.SellBTC(tradePrice, tradeAmount)
-	} else if Option["TradeName"] == "ltc_cny" {
+	} else if Option["symbol"] == "ltc_cny" {
 		sellId = tradeAPI.SellLTC(tradePrice, tradeAmount)
 	}
 	logger.Infoln("sellId", sellId)
