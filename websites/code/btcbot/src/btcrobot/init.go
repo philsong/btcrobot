@@ -21,16 +21,16 @@ package main
 import (
 	. "config"
 	"fmt"
-	"huobiapi"
+	"huobi"
 	"logger"
-	"okcoinapi"
+	"okcoin"
 	"strconv"
 	"time"
 )
 
 func backtesting() {
 	fmt.Println("back testing begin...")
-	huobi := huobiapi.NewHuobi()
+	huobi := huobi.NewHuobi()
 	huobi.Disable_trading = 1
 
 	peroids := []int{1, 5, 15, 30, 60, 100}
@@ -51,7 +51,7 @@ func backtesting() {
 func testKLineAPI(done chan bool) {
 	ticker := time.NewTicker(2000 * time.Millisecond) //2s
 
-	huobi := huobiapi.NewHuobi()
+	huobi := huobi.NewHuobi()
 	huobi.Peroid, _ = strconv.Atoi(Option["tick_interval"])
 	totalHour, _ := strconv.ParseInt(Option["totalHour"], 0, 64)
 	if totalHour < 1 {
@@ -88,7 +88,7 @@ func testKLineAPI(done chan bool) {
 }
 
 func testHuobiAPI() {
-	tradeAPI := huobiapi.NewHuobiTrade(SecretOption["access_key"], SecretOption["secret_key"])
+	tradeAPI := huobi.NewHuobiTrade(SecretOption["access_key"], SecretOption["secret_key"])
 	accout_info, _ := tradeAPI.Get_account_info()
 	fmt.Println(accout_info)
 
@@ -115,7 +115,7 @@ func testHuobiAPI() {
 }
 
 func testOkcoinAPI() {
-	tradeAPI := okcoinapi.NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+	tradeAPI := okcoin.NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 	accout_info, _ := tradeAPI.Get_account_info()
 	fmt.Println(accout_info)
 
@@ -124,7 +124,7 @@ func testOkcoinAPI() {
 	sellret := tradeAPI.SellBTC("10000", "0.01")
 	fmt.Println(sellret)
 
-	var orderTable okcoinapi.OrderTable
+	var orderTable okcoin.OrderTable
 	orderTable, ret := tradeAPI.Get_BTCorder("-1")
 	fmt.Println(ret, orderTable)
 

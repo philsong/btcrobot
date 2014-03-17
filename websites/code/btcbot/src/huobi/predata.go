@@ -16,7 +16,7 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package huobiapi
+package huobi
 
 import (
 	"bufio"

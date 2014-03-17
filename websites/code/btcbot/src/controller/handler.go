@@ -24,7 +24,7 @@ import (
 	"filter"
 	"fmt"
 	"github.com/studygolang/mux"
-	"huobiapi"
+	"huobi"
 	"logger"
 	"net/http"
 )
@@ -72,7 +72,7 @@ func TradeHandler(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		huobi := huobiapi.NewHuobi()
+		huobi := huobi.NewHuobi()
 		var ret bool
 		if msgtype == "dobuy" {
 			ret = huobi.BuyIn(config.TradeOption["buyprice"], config.TradeOption["buyamount"])

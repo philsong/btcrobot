@@ -15,7 +15,7 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package okcoinapi
+package okcoin
 
 import (
 	"compress/gzip"
