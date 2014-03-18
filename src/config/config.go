@@ -31,14 +31,12 @@ var ROOT string
 
 var Config map[string]string
 var Option map[string]string
-var Remind map[string]string
 var TradeOption map[string]string
 var SecretOption map[string]string
 
 func init() {
 	LoadConfig()
 	LoadOption()
-	LoadRemind()
 	LoadSecretOption()
 	//fmt.Println(Config)
 	//fmt.Println(Option)
@@ -114,20 +112,6 @@ func LoadOption() error {
 
 func SaveOption() error {
 	return save_config("/conf/option.json", Option)
-}
-
-func LoadRemind() (err error) {
-	_Remind, err := load_config("/conf/remind.json")
-	if err != nil {
-		return (err)
-	}
-	Remind = make(map[string]string)
-	Remind = _Remind
-	return nil
-}
-
-func SaveRemind() error {
-	return save_config("/conf/remind.json", Remind)
 }
 
 func LoadTrade() (err error) {

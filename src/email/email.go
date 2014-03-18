@@ -25,6 +25,7 @@ import (
 	"logger"
 	"net/mail"
 	"net/smtp"
+	"strconv"
 	"strings"
 )
 
@@ -54,7 +55,7 @@ func SendMail(subject, content string, tos []string) error {
 				` + content
 
 	auth := smtp.PlainAuth("", SecretOption["smtp_username"], SecretOption["smtp_password"], SecretOption["smtp_host"])
-	err := smtp.SendMail(SecretOption["smtp_addr"], auth, Remind["from_email"], tos, []byte(message))
+	err := smtp.SendMail(SecretOption["smtp_addr"], auth, Option["from_email"], tos, []byte(message))
 	if err != nil {
 		logger.Errorln("Send Mail to", strings.Join(tos, ","), "error:", err)
 		return err
@@ -139,4 +140,43 @@ func NoticeEmail2() {
 	} else {
 		fmt.Println("send mail success!")
 	}
+}
+
+func TriggerTrender(alert string) error {
+
+	if Option["disable_email"] != "1" {
+		if alert != "" {
+			SendAlertEmail(Option["to_email"], alert)
+		}
+	}
+
+	return nil
+}
+
+func TriggerPrice(price float64) error {
+	lowest_price, err := strconv.ParseFloat(Option["lowest_price"], 64)
+	if err != nil {
+		logger.Debugln("config item lowest_price is not float")
+		return err
+	}
+	highest_price, err := strconv.ParseFloat(Option["highest_price"], 64)
+	if err != nil {
+		logger.Debugln("config item highest_price is not float")
+		return err
+	}
+
+	var alert string
+	if Option["disable_email"] != "1" {
+		if price < lowest_price {
+			alert = fmt.Sprintf("价格 %f 低于设定的阀值 %f", price, Option["lowest_price"])
+		} else if price > highest_price {
+			alert = fmt.Sprintf("价格 %f 超过设定的阀值 %f", price, Option["highest_price"])
+		}
+
+		if alert != "" {
+			SendAlertEmail(Option["to_email"], alert)
+		}
+	}
+
+	return nil
 }

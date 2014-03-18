@@ -98,7 +98,7 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 	for key, val := range pParams {
 		v.Add(key, val)
 	}
-	fmt.Println(v.Encode())
+	//	fmt.Println(v.Encode())
 
 	req, err := http.NewRequest("POST", api_url, strings.NewReader(v.Encode()))
 	if err != nil {

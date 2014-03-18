@@ -24,6 +24,7 @@ _testmain.go
 *.exe
 secret.json
 cache
+bin
 log
 pid
 release

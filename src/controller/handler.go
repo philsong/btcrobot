@@ -141,6 +141,15 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 			config.Option["disable_trading"] = "0"
 		}
 
+		// open传递过来的是“on”或没传递
+		if req.FormValue("disable_email") == "on" {
+			config.Option["disable_email"] = "1"
+		} else {
+			config.Option["disable_email"] = "0"
+		}
+
+		config.Option["to_email"] = req.FormValue("to_email")
+
 		logger.Debugln("===[", req.FormValue("disable_backtesting"), "]")
 		if req.FormValue("disable_backtesting") == "on" {
 			config.Option["disable_backtesting"] = "1"
@@ -168,50 +177,6 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		fmt.Fprint(rw, `{"errno": 0, "msg":"更新引擎配置成功!"}`)
-	}
-}
-
-func RemindHandler(rw http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	msgtype := vars["msgtype"]
-	if req.Method != "POST" && msgtype == "" {
-		// 获取用户信息
-		err := config.LoadRemind()
-		if err != nil {
-			fmt.Fprint(rw, `{"errno": 1, "error":"`, "读取提醒配置数据失败", `"}`)
-			return
-		}
-		// 设置模板数据
-		filter.SetData(req, map[string]interface{}{"config": config.Remind})
-		req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/remind.html")
-		return
-	} else if req.Method != "POST" && msgtype == "ajax" {
-		Remind_json, err := json.Marshal(config.Remind)
-		if err != nil {
-			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "读取提醒配置数据失败", `"}`)
-		} else {
-			fmt.Fprint(rw, string(Remind_json))
-		}
-		return
-	} else {
-		// open传递过来的是“on”或没传递
-		if req.FormValue("disable_email") == "on" {
-			config.Remind["disable_email"] = "1"
-		} else {
-			config.Remind["disable_email"] = "0"
-		}
-		config.Remind["lowest_price"] = req.FormValue("lowest_price")
-		config.Remind["highest_price"] = req.FormValue("highest_price")
-		config.Remind["to_email"] = req.FormValue("to_email")
-
-		// 更新个人信息
-		err := config.SaveRemind()
-		if err != nil {
-			fmt.Fprint(rw, `{"errno": 1, "error":"`, "写入提醒配置数据失败", `"}`)
-			return
-		}
-
-		fmt.Fprint(rw, `{"errno": 0, "msg":"更新提醒配置成功!"}`)
 	}
 }
 

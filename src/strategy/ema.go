@@ -19,6 +19,7 @@ package strategy
 
 import (
 	. "config"
+	"email"
 	"fmt"
 	"logger"
 	"os"
@@ -61,6 +62,8 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 
 	length := len(Price)
 
+	//go TriggerPrice(Price[length-1])
+
 	//EMA cross
 	if (EMAdif[length-2] < 0 && EMAdif[length-1] > 0) || (EMAdif[length-2] > 0 && EMAdif[length-1] < 0) { //up cross
 
@@ -76,6 +79,7 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 				emaStrategy.PrevEMATrend = "up"
 				logger.Infoln("EMA up cross, 买入buy In", tradeAPI.GetTradePrice(""))
 				tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount)
+				go email.TriggerTrender("EMA up cross, 买入buy In")
 			}
 		}
 
@@ -85,6 +89,7 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 				emaStrategy.PrevEMATrend = "down"
 				logger.Infoln("EMA down cross, 卖出Sell Out", tradeAPI.GetTradePrice(""))
 				tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount)
+				go email.TriggerTrender("EMA down cross, 卖出Sell Out")
 			}
 		}
 

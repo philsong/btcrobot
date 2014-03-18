@@ -11,8 +11,14 @@
             <div class="controls">
               <label class="string optional control-label" for="disable_trading" class="checkbox"><input id="disable_trading" name="disable_trading" type="checkbox"> 关闭自动交易引擎</label>
             </div>
+            <div class="controls">
+              <label class="string optional control-label" for="disable_email" class="checkbox"><input id="disable_email" name="disable_email" type="checkbox"> 关闭邮件通知</label>
+            </div>
+
           </div>
-          
+
+          <div class="control-group email required"><label class="email required control-label" for="to_email"><abbr title="required">*</abbr>接收Email</label><div class="controls"><input class="string email required span2" id="to_email" name="to_email" size="50" type="email" value="{{.config.to_email}}"></div></div>
+
           <div class="control-group" style="display: none" >
             <div class="controls">
               <label class="string optional control-label" for="disable_backtesting" class="checkbox"><input id="disable_backtesting" name="disable_backtesting" type="checkbox"> 关闭后向测试backtesting</label>
@@ -112,7 +118,13 @@ $(function(){
         }else{
           $('#disable_trading').prop('checked', true);
         }
-
+        console.log(data.disable_email)
+        if (data.disable_email == "0" ) {
+          $('#disable_email').prop('checked', false);
+        }else{
+          $('#disable_email').prop('checked', true);
+        }
+        
         console.log(data.disable_backtesting)
         if (data.disable_backtesting == "0" ) {
           $('#disable_backtesting').prop('checked', false);
