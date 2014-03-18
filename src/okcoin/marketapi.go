@@ -210,7 +210,7 @@ func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
 		peroidRecord.Close = Close
 		peroidRecord.Volumn = Volumn
 
-		logger.Traceln(peroidRecord)
+		//logger.Traceln(peroidRecord)
 
 		PeroidRecords = append(PeroidRecords, peroidRecord)
 	}
