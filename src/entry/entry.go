@@ -99,7 +99,7 @@ func RunRobot() {
 }
 
 func testHuobiAPI() {
-	tradeAPI := huobi.NewHuobiTrade(SecretOption["access_key"], SecretOption["secret_key"])
+	tradeAPI := huobi.NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
 	accout_info, _ := tradeAPI.Get_account_info()
 	fmt.Println(accout_info)
 

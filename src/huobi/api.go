@@ -55,7 +55,7 @@ func (w Huobi) AnalyzeKLine(peroid int) (ret bool) {
 }
 
 func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
-	tradeAPI := NewHuobiTrade(SecretOption["access_key"], SecretOption["secret_key"])
+	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
 
 	var buyId string
 	if Option["symbol"] == "btc_cny" {
@@ -75,7 +75,7 @@ func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
 }
 
 func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
-	tradeAPI := NewHuobiTrade(SecretOption["access_key"], SecretOption["secret_key"])
+	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
 
 	var sellId string
 	if Option["symbol"] == "btc_cny" {
@@ -83,7 +83,7 @@ func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
 	} else if Option["symbol"] == "ltc_cny" {
 		sellId = tradeAPI.SellLTC(tradePrice, tradeAmount)
 	}
-	logger.Infoln("sellId", sellId)
+
 	if sellId != "0" {
 		logger.Infoln("执行卖出委托成功", tradePrice, tradeAmount)
 		return true
@@ -99,7 +99,7 @@ func (w Huobi) GetTradePrice(tradeDirection string) string {
 		return "false"
 	}
 
-	slippage, err := strconv.ParseFloat(Config["slippage"], 64)
+	slippage, err := strconv.ParseFloat(Option["slippage"], 64)
 	if err != nil {
 		logger.Debugln("config item slippage is not float")
 		slippage = 0

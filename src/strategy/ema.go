@@ -35,7 +35,7 @@ func init() {
 }
 
 //EMA strategy
-func (emaStrategy EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
+func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
 
 	//
 	if len(Time) == 0 || len(Price) == 0 || len(Volumn) == 0 {

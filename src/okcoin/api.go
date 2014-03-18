@@ -53,7 +53,7 @@ func (w Okcoin) AnalyzeKLine(peroid int) (ret bool) {
 }
 
 func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
-	tradeAPI := NewOkcoinTrade(SecretOption["access_key"], SecretOption["secret_key"])
+	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 
 	var buyId string
 	symbol := Option["symbol"]
@@ -63,7 +63,6 @@ func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
 		buyId = tradeAPI.BuyLTC(tradePrice, tradeAmount)
 	}
 
-	logger.Infoln("buyId", buyId)
 	if buyId != "0" {
 		logger.Infoln("执行买入委托成功", tradePrice, tradeAmount)
 		return true
@@ -74,7 +73,7 @@ func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
 }
 
 func (w Okcoin) Sell(tradePrice, tradeAmount string) bool {
-	tradeAPI := NewOkcoinTrade(SecretOption["access_key"], SecretOption["secret_key"])
+	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 
 	var sellId string
 	symbol := Option["symbol"]
@@ -84,7 +83,6 @@ func (w Okcoin) Sell(tradePrice, tradeAmount string) bool {
 		sellId = tradeAPI.SellLTC(tradePrice, tradeAmount)
 	}
 
-	logger.Infoln("sellId", sellId)
 	if sellId != "0" {
 		logger.Infoln("执行卖出委托成功", tradePrice, tradeAmount)
 		return true
@@ -100,7 +98,7 @@ func (w Okcoin) GetTradePrice(tradeDirection string) string {
 		return "false"
 	}
 
-	slippage, err := strconv.ParseFloat(Config["slippage"], 64)
+	slippage, err := strconv.ParseFloat(Option["slippage"], 64)
 	if err != nil {
 		logger.Debugln("config item slippage is not float")
 		slippage = 0

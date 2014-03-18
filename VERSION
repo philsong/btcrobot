@@ -1,8 +1,6 @@
 /*
- *BTC操盘手自动化交易引擎*
-  btcbot is a Bitcoin trading bot for HUOBI.com written
-  in golang, it features multiple trading methods using
-  technical analysis.
+  btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
+  it features multiple trading methods using technical analysis.
 
   Disclaimer:
 
@@ -14,8 +12,8 @@
   backtesting on historical data. Also look at the code to see what how
   it's working.
 
+  Weibo:http://weibo.com/bocaicfa
 
- *@feedback http://weibo.com/bocaicfa
  *@Version 0.10
  *@time 2014-01-06 support auto process: login/buy/sell/update/cancel/delegation query/auto trade
  *@Version 0.11
@@ -42,8 +40,8 @@
  *@time 2014-03-13 add backtesting and fix crash bug
  *@Version 0.21
  *@time 2014-03-13 解决规避火币网K线数据一阳指的问题
+ *@Version 0.30
+ *@time 2014-03-17 0.重构代码 1.支持用户自己写交易策略。2.加入莱特币的支持。3.加入对okcoin支持。
  *
- *
- *@go语言(模拟登陆huobi.com平台)+(官方API)实现自动化套利
  *
  */

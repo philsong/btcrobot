@@ -9,7 +9,7 @@ fi
 
 CURDIR=`pwd`
 OLDGOPATH="$GOPATH"
-export GOPATH="$CURDIR:$CURDIR/../thirdparty"
+export GOPATH="$CURDIR:$CURDIR/thirdparty"
 
 go clean -i -r btcbot
 
