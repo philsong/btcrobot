@@ -62,7 +62,7 @@ BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
 4、配置秘钥API文件
 
-修改btcrobot/websites/code/btcbot/conf目录下的secret.sample文件名为secret.json
+修改btcrobot/conf目录下的secret.sample文件名为secret.json
 
 5、运行 btcrobot。
 
