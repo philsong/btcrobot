@@ -13,8 +13,7 @@ set GOPATH=%~dp0;%~dp0\thirdparty
 
 gofmt -w src
 
-:: -tags "debug" 表示测试
-go install -tags "debug" btcrobot
+go install btcrobot
 
 set GOPATH=%OLDGOPATH%
 
