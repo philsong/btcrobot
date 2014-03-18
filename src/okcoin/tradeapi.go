@@ -263,7 +263,8 @@ func (w *OkcoinTrade) Cancel_order(symbol, order_id string) bool {
 	doc := json.NewDecoder(strings.NewReader(body))
 
 	type Msg struct {
-		Result string
+		Result   bool
+		Order_id int
 	}
 
 	var m Msg
@@ -275,7 +276,7 @@ func (w *OkcoinTrade) Cancel_order(symbol, order_id string) bool {
 
 	logger.Traceln(m)
 
-	if m.Result == "success" {
+	if m.Result == true {
 		return true
 	} else {
 		return false
@@ -311,8 +312,8 @@ func (w *OkcoinTrade) doTrade(symbol, method, rate, amount string) int {
 	doc := json.NewDecoder(strings.NewReader(body))
 
 	type Msg struct {
-		Result string
-		Id     int
+		Result   bool
+		Order_id int
 	}
 
 	var m Msg
@@ -322,10 +323,10 @@ func (w *OkcoinTrade) doTrade(symbol, method, rate, amount string) int {
 		logger.Fatal(err)
 	}
 
-	logger.Infoln(m)
+	logger.Traceln(m)
 
-	if m.Result == "success" {
-		return m.Id
+	if m.Result == true {
+		return m.Order_id
 	} else {
 		return 0
 	}
@@ -348,6 +349,26 @@ func (w *OkcoinTrade) BuyLTC(price, amount string) string {
 
 func (w *OkcoinTrade) SellLTC(price, amount string) string {
 	sellId := w.doTrade("ltc_cny", "sell", price, amount)
+	return (fmt.Sprintf("%d", sellId))
+}
+
+func (w *OkcoinTrade) BuyMarketBTC(price, amount string) string {
+	buyId := w.doTrade("btc_cny", "buy_market", price, amount)
+	return (fmt.Sprintf("%d", buyId))
+}
+
+func (w *OkcoinTrade) SellMarketBTC(price, amount string) string {
+	sellId := w.doTrade("btc_cny", "sell_market", price, amount)
+	return (fmt.Sprintf("%d", sellId))
+}
+
+func (w *OkcoinTrade) BuyMarketLTC(price, amount string) string {
+	buyId := w.doTrade("ltc_cny", "buy_market", price, amount)
+	return (fmt.Sprintf("%d", buyId))
+}
+
+func (w *OkcoinTrade) SellMarketLTC(price, amount string) string {
+	sellId := w.doTrade("ltc_cny", "sell_market", price, amount)
 	return (fmt.Sprintf("%d", sellId))
 }
 

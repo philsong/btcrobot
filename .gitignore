@@ -26,7 +26,7 @@ secret.json
 cache
 log
 pid
-bin/btcrobot*
+release
 pkg
 thirdparty/src
 src/github.com

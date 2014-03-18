@@ -26,6 +26,7 @@ import (
 	"net/http"
 	"os"
 	"strategy"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -127,9 +128,9 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 }
 
 type PeroidRecord struct {
-	Time   int
-	zero1  int
-	zero2  int
+	Time   int64
+	zero1  int64
+	zero2  int64
 	Open   float64
 	High   float64
 	Low    float64
@@ -137,67 +138,110 @@ type PeroidRecord struct {
 	Volumn float64
 }
 
+func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
+	logger.Traceln("Okcoin parsePeroidArray begin....")
+	content = strings.TrimPrefix(content, "[[")
+	content = strings.TrimSuffix(content, "]]")
+
+	ret = false
+	for _, value := range strings.Split(content, `],[`) {
+		//logger.Traceln(value)
+		v := strings.Split(value, ",")
+		if len(v) != 8 {
+			logger.Traceln("wrong data")
+			return
+		}
+
+		var peroidRecord PeroidRecord
+		Time, err := strconv.ParseInt(v[0], 0, 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		zero1, err := strconv.ParseInt(v[1], 0, 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+		zero2, err := strconv.ParseInt(v[2], 0, 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		Open, err := strconv.ParseFloat(v[3], 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		High, err := strconv.ParseFloat(v[4], 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		Low, err := strconv.ParseFloat(v[5], 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		Close, err := strconv.ParseFloat(v[6], 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		Volumn, err := strconv.ParseFloat(v[7], 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		peroidRecord.Time = Time
+		peroidRecord.zero1 = zero1
+		peroidRecord.zero2 = zero2
+
+		peroidRecord.Open = Open
+		peroidRecord.High = High
+		peroidRecord.Low = Low
+		peroidRecord.Close = Close
+		peroidRecord.Volumn = Volumn
+
+		logger.Traceln(peroidRecord)
+
+		PeroidRecords = append(PeroidRecords, peroidRecord)
+	}
+
+	logger.Traceln("Okcoin parsePeroidArray end....")
+	ret = true
+	return
+}
+
 func (w *Okcoin) analyzePeroidLine(filename string, content string) bool {
 	//logger.Infoln(content)
 	//logger.Infoln(filename)
-	//PeroidRecords := parsePeroidCSV(filename)
-
-	var PeroidRecords []PeroidRecord
-	logger.Traceln("Okcoin analyzePeroidLine begin....")
-	content = strings.TrimPrefix(content, "[[")
-	content = strings.TrimSuffix(content, "]]")
-	/*
-		for _, value := range strings.Split(content, `],[`) {
-
-				//logger.Traceln(value)
-				v := strings.Split(value, ",")
-				if len(valueItem) != 8 {
-					logger.Traceln("wrong data")
-					break
-				}
-
-					var peroidRecord PeroidRecord
-					_, err := strconv.ParseInt(v[0], 64)
-					if err != nil {
-						logger.Debugln("config item tradeAmount is not float")
-						return false
-					}
-
-					peroidRecord.Time = v[0]
-					peroidRecord.zero1 = v[1]
-					peroidRecord.zero2 = v[2]
-					_, err := strconv.ParseFloat(v[0], 64)
-					if err != nil {
-						logger.Debugln("config item tradeAmount is not float")
-						return false
-					}
-
-					peroidRecord.Open = v[3]
-					peroidRecord.High = v[4]
-					peroidRecord.Low = v[5]
-					peroidRecord.Close = v[6]
-					peroidRecord.Volumn = v[7].(float64)
-
-				logger.Traceln(peroidRecord)
-
-			//ids = append(ids, valueItem)
-		}
-	*/
-	logger.Traceln("Okcoin analyzePeroidLine end....")
-	return false
-
-	fmt.Println(PeroidRecords)
-	return true
+	ret, PeroidRecords := parsePeroidArray(content)
+	if ret == false {
+		logger.Errorln("Okcoin parsePeroidArray failed....")
+		return false
+	}
+	//logger.Traceln(PeroidRecords)
+	//return true
 	var Time []string
 	var Price []float64
 	var Volumn []float64
 	for _, v := range PeroidRecords {
-		//Time = append(Time, v.Time)
+		const layout = "2006-01-02 15:04:05"
+		t := time.Unix(v.Time, 0)
+		Time = append(Time, t.Format(layout))
 		Price = append(Price, v.Close)
 		Volumn = append(Volumn, v.Volumn)
-		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
-		//Price = append(Price, v.Low)
 	}
+
+	//logger.Infoln(Time[len(Time)-1], Price[len(Time)-1], Volumn[len(Time)-1])
 	w.Time = Time
 	w.Price = Price
 	w.Volumn = Volumn

@@ -57,9 +57,11 @@ func backtesting() {
 */
 
 func RunRobot() {
+	fmt.Println("env", Config["env"])
 	if Config["env"] == "dev" {
-		testHuobiAPI()
-		testOkcoinAPI()
+		fmt.Println("test working...")
+		//testHuobiAPI()
+		testOkcoinLTCAPI()
 		return
 	}
 
@@ -125,7 +127,7 @@ func testHuobiAPI() {
 	fmt.Println(tradeAPI.Get_delegations())
 }
 
-func testOkcoinAPI() {
+func testOkcoinBTCAPI() {
 	tradeAPI := okcoin.NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 	accout_info, _ := tradeAPI.Get_account_info()
 	fmt.Println(accout_info)
@@ -151,4 +153,32 @@ func testOkcoinAPI() {
 
 	ret = tradeAPI.Cancel_LTCorder("-1")
 	fmt.Println(ret)
+}
+
+func testOkcoinLTCAPI() {
+	tradeAPI := okcoin.NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+
+	buyret := tradeAPI.BuyMarketLTC("100", "0.1")
+	fmt.Println(buyret)
+
+	time.Sleep(2000 * time.Millisecond)
+
+	sellret := tradeAPI.SellMarketLTC("150", "0.1")
+	fmt.Println(sellret)
+
+	time.Sleep(2000 * time.Millisecond)
+
+	buyret = tradeAPI.BuyLTC("100", "0.1")
+	fmt.Println(buyret)
+
+	time.Sleep(2000 * time.Millisecond)
+
+	sellret = tradeAPI.SellLTC("150", "0.1")
+	fmt.Println(sellret)
+
+	//orderTable, ret := tradeAPI.Get_LTCorder("-1")
+	//fmt.Println(ret, orderTable)
+
+	//ret = tradeAPI.Cancel_LTCorder("100253")
+	//fmt.Println(ret)
 }
