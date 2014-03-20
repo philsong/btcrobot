@@ -87,7 +87,7 @@ func (w *Huobi) AnalyzeKLinePeroid(peroid int) (ret bool) {
 			} else {
 				body = string(bodyByte)
 
-				ioutil.WriteFile(fmt.Sprintf("cache/TradeKLine_%03d.data", peroid), bodyByte, os.ModeAppend)
+				ioutil.WriteFile(fmt.Sprintf("cache/TradeKLine_%03d.data", peroid), bodyByte, 644)
 			}
 		}
 
@@ -146,7 +146,7 @@ func (w *Huobi) AnalyzeKLineMinute() (ret bool) {
 			} else {
 				body = string(bodyByte)
 
-				ioutil.WriteFile(fmt.Sprintf("cache/TradeKLine_minute.data"), bodyByte, os.ModeAppend)
+				ioutil.WriteFile(fmt.Sprintf("cache/TradeKLine_minute.data"), bodyByte, 644)
 			}
 		}
 

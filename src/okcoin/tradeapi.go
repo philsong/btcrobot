@@ -136,7 +136,7 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
 			body = string(bodyByte)
-			ioutil.WriteFile("cache/okapi_url.json", bodyByte, os.ModeAppend)
+			ioutil.WriteFile("cache/okapi_url.json", bodyByte, 644)
 		}
 
 		logger.Traceln(body)
