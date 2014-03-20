@@ -27,7 +27,6 @@ import (
 	"logger"
 	"net/http"
 	"net/url"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -112,7 +111,7 @@ func (w *HuobiTrade) httpRequest(pParams map[string]string) (string, error) {
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
 			body = string(bodyByte)
-			ioutil.WriteFile("cache/api_url.json", bodyByte, 644)
+			ioutil.WriteFile("cache/api_url.json", bodyByte, 0644)
 		}
 
 		logger.Traceln(body)

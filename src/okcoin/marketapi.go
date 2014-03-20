@@ -24,7 +24,6 @@ import (
 	"io/ioutil"
 	"logger"
 	"net/http"
-	"os"
 	"strategy"
 	"strconv"
 	"strings"
@@ -106,7 +105,7 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 			} else {
 				body = string(bodyByte)
 
-				ioutil.WriteFile(fmt.Sprintf("cache/okTradeKLine_%03d.data", peroid), bodyByte, 644)
+				ioutil.WriteFile(fmt.Sprintf("cache/okTradeKLine_%03d.data", peroid), bodyByte, 0644)
 			}
 		}
 
