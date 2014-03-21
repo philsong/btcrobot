@@ -87,7 +87,10 @@ func (w *HuobiTrade) httpRequest(pParams map[string]string) (string, error) {
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)
 
-	w.client = new(http.Client)
+	if w.client == nil {
+		w.client = &http.Client{nil, nil, nil}
+	}
+
 	resp, err := w.client.Do(req)
 	if err != nil {
 		logger.Fatal(err)

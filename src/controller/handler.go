@@ -168,6 +168,8 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 		config.Option["slippage"] = req.FormValue("slippage")
 
 		config.Option["totalHour"] = req.FormValue("totalHour")
+		config.Option["buyThreshold"] = req.FormValue("buyThreshold")
+		config.Option["sellThreshold"] = req.FormValue("sellThreshold")
 
 		// 更新个人信息
 		err := config.SaveOption()

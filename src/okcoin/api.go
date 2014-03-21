@@ -33,9 +33,7 @@ type TradeAPI interface {
 }
 
 type Okcoin struct {
-	client       *http.Client
-	tradeAPI     *TradeAPI
-	prevEMATrend string
+	client *http.Client
 
 	Time   []string
 	Price  []float64

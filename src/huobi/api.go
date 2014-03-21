@@ -33,8 +33,7 @@ type TradeAPI interface {
 }
 
 type Huobi struct {
-	client   *http.Client
-	tradeAPI *TradeAPI
+	client *http.Client
 
 	Time   []string
 	Price  []float64
@@ -47,10 +46,11 @@ func NewHuobi() *Huobi {
 }
 
 func (w Huobi) AnalyzeKLine(peroid int) (ret bool) {
+	symbol := Option["symbol"]
 	if peroid == 1 {
-		return w.AnalyzeKLineMinute()
+		return w.AnalyzeKLineMinute(symbol)
 	} else {
-		return w.AnalyzeKLinePeroid(peroid)
+		return w.AnalyzeKLinePeroid(symbol, peroid)
 	}
 }
 

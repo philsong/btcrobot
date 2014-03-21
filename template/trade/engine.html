@@ -26,6 +26,26 @@
           </div>
 
           <div class="control-group string optional">
+            <label class="string optional control-label" for="tradecenter"><abbr title="required">*</abbr>交易中心</label>
+            <div class="controls">
+                <select name="tradecenter" id="tradecenter" class="select-1" >
+                    <option value="huobi">huobi</option>
+                    <option value="okcoin">okcoin</option>
+                </select>
+            </div>
+          </div>
+
+          <div class="control-group string optional">
+            <label class="string optional control-label" for="symbol"><abbr title="required">*</abbr>交易币种</label>
+            <div class="controls">
+                <select name="symbol" id="symbol" class="select-1" >
+                    <option value="btc_cny">btc_cny</option>
+                    <option value="ltc_cny">ltc_cny</option>
+                </select>
+            </div>
+          </div>
+          
+          <div class="control-group string optional">
             <label class="string optional control-label" for="strategy"><abbr title="required">*</abbr>交易策略</label>
             <div class="controls">
                 <select name="strategy" id="strategy" class="select-1" >
@@ -57,27 +77,9 @@
 
           <div class="control-group string optional"><label class="string optional control-label" for="slippage"><abbr title="required">*</abbr>交易滑动量</label><div class="controls"><input class="string optional span1" id="slippage" name="slippage" size="50" type="text" value="{{.config.slippage}}">个点</div></div>
 
-          <div class="control-group string optional">
-            <label class="string optional control-label" for="tradecenter"><abbr title="required">*</abbr>交易中心</label>
-            <div class="controls">
-                <select name="tradecenter" id="tradecenter" class="select-1" >
-                    <option value="huobi">huobi</option>
-                    <option value="okcoin">okcoin</option>
-                </select>
-            </div>
-          </div>
+          <div class="control-group string optional"><label class="string optional control-label" for="buyThreshold"><abbr title="required">*</abbr>买入diff阀值</label><div class="controls"><input class="string optional span1" id="buyThreshold" name="buyThreshold" size="50" type="text" value="{{.config.buyThreshold}}"></div></div>
 
-          <div class="control-group string optional">
-            <label class="string optional control-label" for="symbol"><abbr title="required">*</abbr>交易币种</label>
-            <div class="controls">
-                <select name="symbol" id="symbol" class="select-1" >
-                    <option value="btc_cny">btc_cny</option>
-                    <option value="ltc_cny">ltc_cny</option>
-                </select>
-            </div>
-          </div>
-
-
+          <div class="control-group string optional"><label class="string optional control-label" for="sellThreshold"><abbr title="required">*</abbr>卖出diff阀值</label><div class="controls"><input class="string optional span1" id="sellThreshold" name="sellThreshold" size="50" type="text" value="{{.config.sellThreshold}}"></div></div>
 
           <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>运行时长</label><div class="controls"><input class="string optional span1" id="totalHour" name="totalHour" size="50" type="text" value="{{.config.totalHour}}">小时</div></div>
 

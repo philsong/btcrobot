@@ -87,6 +87,7 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 		logger.Errorln(err)
 		return false
 	}
+
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 {
 		var body string

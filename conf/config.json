@@ -21,16 +21,13 @@
 	"trade_fenshi": "https://market.huobi.com/market/huobi.php?a=td",
 	"trade_flash_url": "https://www.huobi.com/market/huobi.php?a=market_flash_huobi_useapi&version=20130807",
 
-	"debug": "0",
+	"debug": "1",
 	"errorconsole": "1",
 	"infoconsole": "1",
-	"debugconsole": "1",
-
-	"EMAMinThreshold": "0.0025",
+	"debugconsole": "0",
 
 	"macd": "enable9",
 	"signalPeriod": "9",
-	"MACDMinThreshold": "9",
 
 	"TresholdLevel": "1",
 

@@ -22,12 +22,16 @@ import (
 	"email"
 	"fmt"
 	"logger"
+	"math"
 	"os"
 	"strconv"
 )
 
 type EMAStrategy struct {
-	PrevEMATrend string
+	PrevEMATrend      string
+	PrevEMAdif        float64
+	LessBuyThreshold  bool
+	LessSellThreshold bool
 }
 
 func init() {
@@ -35,12 +39,52 @@ func init() {
 	Register("EMA", emaStrategy)
 }
 
+func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64) bool {
+	if direction == "buy" {
+		buyThreshold, err := strconv.ParseFloat(Option["buyThreshold"], 64)
+		if err != nil {
+			logger.Errorln("config item buyThreshold is not float")
+			return false
+		}
+
+		if EMAdif >= buyThreshold {
+			logger.Infof("EMAdif %0.03f arrive buyThreshold %0.03f\n", EMAdif, buyThreshold)
+			emaStrategy.LessBuyThreshold = false
+			return true
+		} else {
+			if emaStrategy.LessBuyThreshold == false {
+				logger.Infoln("cross up, but does not arrive buyThreshold")
+				emaStrategy.LessBuyThreshold = true
+			}
+		}
+	} else {
+		sellThreshold, err := strconv.ParseFloat(Option["sellThreshold"], 64)
+		if err != nil {
+			logger.Errorln("config item sellThreshold is not float")
+			return false
+		}
+
+		if math.Abs(EMAdif) >= sellThreshold {
+			logger.Infof("Abs(EMAdif) %0.03f arrive sellThreshold %0.03f\n", math.Abs(EMAdif), sellThreshold)
+			emaStrategy.LessSellThreshold = false
+			return true
+		} else {
+			if emaStrategy.LessSellThreshold == false {
+				logger.Infoln("cross down, but does not arrive sellThreshold")
+				emaStrategy.LessSellThreshold = true
+			}
+		}
+	}
+
+	return false
+}
+
 //EMA strategy
 func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
 
 	//
 	if len(Time) == 0 || len(Price) == 0 || len(Volumn) == 0 {
-		logger.Errorln("detect exception data")
+		logger.Errorln("warning:detect exception data", len(Time), len(Price), len(Volumn))
 		return false
 	}
 
@@ -63,9 +107,24 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 	length := len(Price)
 
 	//go TriggerPrice(Price[length-1])
+	if EMAdif[length-1] != emaStrategy.PrevEMAdif {
+		emaStrategy.PrevEMAdif = EMAdif[length-1]
+		logger.Infof("EMA Diff:%0.03f\t%0.03f\tPrice:%0.02f\n", EMAdif[length-2], EMAdif[length-1], Price[length-1])
+	}
+
+	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
+	if emaStrategy.LessBuyThreshold && (EMAdif[length-2] < 0 && EMAdif[length-1] < 0) {
+		emaStrategy.LessBuyThreshold = false
+		logger.Infoln("did not arrive buy threshold, but price down again")
+	}
+	if emaStrategy.LessSellThreshold && (EMAdif[length-2] > 0 && EMAdif[length-1] > 0) {
+		emaStrategy.LessSellThreshold = false
+		logger.Infoln("did not arrive sell threshold, but price up again")
+	}
 
 	//EMA cross
-	if (EMAdif[length-2] < 0 && EMAdif[length-1] > 0) || (EMAdif[length-2] > 0 && EMAdif[length-1] < 0) { //up cross
+	if ((EMAdif[length-2] < 0 && EMAdif[length-1] > 0) || emaStrategy.LessBuyThreshold) ||
+		((EMAdif[length-2] > 0 && EMAdif[length-1] < 0) || emaStrategy.LessSellThreshold) { //up cross
 
 		//check exception data in trade center
 		if checkException(Price[length-2], Price[length-1], Volumn[length-1]) == false {
@@ -74,22 +133,28 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 		}
 
 		//do buy when cross up
-		if EMAdif[length-2] < 0 && EMAdif[length-1] > 0 {
+		if (EMAdif[length-2] < 0 && EMAdif[length-1] > 0) || emaStrategy.LessBuyThreshold {
 			if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrend != "up" {
-				emaStrategy.PrevEMATrend = "up"
-				logger.Infoln("EMA up cross, 买入buy In", tradeAPI.GetTradePrice(""))
-				tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount)
-				go email.TriggerTrender("EMA up cross, 买入buy In")
+				if emaStrategy.checkThreshold("buy", EMAdif[length-1]) {
+					emaStrategy.PrevEMATrend = "up"
+					warning := "EMA up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("buy")
+					logger.Infoln(warning)
+					tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount)
+					go email.TriggerTrender(warning)
+				}
 			}
 		}
 
 		//do sell when cross down
-		if EMAdif[length-2] > 0 && EMAdif[length-1] < 0 {
+		if (EMAdif[length-2] > 0 && EMAdif[length-1] < 0) || emaStrategy.LessSellThreshold {
 			if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrend != "down" {
-				emaStrategy.PrevEMATrend = "down"
-				logger.Infoln("EMA down cross, 卖出Sell Out", tradeAPI.GetTradePrice(""))
-				tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount)
-				go email.TriggerTrender("EMA down cross, 卖出Sell Out")
+				if emaStrategy.checkThreshold("sell", EMAdif[length-1]) {
+					emaStrategy.PrevEMATrend = "down"
+					warning := "EMA down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
+					logger.Infoln(warning)
+					tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount)
+					go email.TriggerTrender(warning)
+				}
 			}
 		}
 

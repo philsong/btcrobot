@@ -48,7 +48,16 @@ import (
 	logger.Traceln(txcode[m.Code])
 */
 
-func (w *Huobi) AnalyzeKLinePeroid(peroid int) (ret bool) {
+func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
+	var huobisymbol string
+	if symbol == "btc_cny" {
+		huobisymbol = "huobibtccny"
+	} else {
+		huobisymbol = "huobiltccny"
+		logger.Fatal("huobi does not support LTC by now, wait for huobi provide it.", huobisymbol)
+		return false
+	}
+
 	req, err := http.NewRequest("GET", fmt.Sprintf(Config["trade_kline_url"], peroid, rand.Float64()), nil)
 	if err != nil {
 		logger.Fatal(err)
@@ -108,7 +117,16 @@ func (w *Huobi) AnalyzeKLinePeroid(peroid int) (ret bool) {
 	return false
 }
 
-func (w *Huobi) AnalyzeKLineMinute() (ret bool) {
+func (w *Huobi) AnalyzeKLineMinute(symbol string) (ret bool) {
+	var huobisymbol string
+	if symbol == "btc_cny" {
+		huobisymbol = "huobibtccny"
+	} else {
+		huobisymbol = "huobiltccny"
+		logger.Fatal("huobi does not support LTC by now, wait for huobi provide it.", huobisymbol)
+		return false
+	}
+
 	req, err := http.NewRequest("GET", Config["trade_fenshi"], nil)
 	if err != nil {
 		logger.Fatal(err)

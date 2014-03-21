@@ -148,19 +148,19 @@ function myTimer() {
 				type: 'histogram'
 
 			}, {
-				name: '10-EMA',
+				name: '12-EMA',
 				linkedTo: 'primary',
 				showInLegend: true,
 				type: 'trendline',
 				algorithm: 'EMA',
-				periods: 10
+				periods: 12
 			}, {
-				name: '21-EMA',
+				name: '26-EMA',
 				linkedTo: 'primary',
 				showInLegend: true,
 				type: 'trendline',
 				algorithm: 'EMA',
-				periods: 21
+				periods: 26
 			}, {
 				name: 'Linear Trendline线性趋势线',
 				linkedTo: 'primary',

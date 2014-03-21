@@ -69,18 +69,19 @@ func SendAlertEmail(receiver, alert string) error {
 
 	auth := smtp.PlainAuth("", SecretOption["smtp_username"], SecretOption["smtp_password"], SecretOption["smtp_host"])
 
-	from := mail.Address{"BTCRobot监控中心", "78623269@qq.com"}
+	from := mail.Address{"BTCRobot监控中心", SecretOption["smtp_username"]}
 	to := mail.Address{"收件人", receiver}
-	title := "BTC价格预警" + alert
+	title := "BTCRobot来电--->" + alert
 
 	body := `
 	<html>
 	<body>
 	<h3>
-	"%s"
+	%s
 	</h3>
+	<p>
 	捐助BTC，支持开发<span style="font-size: 80%"><a href="bitcoin:1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8">1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8</a></span>
-
+	</p>
 	</body>
 	</html>
 	`
@@ -118,8 +119,8 @@ func SendAlertEmail(receiver, alert string) error {
 	return nil
 }
 
-func NoticeEmail2() {
-	tos := []string{"78623269@qq.com", "philsong@techtrex.com"}
+func NoticeEmailV2() {
+	tos := []string{"78623269@qq.com", "songbohr@gmail.com"}
 
 	subject := "Test send email"
 
