@@ -21,6 +21,7 @@ BTC操盘手自动化交易引擎
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
 
 BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
+
 LTC捐赠地址：LXwX5XeZeVfXM2b4GRs6HM1mNn4K9En3F4
 
 捐助清单如下：
