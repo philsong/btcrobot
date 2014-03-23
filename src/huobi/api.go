@@ -107,11 +107,12 @@ func (w Huobi) GetTradePrice(tradeDirection string) string {
 
 	var finalTradePrice float64
 	if tradeDirection == "buy" {
-		finalTradePrice = w.Price[len(w.Price)-1] + slippage*0.001
+		finalTradePrice = w.Price[len(w.Price)-1] * (1 + slippage*0.001)
 	} else if tradeDirection == "sell" {
-		finalTradePrice = w.Price[len(w.Price)-1] - slippage*0.001
+		finalTradePrice = w.Price[len(w.Price)-1] * (1 - slippage*0.001)
 	} else {
 		finalTradePrice = w.Price[len(w.Price)-1]
 	}
+
 	return fmt.Sprintf("%0.02f", finalTradePrice)
 }
