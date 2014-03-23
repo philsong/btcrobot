@@ -178,9 +178,9 @@ func (w *HuobiTrade) Get_account_info() (string, error) {
 	return w.httpRequest(pParams)
 }
 
-func (w *HuobiTrade) Get_delegations() (m []DelegationsMsg, ret bool) {
+func (w *HuobiTrade) Get_orders() (m []DelegationsMsg, ret bool) {
 	pParams := make(map[string]string)
-	pParams["method"] = "get_delegations"
+	pParams["method"] = "get_orders"
 	pParams["access_key"] = w.access_key
 	now := time.Now().Unix()
 	pParams["created"] = strconv.FormatInt(now, 10)
@@ -212,9 +212,9 @@ func (w *HuobiTrade) Get_delegations() (m []DelegationsMsg, ret bool) {
 	return
 }
 
-func (w *HuobiTrade) Get_delegation_info(id string) (string, error) {
+func (w *HuobiTrade) Get_order_info(id string) (string, error) {
 	pParams := make(map[string]string)
-	pParams["method"] = "delegation_info"
+	pParams["method"] = "order_info"
 	pParams["access_key"] = w.access_key
 	pParams["id"] = id
 	now := time.Now().Unix()
@@ -224,9 +224,9 @@ func (w *HuobiTrade) Get_delegation_info(id string) (string, error) {
 	return w.httpRequest(pParams)
 }
 
-func (w *HuobiTrade) Cancel_delegation(id string) bool {
+func (w *HuobiTrade) Cancel_order(id string) bool {
 	pParams := make(map[string]string)
-	pParams["method"] = "cancel_delegation"
+	pParams["method"] = "cancel_order"
 	pParams["access_key"] = w.access_key
 	pParams["id"] = id
 	now := time.Now().Unix()
