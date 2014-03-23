@@ -54,7 +54,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 			return true
 		} else {
 			if emaStrategy.LessBuyThreshold == false {
-				logger.Infoln("cross up, but does not arrive buyThreshold")
+				logger.Infof("cross up, but EMAdif %0.03f does NOT arrive buyThreshold %0.03f\n", EMAdif, buyThreshold)
 				emaStrategy.LessBuyThreshold = true
 			}
 		}
@@ -71,7 +71,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 			return true
 		} else {
 			if emaStrategy.LessSellThreshold == false {
-				logger.Infoln("cross down, but does not arrive sellThreshold")
+				logger.Infoln("cross down, but Abs(EMAdif) %0.03f does NOT arrive sellThreshold %0.03f\n", math.Abs(EMAdif), sellThreshold)
 				emaStrategy.LessSellThreshold = true
 			}
 		}
