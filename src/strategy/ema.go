@@ -172,9 +172,9 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 		}
 		logger.Infoln("prev cross is", emaStrategy.PrevEMACross)
 		if is_uptrend(EMAdif[length-3]) {
-			logger.Infoln("等待卖出点触发")
+			logger.Infoln("上一个趋势是上涨，等待卖出点触发")
 		} else if is_downtrend(EMAdif[length-3]) {
-			logger.Infoln("等待买入点触发")
+			logger.Infoln("上一个趋势是下跌，等待买入点触发")
 		}
 	}
 
