@@ -19,7 +19,7 @@ BTC操盘手自动化交易引擎
   Weibo:http://weibo.com/bocaicfa
 
 
-支持多个交易平台-火币、OKCoin，自动买卖，机器人算法，操盘手下单, 进群124603104
+支持多个交易平台-火币、OKCoin，自动买卖，机器人算法
 
 使用指南， 用前必读！
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
@@ -71,7 +71,8 @@ https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E
 4、配置秘钥API文件
 
 修改btcrobot/conf目录下的secret.sample文件名为secret.json
-申请交易API，并填入secret.json中
+
+像火币或者OKcoin申请交易API，并填入secret.json中
 
 5、运行 btcrobot。
 
