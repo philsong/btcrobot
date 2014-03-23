@@ -104,9 +104,9 @@ func (w Okcoin) GetTradePrice(tradeDirection string) string {
 
 	var finalTradePrice float64
 	if tradeDirection == "buy" {
-		finalTradePrice = w.Price[len(w.Price)-1] + slippage
+		finalTradePrice = w.Price[len(w.Price)-1] + slippage*0.001
 	} else if tradeDirection == "sell" {
-		finalTradePrice = w.Price[len(w.Price)-1] - slippage
+		finalTradePrice = w.Price[len(w.Price)-1] - slippage*0.001
 	} else {
 		finalTradePrice = w.Price[len(w.Price)-1]
 	}

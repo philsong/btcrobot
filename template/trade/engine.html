@@ -75,11 +75,15 @@
 
           <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>交易数量</label><div class="controls"><input class="string optional span1" id="tradeAmount" name="tradeAmount" size="50" type="text" value="{{.config.tradeAmount}}">个币</div></div>
 
-          <div class="control-group string optional"><label class="string optional control-label" for="slippage"><abbr title="required">*</abbr>交易滑动量</label><div class="controls"><input class="string optional span1" id="slippage" name="slippage" size="50" type="text" value="{{.config.slippage}}">个点</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="slippage"><abbr title="required">*</abbr>交易滑动量</label><div class="controls"><input class="string optional span1" id="slippage" name="slippage" size="50" type="text" value="{{.config.slippage}}">‰</div></div>
 
           <div class="control-group string optional"><label class="string optional control-label" for="buyThreshold"><abbr title="required">*</abbr>买入diff阀值</label><div class="controls"><input class="string optional span1" id="buyThreshold" name="buyThreshold" size="50" type="text" value="{{.config.buyThreshold}}"></div></div>
-
+          
           <div class="control-group string optional"><label class="string optional control-label" for="sellThreshold"><abbr title="required">*</abbr>卖出diff阀值</label><div class="controls"><input class="string optional span1" id="sellThreshold" name="sellThreshold" size="50" type="text" value="{{.config.sellThreshold}}"></div></div>
+          
+          <div class="control-group string optional"><label class="string optional control-label" for="stoploss"><abbr title="required">*</abbr>交易停损量</label><div class="controls"><input class="string optional span1" id="stoploss" name="stoploss" size="50" type="text" value="{{.config.stoploss}}">%</div></div>
+
+
 
           <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>运行时长</label><div class="controls"><input class="string optional span1" id="totalHour" name="totalHour" size="50" type="text" value="{{.config.totalHour}}">小时</div></div>
 

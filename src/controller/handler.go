@@ -171,6 +171,8 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 		config.Option["buyThreshold"] = req.FormValue("buyThreshold")
 		config.Option["sellThreshold"] = req.FormValue("sellThreshold")
 
+		config.Option["stoploss"] = req.FormValue("stoploss")
+
 		// 更新个人信息
 		err := config.SaveOption()
 		if err != nil {

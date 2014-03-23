@@ -44,6 +44,8 @@
  *@time 2014-03-17 0.重构代码 1.支持用户自己写交易策略。2.加入莱特币的支持。3.加入对okcoin支持。
  *@Version 0.23
  *@time 2014-03-21 add EMA diff factor(buyThreshold and sellThreshold) to deduce the fake buy/sell cross point
+ *@Version 0.24
+ *@time 2014-03-23 add stoploss交易停损
  *
  *
  */
