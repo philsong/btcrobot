@@ -28,7 +28,7 @@ import (
 )
 
 type EMAStrategy struct {
-	PrevEMATrend      string
+	PrevEMACross      string
 	PrevEMAdif        float64
 	LessBuyThreshold  bool
 	LessSellThreshold bool
@@ -36,6 +36,7 @@ type EMAStrategy struct {
 
 func init() {
 	emaStrategy := new(EMAStrategy)
+	emaStrategy.PrevEMACross = "unknown"
 	Register("EMA", emaStrategy)
 }
 
@@ -79,6 +80,49 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 	return false
 }
 
+/* test cases
+2014/03/23 07:17:58 EMA Diff:-0.002	-0.000	Price:96.41
+2014/03/23 07:18:06 EMA Diff:-0.002	0.003	Price:96.44
+2014/03/23 07:18:12 EMA Diff:-0.002	-0.000	Price:96.41
+2014/03/23 07:18:56 EMA Diff:-0.000	0.014	Price:96.52
+*/
+
+func is_uptrend(ema float64) bool {
+	if ema > 0.000001 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func is_downtrend(ema float64) bool {
+	if ema < -0.000001 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func (emaStrategy *EMAStrategy) is_upcross(prevema, ema float64) bool {
+	if is_uptrend(ema) {
+		if prevema <= 0 || emaStrategy.PrevEMACross == "down" {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (emaStrategy *EMAStrategy) is_downcross(prevema, ema float64) bool {
+	if is_downtrend(ema) {
+		if prevema >= 0 || emaStrategy.PrevEMACross == "up" {
+			return true
+		}
+	}
+
+	return false
+}
+
 //EMA strategy
 func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
 
@@ -106,6 +150,17 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 
 	length := len(Price)
 
+	if emaStrategy.PrevEMACross == "unknown" {
+		if is_uptrend(EMAdif[length-3]) {
+			emaStrategy.PrevEMACross = "up"
+		} else if is_downtrend(EMAdif[length-3]) {
+			emaStrategy.PrevEMACross = "down"
+		} else {
+			emaStrategy.PrevEMACross = "unknown"
+		}
+		logger.Infoln("prev cross is", emaStrategy.PrevEMACross)
+	}
+
 	//go TriggerPrice(Price[length-1])
 	if EMAdif[length-1] != emaStrategy.PrevEMAdif {
 		emaStrategy.PrevEMAdif = EMAdif[length-1]
@@ -113,18 +168,21 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 	}
 
 	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
-	if emaStrategy.LessBuyThreshold && (EMAdif[length-2] < 0 && EMAdif[length-1] < 0) {
+	if emaStrategy.LessBuyThreshold && is_downtrend(EMAdif[length-1]) {
 		emaStrategy.LessBuyThreshold = false
-		logger.Infoln("did not arrive buy threshold, but price down again")
+		emaStrategy.PrevEMACross = "down" //reset
+		logger.Infoln("'down->up->down ^', but not arrive buy threshold yet, and then price down again")
+
 	}
-	if emaStrategy.LessSellThreshold && (EMAdif[length-2] > 0 && EMAdif[length-1] > 0) {
+	if emaStrategy.LessSellThreshold && is_uptrend(EMAdif[length-1]) {
 		emaStrategy.LessSellThreshold = false
-		logger.Infoln("did not arrive sell threshold, but price up again")
+		emaStrategy.PrevEMACross = "up" //reset
+		logger.Infoln("'up->down->up V', but not arrive sell threshold yet, and then price up again")
 	}
 
 	//EMA cross
-	if ((EMAdif[length-2] < 0 && EMAdif[length-1] > 0) || emaStrategy.LessBuyThreshold) ||
-		((EMAdif[length-2] > 0 && EMAdif[length-1] < 0) || emaStrategy.LessSellThreshold) { //up cross
+	if (emaStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessBuyThreshold) ||
+		(emaStrategy.is_downcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessSellThreshold) { //up cross
 
 		//check exception data in trade center
 		if checkException(Price[length-2], Price[length-1], Volumn[length-1]) == false {
@@ -133,10 +191,12 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 		}
 
 		//do buy when cross up
-		if (EMAdif[length-2] < 0 && EMAdif[length-1] > 0) || emaStrategy.LessBuyThreshold {
-			if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrend != "up" {
+		if emaStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessBuyThreshold {
+			if Option["disable_trading"] != "1" && emaStrategy.PrevEMACross != "up" {
+
+				emaStrategy.PrevEMACross = "up"
+
 				if emaStrategy.checkThreshold("buy", EMAdif[length-1]) {
-					emaStrategy.PrevEMATrend = "up"
 					warning := "EMA up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("buy")
 					logger.Infoln(warning)
 					tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount)
@@ -146,10 +206,12 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 		}
 
 		//do sell when cross down
-		if (EMAdif[length-2] > 0 && EMAdif[length-1] < 0) || emaStrategy.LessSellThreshold {
-			if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrend != "down" {
+		if emaStrategy.is_downcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessSellThreshold {
+			if Option["disable_trading"] != "1" && emaStrategy.PrevEMACross != "down" {
+
+				emaStrategy.PrevEMACross = "down"
+
 				if emaStrategy.checkThreshold("sell", EMAdif[length-1]) {
-					emaStrategy.PrevEMATrend = "down"
 					warning := "EMA down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
 					logger.Infoln(warning)
 					tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount)
