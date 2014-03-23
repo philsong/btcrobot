@@ -2,6 +2,7 @@ BTC Robot
 ===========
 BTC操盘手自动化交易引擎
 
+
   btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
   it features multiple trading methods using technical analysis.
 
@@ -16,6 +17,9 @@ BTC操盘手自动化交易引擎
   it's working.
 
   Weibo:http://weibo.com/bocaicfa
+
+
+支持多个交易平台-火币、OKCoin，自动买卖，机器人算法，操盘手下单, 进群124603104
 
 使用指南， 用前必读！
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
@@ -46,9 +50,9 @@ https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E
 2、下载安装依赖库（如果依赖库下载不下来可以联系我）
 
 	cd btcrobot/thirdparty
-	// windows 下执行
+	// windows/DOS下执行
 	getpkg.bat
-	// linux/mac 下执行
+	// linux/mac或者Git Bash 下执行
 	sh getpkg
 
 3、编译 btcrobot
@@ -57,9 +61,9 @@ https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E
 
 	// 接着上一步
 	cd ../
-	// windows 下执行
+	// windows/DOS 下执行
 	install.bat
-	// linux/mac 下执行
+	// linux/mac或者Git Bash 下执行
 	sh install
 	
 这样便编译好了 btcrobot
@@ -67,6 +71,7 @@ https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E
 4、配置秘钥API文件
 
 修改btcrobot/conf目录下的secret.sample文件名为secret.json
+申请交易API，并填入secret.json中
 
 5、运行 btcrobot。
 

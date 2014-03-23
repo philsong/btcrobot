@@ -22,7 +22,6 @@ import (
 	"email"
 	"fmt"
 	"logger"
-	"math"
 	"os"
 	"strconv"
 )
@@ -49,7 +48,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 			return false
 		}
 
-		if EMAdif >= buyThreshold {
+		if EMAdif > buyThreshold {
 			logger.Infof("EMAdif %0.03f arrive buyThreshold %0.03f\n", EMAdif, buyThreshold)
 			emaStrategy.LessBuyThreshold = false
 			return true
@@ -66,13 +65,13 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 			return false
 		}
 
-		if math.Abs(EMAdif) >= sellThreshold {
-			logger.Infof("Abs(EMAdif) %0.03f arrive sellThreshold %0.03f\n", math.Abs(EMAdif), sellThreshold)
+		if EMAdif < sellThreshold {
+			logger.Infof("EMAdif %0.03f arrive sellThreshold %0.03f\n", EMAdif, sellThreshold)
 			emaStrategy.LessSellThreshold = false
 			return true
 		} else {
 			if emaStrategy.LessSellThreshold == false {
-				logger.Infof("cross down, but Abs(EMAdif) %0.03f < sellThreshold %0.03f\n", math.Abs(EMAdif), sellThreshold)
+				logger.Infof("cross down, but EMAdif %0.03f >= sellThreshold %0.03f\n", EMAdif, sellThreshold)
 				emaStrategy.LessSellThreshold = true
 			}
 		}
