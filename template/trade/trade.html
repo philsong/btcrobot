@@ -10,9 +10,9 @@
           <hr>
                 此处相对简陋，欢迎提需求和意见。
           <hr>
-          <div class="control-group string optional"><label class="string optional control-label" for="buyprice"><abbr title="required">*</abbr>买入价</label><div class="controls"><input class=" string optional span2" id="buyprice" name="buyprice" size="50" type="text" value="{{.trade.buyprice}}">RMB</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="buyprice"><abbr title="required">*</abbr>买入价</label><div class="controls"><input class=" string optional span2" id="buyprice" name="buyprice" size="50" type="text" value="{{.trade.buyprice}}">CNY</div></div>
          
-          <div class="control-group string optional"><label class="string optional control-label" for="buyamount"><abbr title="required">*</abbr>买入量</label><div class="controls"><input class="string optional span2" id="buyamount" name="buyamount" size="50" type="text" value="{{.trade.buyamount}}">BTC</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="buyamount"><abbr title="required">*</abbr>买入量</label><div class="controls"><input class="string optional span2" id="buyamount" name="buyamount" size="50" type="text" value="{{.trade.buyamount}}">BTC/LTC（买入数量，BTC最小0.01，LTC最小0.1）</div></div>
           
           <div class="form-actions">
               <input class="btn btn-primary" data-disable-with="正在处理" name="dobuy" type="submit" value="一键杀入"/>
@@ -20,9 +20,9 @@
 
           <hr>
 
-          <div class="control-group string optional"><label class="string optional control-label" for="sellprice"><abbr title="required">*</abbr>卖出价</label><div class="controls"><input class=" string optional span2" id="sellprice" name="sellprice" size="50" type="text" value="{{.trade.sellprice}}">RMB</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="sellprice"><abbr title="required">*</abbr>卖出价</label><div class="controls"><input class=" string optional span2" id="sellprice" name="sellprice" size="50" type="text" value="{{.trade.sellprice}}">CNY</div></div>
          
-          <div class="control-group string optional"><label class="string optional control-label" for="sellamount"><abbr title="required">*</abbr>卖出量</label><div class="controls"><input class="string optional span2" id="sellamount" name="sellamount" size="50" type="text" value="{{.trade.sellamount}}">BTC</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="sellamount"><abbr title="required">*</abbr>卖出量</label><div class="controls"><input class="string optional span2" id="sellamount" name="sellamount" size="50" type="text" value="{{.trade.sellamount}}">BTC/LTC（卖出数量，BTC最小0.01，LTC最小0.1）</div></div>
           
           <div class="form-actions">
               <input class="btn btn-primary" data-disable-with="正在处理" name="dosell" type="submit" value="一键平仓"/>
