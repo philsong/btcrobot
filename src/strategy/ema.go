@@ -65,6 +65,10 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 			return false
 		}
 
+		if sellThreshold > 0 {
+			sellThreshold = -sellThreshold
+		}
+
 		if EMAdif < sellThreshold {
 			logger.Infof("EMAdif(%0.03f) <  sellThreshold(%0.03f), trigger to buy\n", EMAdif, sellThreshold)
 			emaStrategy.LessSellThreshold = false
