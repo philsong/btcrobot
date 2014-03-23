@@ -22,6 +22,8 @@ https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E
 
 BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
+LTC捐赠地址：LXwX5XeZeVfXM2b4GRs6HM1mNn4K9En3F4
+
 捐助清单如下：
 https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E5%BC%80%E5%8F%91%E7%9A%84%E4%BA%BA
 
