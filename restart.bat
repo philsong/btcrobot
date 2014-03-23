@@ -15,7 +15,7 @@ del /q /f /a pid
 Sleep 3
 
 :: start
-start /b bin\btcrobot >> log\panic.log 2>&1 &
+start /b bin\btcrobot
 
 echo restart successfully
 
