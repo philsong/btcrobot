@@ -1,6 +1,6 @@
-BTC Robot
+BTC/LTC Robot
 ===========
-BTC操盘手自动化交易引擎
+BTC/LTC操盘手自动化交易引擎
 
 
   btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
