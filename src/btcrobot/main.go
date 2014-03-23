@@ -39,7 +39,7 @@ func init() {
 
 func main() {
 
-	version := "0.31"
+	version := "0.23"
 	fmt.Println("[ ---------------------------------------------------------->>> ")
 	fmt.Println(" BTC robot version ", version)
 	fmt.Println(" *BTC操盘手自动化交易引擎*")
