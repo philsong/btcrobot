@@ -11,7 +11,7 @@ goto end
 set OLDGOPATH=%GOPATH%
 set GOPATH=%~dp0;%~dp0\thirdparty
 
-go clean -i -r btcbot
+go clean -i -r btcrobot
 
 rd /s /q pid
 rd /s /q bin

@@ -115,7 +115,7 @@ func SendAlertEmail(receiver, alert string) error {
 		logger.Errorln("Send Mail to", to, "error:", err)
 		return err
 	}
-	logger.Debugln("Send Mail to", to, "Successfully")
+	logger.Infoln("Send Mail to", to, "Successfully")
 	return nil
 }
 

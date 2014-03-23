@@ -20,6 +20,7 @@ package controller
 
 import (
 	"config"
+	"email"
 	"encoding/json"
 	"filter"
 	"fmt"
@@ -218,5 +219,7 @@ func SecretHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		fmt.Fprint(rw, `{"errno": 0, "msg":"更新秘钥配置成功!"}`)
+
+		go email.TriggerTrender("btcrobot测试邮件，您能收到这封邮件说明您的SMTP配置成功，您没收到？那您看的是个毛？来自星星的机器人")
 	}
 }

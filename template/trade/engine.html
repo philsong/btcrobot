@@ -73,7 +73,7 @@
             </div>
           </div>
 
-          <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>交易数量</label><div class="controls"><input class="string optional span1" id="tradeAmount" name="tradeAmount" size="50" type="text" value="{{.config.tradeAmount}}">个BTC/LTC</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>交易数量</label><div class="controls"><input class="string optional span1" id="tradeAmount" name="tradeAmount" size="50" type="text" value="{{.config.tradeAmount}}">BTC/LTC（BTC最小0.01，LTC最小0.1）</div></div>
 
           <div class="control-group string optional"><label class="string optional control-label" for="slippage"><abbr title="required">*</abbr>交易滑动量</label><div class="controls"><input class="string optional span1" id="slippage" name="slippage" size="50" type="text" value="{{.config.slippage}}">‰  买入价=市价*(1+交易滑动量*0.001)，卖出价=市价*(1-交易滑动量*0.001)</div></div>
 

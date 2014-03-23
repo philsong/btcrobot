@@ -111,20 +111,20 @@ func testHuobiAPI() {
 		sellId := tradeAPI.SellBTC("10000", "0.001")
 
 		//fmt.Println(tradeAPI.Get_delegations())
-		if tradeAPI.Cancel_delegation(buyId) {
+		if tradeAPI.Cancel_order(buyId) {
 			fmt.Printf("cancel %s success \n", buyId)
 		} else {
 			fmt.Printf("cancel %s falied \n", buyId)
 		}
 
-		if tradeAPI.Cancel_delegation(sellId) {
+		if tradeAPI.Cancel_order(sellId) {
 			fmt.Printf("cancel %s success \n", sellId)
 		} else {
 			fmt.Printf("cancel %s falied \n", sellId)
 		}
 	}
 
-	fmt.Println(tradeAPI.Get_delegations())
+	fmt.Println(tradeAPI.Get_orders())
 }
 
 func testOkcoinBTCAPI() {
