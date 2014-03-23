@@ -19,9 +19,7 @@ BTC/LTC操盘手自动化交易引擎
   Weibo:http://weibo.com/bocaicfa
 
 
-支持多个交易平台-火币、OKCoin，自动买卖，机器人算法
-
-使用指南， 用前必读！
+支持多个交易平台-火币、OKCoin，自动买卖，机器人EMA算法，使用指南，如下！
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
 
 BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
