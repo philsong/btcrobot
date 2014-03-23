@@ -54,7 +54,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 			return true
 		} else {
 			if emaStrategy.LessBuyThreshold == false {
-				logger.Infof("cross up, but EMAdif %0.03f < buyThreshold %0.03f\n", EMAdif, buyThreshold)
+				logger.Infof("cross up, but EMAdif(%0.03f) <= buyThreshold(%0.03f)\n", EMAdif, buyThreshold)
 				emaStrategy.LessBuyThreshold = true
 			}
 		}
@@ -66,12 +66,12 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 		}
 
 		if EMAdif < sellThreshold {
-			logger.Infof("EMAdif %0.03f arrive sellThreshold %0.03f\n", EMAdif, sellThreshold)
+			logger.Infof("EMAdif(%0.03f) <  sellThreshold(%0.03f), trigger to buy\n", EMAdif, sellThreshold)
 			emaStrategy.LessSellThreshold = false
 			return true
 		} else {
 			if emaStrategy.LessSellThreshold == false {
-				logger.Infof("cross down, but EMAdif %0.03f >= sellThreshold %0.03f\n", EMAdif, sellThreshold)
+				logger.Infof("cross down, but EMAdif(%0.03f) >= sellThreshold(%0.03f)\n", EMAdif, sellThreshold)
 				emaStrategy.LessSellThreshold = true
 			}
 		}
@@ -171,6 +171,11 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 			emaStrategy.PrevEMACross = "unknown"
 		}
 		logger.Infoln("prev cross is", emaStrategy.PrevEMACross)
+		if is_uptrend(EMAdif[length-3]) {
+			logger.Infoln("等待卖出点触发")
+		} else if is_downtrend(EMAdif[length-3]) {
+			logger.Infoln("等待买入点触发")
+		}
 	}
 
 	//go TriggerPrice(Price[length-1])
@@ -183,13 +188,13 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 	if emaStrategy.LessBuyThreshold && is_downtrend(EMAdif[length-1]) {
 		emaStrategy.LessBuyThreshold = false
 		emaStrategy.PrevEMACross = "down" //reset
-		logger.Infoln("down->up(less than buy threshold)->down ^")
+		logger.Infoln("down->up(EMA diff < buy threshold)->down ^")
 
 	}
 	if emaStrategy.LessSellThreshold && is_uptrend(EMAdif[length-1]) {
 		emaStrategy.LessSellThreshold = false
 		emaStrategy.PrevEMACross = "up" //reset
-		logger.Infoln("up->down(less than sell threshold)->up V")
+		logger.Infoln("up->down(EMA diff > sell threshold)->up V")
 	}
 
 	//EMA cross
