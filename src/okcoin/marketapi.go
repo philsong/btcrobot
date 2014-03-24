@@ -147,7 +147,7 @@ func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
 	for _, value := range strings.Split(content, `],[`) {
 		//logger.Traceln(value)
 		v := strings.Split(value, ",")
-		if len(v) != 8 {
+		if len(v) < 8 {
 			logger.Traceln("wrong data")
 			return
 		}
