@@ -1,7 +1,7 @@
-// Copyright 2014 The btcbot Authors. All rights reserved.
+// Copyright 2014 The btcrobot Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-// https://github.com/philsong/
+// https://github.com/philsong/btcrobot
 
 $(function() {
 	myTimer();
