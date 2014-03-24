@@ -328,7 +328,7 @@ func parseMinuteCSV(filename string) (MinuteRecords []MinuteRecord) {
 			return
 		}
 
-		if len(record) == 0 {
+		if len(record) < 4 {
 			fmt.Println("Error:", "record is zero, maybe it is not a cvs format!!!")
 			return
 		}
@@ -377,12 +377,12 @@ func parsePeroidCSV(filename string) (PeroidRecords []PeroidRecord) {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			fmt.Println("Error:", err)
+			logger.Fatal("Error:", err)
 			return
 		}
 
 		if len(record) < 8 {
-			fmt.Println("Error:", "record is zero, maybe it is not a cvs format!!!", len(record))
+			logger.Fatal("Error:", "record is zero, maybe it is not a cvs format!!!", len(record))
 			return
 		}
 

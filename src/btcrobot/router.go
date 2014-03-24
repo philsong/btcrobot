@@ -39,8 +39,6 @@ func initRouter() *mux.Router {
 	router.HandleFunc("/engine{msgtype:(|ajax|get|post)}{json:(|.json)}", EngineHandler)
 	router.HandleFunc("/trade{msgtype:(|ajax|dobuy|dosell)}{json:(|.json)}", TradeHandler)
 
-	// 错误处理handler
-	router.HandleFunc("/noauthorize", NoAuthorizeHandler) // 无权限handler
 	// 404页面
 	router.HandleFunc("/{*}", NotFoundHandler)
 

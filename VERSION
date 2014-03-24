@@ -46,6 +46,8 @@
  *@time 2014-03-21 add EMA diff factor(buyThreshold and sellThreshold) to deduce the fake buy/sell cross point
  *@Version 0.24
  *@time 2014-03-23 add stoploss交易停损
+ *@Version 0.25
+ *@time 2014-03-24 add  www-authenticate, default username/password is admin/123456
  *
  *
  */

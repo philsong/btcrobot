@@ -35,13 +35,17 @@ var TradeOption map[string]string
 var SecretOption map[string]string
 
 func init() {
-	LoadConfig()
-	LoadOption()
-	LoadSecretOption()
+	LoadAll()
 	//fmt.Println(Config)
 	//fmt.Println(Option)
 	//fmt.Println(Licence)
 	//fmt.Println(Remind)
+}
+
+func LoadAll() {
+	LoadConfig()
+	LoadOption()
+	LoadSecretOption()
 }
 
 func load_config(file string) (config map[string]string, err error) {

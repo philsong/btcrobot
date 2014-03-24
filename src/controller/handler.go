@@ -20,7 +20,10 @@ package controller
 
 import (
 	"config"
+	"crypto/sha256"
+	"crypto/subtle"
 	"email"
+	"encoding/base64"
 	"encoding/json"
 	"filter"
 	"fmt"
@@ -38,14 +41,47 @@ type TradeAPI interface {
 	GetTradePrice(tradeDirection string) string
 }
 
+func NotFoundHandler(rw http.ResponseWriter, req *http.Request) {
+	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/404.html")
+}
+
+// SecureCompare performs a constant time compare of two strings to limit timing attacks.
+func SecureCompare(given string, actual string) bool {
+	givenSha := sha256.Sum256([]byte(given))
+	actualSha := sha256.Sum256([]byte(actual))
+
+	return subtle.ConstantTimeCompare(givenSha[:], actualSha[:]) == 1
+}
+
+// Basic returns a Handler that authenticates via Basic Auth. Writes a http.StatusUnauthorized
+// if authentication fails
+func Basic(rw http.ResponseWriter, req *http.Request) bool {
+	var siteAuth = base64.StdEncoding.EncodeToString([]byte(config.SecretOption["username"] + ":" + config.SecretOption["password"]))
+	auth := req.Header.Get("Authorization")
+	if !SecureCompare(auth, "Basic "+siteAuth) {
+		logger.Infoln("auth failed")
+		rw.Header().Set("WWW-Authenticate", "Basic realm=\"Authorization Required\"")
+		http.Error(rw, "请输入用户名密码：默认为admin/123456，登陆后请尽快修改默认密码。", http.StatusUnauthorized)
+		return false
+	}
+
+	return true
+}
+
 // 用户个人首页
 // URI: /trade/{username}
 func IndictorHandler(rw http.ResponseWriter, req *http.Request) {
+	if !Basic(rw, req) {
+		return
+	}
 	//util.Redirect(rw, req, "/static/trade")
 	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/indictor.html")
 }
 
 func TradeHandler(rw http.ResponseWriter, req *http.Request) {
+	if !Basic(rw, req) {
+		return
+	}
 	vars := mux.Vars(req)
 
 	msgtype := vars["msgtype"]
@@ -109,6 +145,9 @@ func TradeHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func EngineHandler(rw http.ResponseWriter, req *http.Request) {
+	if !Basic(rw, req) {
+		return
+	}
 	vars := mux.Vars(req)
 
 	msgtype := vars["msgtype"]
@@ -186,6 +225,9 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 }
 
 func SecretHandler(rw http.ResponseWriter, req *http.Request) {
+	if !Basic(rw, req) {
+		return
+	}
 	vars := mux.Vars(req)
 	msgtype := vars["msgtype"]
 	if req.Method != "POST" && msgtype == "" {
@@ -200,6 +242,9 @@ func SecretHandler(rw http.ResponseWriter, req *http.Request) {
 		req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/secret.html")
 		return
 	} else {
+		config.SecretOption["username"] = req.FormValue("username")
+		config.SecretOption["password"] = req.FormValue("password")
+
 		config.SecretOption["huobi_access_key"] = req.FormValue("huobi_access_key")
 		config.SecretOption["huobi_secret_key"] = req.FormValue("huobi_secret_key")
 
@@ -220,6 +265,6 @@ func SecretHandler(rw http.ResponseWriter, req *http.Request) {
 
 		fmt.Fprint(rw, `{"errno": 0, "msg":"更新秘钥配置成功!"}`)
 
-		go email.TriggerTrender("btcrobot测试邮件，您能收到这封邮件说明您的SMTP配置成功，您没收到？那您看的是个毛？来自星星的机器人")
+		go email.TriggerTrender("btcrobot测试邮件，您能收到这封邮件说明您的SMTP配置成功，来自星星的机器人")
 	}
 }

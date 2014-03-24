@@ -19,7 +19,9 @@ BTC/LTC操盘手自动化交易引擎
   Weibo:http://weibo.com/bocaicfa
 
 
-支持多个交易平台-火币、OKCoin，自动买卖，机器人EMA算法，使用指南，如下！
+支持多个交易平台-火币、OKCoin，自动买卖，机器人EMA算法，
+
+使用指南如下:
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
 
 BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
@@ -28,6 +30,10 @@ LTC捐赠地址：LXwX5XeZeVfXM2b4GRs6HM1mNn4K9En3F4
 
 捐助清单如下：
 https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E5%BC%80%E5%8F%91%E7%9A%84%E4%BA%BA
+
+
+安装说明（限win系统）如下：
+https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%EF%BC%88%E9%99%90win%E7%B3%BB%E7%BB%9F%EF%BC%89
 
 # 本地搭建 #
 
@@ -85,9 +91,11 @@ https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E
 
 在浏览器中输入：http://127.0.0.1:9090
 
-应该就能看到了。
+用默认用户名admin, 密码是123456 登录
 
-此时，你可以通过WEB界面配置各种参数，参数实时生效。
+应该就能开始自动化交易之旅了。
+
+此时，你可以通过WEB界面配置各种参数，参数重启生效。
 
 
 注：在第5步运行前可以根据需要修改 conf目录里的 配置，亦可在第6步配置。
