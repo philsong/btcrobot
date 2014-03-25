@@ -73,9 +73,7 @@ func main() {
 	fmt.Println("start web server failed, please check if the port 9090 is already used.")
 	fmt.Println(" <<<----------------------------------------------------------] ")
 
-	oneHour := 60 * 60 * 1000 * time.Millisecond
-
-	time.Sleep(24 * oneHour)
+	time.Sleep(24 * time.Hour)
 }
 
 // 保存PID
