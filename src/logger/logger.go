@@ -40,8 +40,8 @@ var (
 )
 
 func init() {
-	os.Mkdir(ROOT+"/log/", 0777)
-	os.Mkdir(ROOT+"/cache/", 0777)
+	os.Mkdir(ROOT+"/log/", 0644)
+	os.Mkdir(ROOT+"/cache/", 0644)
 	if Config["env"] == "test" {
 		override_file += "_test"
 	}
@@ -64,7 +64,7 @@ func NewReport(out io.Writer) *logger {
 }
 
 func Tradef(format string, args ...interface{}) {
-	file, err := os.OpenFile(trade_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(trade_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -76,7 +76,7 @@ func Tradef(format string, args ...interface{}) {
 }
 
 func Tradeln(args ...interface{}) {
-	file, err := os.OpenFile(trade_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(trade_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -88,7 +88,7 @@ func Tradeln(args ...interface{}) {
 }
 
 func Infof(format string, args ...interface{}) {
-	file, err := os.OpenFile(info_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(info_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -100,7 +100,7 @@ func Infof(format string, args ...interface{}) {
 }
 
 func Infoln(args ...interface{}) {
-	file, err := os.OpenFile(info_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(info_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -112,7 +112,7 @@ func Infoln(args ...interface{}) {
 }
 
 func Errorf(format string, args ...interface{}) {
-	file, err := os.OpenFile(error_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(error_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -124,7 +124,7 @@ func Errorf(format string, args ...interface{}) {
 }
 
 func Errorln(args ...interface{}) {
-	file, err := os.OpenFile(error_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(error_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -141,7 +141,7 @@ func Errorln(args ...interface{}) {
 }
 
 func Fatalf(format string, args ...interface{}) {
-	file, err := os.OpenFile(fatal_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(fatal_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -153,7 +153,7 @@ func Fatalf(format string, args ...interface{}) {
 }
 
 func Fatalln(args ...interface{}) {
-	file, err := os.OpenFile(fatal_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(fatal_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -170,7 +170,7 @@ func Fatalln(args ...interface{}) {
 }
 
 func Fatal(args ...interface{}) {
-	file, err := os.OpenFile(fatal_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(fatal_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -188,7 +188,7 @@ func Fatal(args ...interface{}) {
 
 func Debugf(format string, args ...interface{}) {
 	if Config["debug"] == "1" {
-		file, err := os.OpenFile(debug_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+		file, err := os.OpenFile(debug_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			return
 		}
@@ -204,7 +204,7 @@ func Debugf(format string, args ...interface{}) {
 
 func Debugln(args ...interface{}) {
 	if Config["debug"] == "1" {
-		file, err := os.OpenFile(debug_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+		file, err := os.OpenFile(debug_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
 			return
 		}
@@ -223,7 +223,7 @@ func Debugln(args ...interface{}) {
 
 func Tracef(format string, args ...interface{}) {
 
-	file, err := os.OpenFile(trace_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(trace_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -234,7 +234,7 @@ func Tracef(format string, args ...interface{}) {
 
 func Traceln(args ...interface{}) {
 
-	file, err := os.OpenFile(trace_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(trace_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -251,7 +251,7 @@ var what string
 
 func OverrideStart(Peroid int) {
 	what = fmt.Sprintf("%03d", Peroid)
-	file, err := os.OpenFile(override_file+what+".log", os.O_CREATE|os.O_TRUNC, 0777)
+	file, err := os.OpenFile(override_file+what+".log", os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return
 	}
@@ -259,7 +259,7 @@ func OverrideStart(Peroid int) {
 }
 
 func Overridef(format string, args ...interface{}) {
-	file, err := os.OpenFile(override_file+what+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(override_file+what+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
@@ -268,7 +268,7 @@ func Overridef(format string, args ...interface{}) {
 }
 
 func Overrideln(args ...interface{}) {
-	file, err := os.OpenFile(override_file+what+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(override_file+what+".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}

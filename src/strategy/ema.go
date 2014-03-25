@@ -248,7 +248,9 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 		}
 
 		//backup the kline data for analyze
-		backup(Time[length-1])
+		if Config["env"] == "dev" {
+			backup(Time[length-1])
+		}
 	}
 
 	//do sell when price is below stoploss point
