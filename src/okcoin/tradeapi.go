@@ -20,6 +20,7 @@ package okcoin
 import (
 	"compress/gzip"
 	//. "config"
+	"common"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -172,6 +173,45 @@ type OrderTable struct {
 	Orders []Order
 }
 
+type Money struct {
+	CNY float64
+	BTC float64
+	LTC float64
+}
+
+type Funds struct {
+	Free   Money
+	Frezed Money
+}
+
+type Info struct {
+	Funds Funds
+}
+
+type UserInfo struct {
+	Result bool
+	Info   Info
+}
+
+/*
+　｛
+　　　 　 "result":true,
+　　　 　 "info":{
+　　　 　　 "funds":{
+　　　　　 　"free":{
+　　　　　 　 　"cny":1000,
+　　　 　　 　　 "btc":10,
+　　　 　　 　　"ltc":0
+　　　　　　　 },
+　　　　　　　 "freezed":{
+　　　　　　　　 "cny":1000,
+　　　　 　　　　 "btc":10,
+　　　　 　 　　　"ltc":0
+　　　　　　　 }
+　　　 　　 }
+　　　　 }
+　　　 ｝
+*/
 func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool) {
 	if strings.Contains(body, "result") != true {
 		ret = false
@@ -196,12 +236,36 @@ func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret boo
 	return
 }
 
-func (w *OkcoinTrade) Get_account_info() (string, error) {
+func (w *OkcoinTrade) Get_account_info() (account_info common.Account_info, ret bool) {
 	api_url := "https://www.okcoin.com/api/userinfo.do"
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
 
-	return w.httpRequest(api_url, pParams)
+	ret = true
+
+	body, err := w.httpRequest(api_url, pParams)
+	if err != nil {
+		ret = false
+		return
+	}
+
+	_, ret = w.check_json_result(body)
+	if ret == false {
+		return
+	}
+
+	doc := json.NewDecoder(strings.NewReader(body))
+
+	var m UserInfo
+	if err := doc.Decode(&m); err == io.EOF {
+		logger.Traceln(err)
+	} else if err != nil {
+		logger.Fatal(err)
+	}
+
+	logger.Infoln(m)
+
+	return
 }
 
 func (w *OkcoinTrade) Get_order(symbol, order_id string) (m OrderTable, ret bool) {

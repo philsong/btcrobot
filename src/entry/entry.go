@@ -19,6 +19,7 @@
 package entry
 
 import (
+	"common"
 	. "config"
 	"fmt"
 	"huobi"
@@ -28,13 +29,6 @@ import (
 	"strconv"
 	"time"
 )
-
-type TradeAPI interface {
-	AnalyzeKLine(peroid int) (ret bool)
-	Buy(price, amount string) bool
-	Sell(price, amount string) bool
-	GetTradePrice(tradeDirection string) string
-}
 
 /*
 func backtesting() {
@@ -68,7 +62,7 @@ func RunRobot() {
 	ticker := time.NewTicker(2 * time.Second) //2s
 	defer ticker.Stop()
 
-	var tradeAPI TradeAPI
+	var tradeAPI common.TradeAPI
 	if Option["tradecenter"] == "huobi" {
 		tradeAPI = huobi.NewHuobi()
 	} else if Option["tradecenter"] == "okcoin" {
@@ -84,6 +78,14 @@ func RunRobot() {
 	}
 
 	fmt.Println("robot working...")
+
+	account_info, ret := tradeAPI.Get_account_info()
+
+	if !ret {
+		logger.Infoln("Get_account_info failed")
+	} else {
+		logger.Infoln(account_info)
+	}
 
 	go func() {
 		for _ = range ticker.C {

@@ -18,19 +18,13 @@
 package huobi
 
 import (
+	"common"
 	. "config"
 	"fmt"
 	"logger"
 	"net/http"
 	"strconv"
 )
-
-type TradeAPI interface {
-	AnalyzeKLine(peroid int) (ret bool)
-	Buy(price, amount string) bool
-	Sell(price, amount string) bool
-	GetTradePrice(tradeDirection string) string
-}
 
 type Huobi struct {
 	client *http.Client
@@ -51,6 +45,21 @@ func (w Huobi) AnalyzeKLine(peroid int) (ret bool) {
 		return w.AnalyzeKLineMinute(symbol)
 	} else {
 		return w.AnalyzeKLinePeroid(symbol, peroid)
+	}
+}
+
+func (w Huobi) Get_account_info() (account_info common.Account_info, ret bool) {
+	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
+
+	account_info, ret = tradeAPI.Get_account_info()
+
+	if !ret {
+		logger.Infoln("Get_account_info failed")
+
+		return
+	} else {
+		logger.Infoln(account_info)
+		return
 	}
 }
 

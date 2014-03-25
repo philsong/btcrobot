@@ -18,6 +18,7 @@
 package huobi
 
 import (
+	"common"
 	. "config"
 	"crypto/md5"
 	"encoding/json"
@@ -134,7 +135,7 @@ type ErrorMsg struct {
 	Time int
 }
 
-type DelegationsMsg struct {
+type Order struct {
 	Id               int
 	Type             int
 	order_price      string
@@ -167,7 +168,7 @@ func (w *HuobiTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool
 	return
 }
 
-func (w *HuobiTrade) Get_account_info() (string, error) {
+func (w *HuobiTrade) Get_account_info() (m common.Account_info, ret bool) {
 	pParams := make(map[string]string)
 	pParams["method"] = "get_account_info"
 	pParams["access_key"] = w.access_key
@@ -175,10 +176,33 @@ func (w *HuobiTrade) Get_account_info() (string, error) {
 	pParams["created"] = strconv.FormatInt(now, 10)
 	pParams["sign"] = w.createSign(pParams)
 
-	return w.httpRequest(pParams)
+	ret = true
+
+	body, err := w.httpRequest(pParams)
+	if err != nil {
+		ret = false
+		return
+	}
+
+	_, ret = w.check_json_result(body)
+	if ret == false {
+		return
+	}
+
+	doc := json.NewDecoder(strings.NewReader(body))
+
+	if err := doc.Decode(&m); err == io.EOF {
+		logger.Traceln(err)
+	} else if err != nil {
+		logger.Fatal(err)
+	}
+
+	logger.Traceln(m)
+
+	return
 }
 
-func (w *HuobiTrade) Get_orders() (m []DelegationsMsg, ret bool) {
+func (w *HuobiTrade) Get_orders() (m []Order, ret bool) {
 	pParams := make(map[string]string)
 	pParams["method"] = "get_orders"
 	pParams["access_key"] = w.access_key

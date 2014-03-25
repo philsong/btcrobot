@@ -18,6 +18,7 @@
 package okcoin
 
 import (
+	"common"
 	. "config"
 	"fmt"
 	"logger"
@@ -30,6 +31,7 @@ type TradeAPI interface {
 	Buy(price, amount string) bool
 	Sell(price, amount string) bool
 	GetTradePrice(tradeDirection string) string
+	Get_account_info(account_info common.Account_info, ret bool)
 }
 
 type Okcoin struct {
@@ -48,6 +50,21 @@ func NewOkcoin() *Okcoin {
 func (w Okcoin) AnalyzeKLine(peroid int) (ret bool) {
 	symbol := Option["symbol"]
 	return w.AnalyzeKLinePeroid(symbol, peroid)
+}
+
+func (w Okcoin) Get_account_info() (account_info common.Account_info, ret bool) {
+	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+
+	account_info, ret = tradeAPI.Get_account_info()
+
+	if !ret {
+		logger.Infoln("Get_account_info failed")
+
+		return
+	} else {
+		logger.Infoln(account_info)
+		return
+	}
 }
 
 func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
