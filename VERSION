@@ -48,6 +48,8 @@
  *@time 2014-03-23 add stoploss交易停损
  *@Version 0.25
  *@time 2014-03-24 add  www-authenticate, default username/password is admin/123456
+ *@Version 0.26
+ *@time 2014-03-25 fix diff bug in okcoin mode
  *
  *
  */

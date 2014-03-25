@@ -50,7 +50,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 		}
 
 		if EMAdif > buyThreshold {
-			logger.Infof("EMAdif %0.03f arrive buyThreshold %0.03f\n", EMAdif, buyThreshold)
+			logger.Infof("EMAdif(%0.03f) > buyThreshold(%0.03f), trigger to buy\n", EMAdif, buyThreshold)
 			emaStrategy.LessBuyThreshold = false
 			return true
 		} else {
@@ -71,7 +71,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 		}
 
 		if EMAdif < sellThreshold {
-			logger.Infof("EMAdif(%0.03f) <  sellThreshold(%0.03f), trigger to buy\n", EMAdif, sellThreshold)
+			logger.Infof("EMAdif(%0.03f) <  sellThreshold(%0.03f), trigger to sell\n", EMAdif, sellThreshold)
 			emaStrategy.LessSellThreshold = false
 			return true
 		} else {
@@ -180,6 +180,8 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 			logger.Infoln("上一个趋势是上涨，等待卖出点触发")
 		} else if is_downtrend(EMAdif[length-3]) {
 			logger.Infoln("上一个趋势是下跌，等待买入点触发")
+		} else {
+			logger.Infoln("上一个趋势是unknown。。。")
 		}
 	}
 

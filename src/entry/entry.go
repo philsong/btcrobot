@@ -65,7 +65,8 @@ func RunRobot() {
 		return
 	}
 
-	ticker := time.NewTicker(2000 * time.Millisecond) //2s
+	ticker := time.NewTicker(2 * time.Second) //2s
+	defer ticker.Stop()
 
 	var tradeAPI TradeAPI
 	if Option["tradecenter"] == "huobi" {
@@ -90,13 +91,10 @@ func RunRobot() {
 		}
 	}()
 
-	oneHour := 60 * 60 * 1000 * time.Millisecond
-
 	logger.Infof("程序将持续运行%d小时后停止", time.Duration(totalHour))
 
-	time.Sleep(time.Duration(totalHour) * oneHour)
+	time.Sleep(time.Duration(totalHour) * time.Hour)
 
-	ticker.Stop()
 	logger.Infof("程序到达设定时长%d小时，停止运行。", time.Duration(totalHour))
 }
 
