@@ -203,6 +203,7 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 		config.Option["strategy"] = req.FormValue("strategy")
 		config.Option["shortEMA"] = req.FormValue("shortEMA")
 		config.Option["longEMA"] = req.FormValue("longEMA")
+		config.Option["signalPeriod"] = req.FormValue("signalPeriod")
 
 		config.Option["tradeAmount"] = req.FormValue("tradeAmount")
 		config.Option["slippage"] = req.FormValue("slippage")

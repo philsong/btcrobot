@@ -23,7 +23,6 @@ import (
 	. "config"
 	"fmt"
 	"huobi"
-	"log"
 	"logger"
 	"okcoin"
 	"strconv"
@@ -50,7 +49,64 @@ func backtesting() {
 }
 */
 
+const worker_number = 1
+
+type message struct {
+	normal bool                   //true means exit normal, otherwise
+	state  map[string]interface{} //goroutine state
+}
+
+func worker(mess chan message) {
+	defer func() {
+		exit_message := message{state: make(map[string]interface{})}
+		i := recover()
+		if i != nil {
+			exit_message.normal = false
+		} else {
+			exit_message.normal = true
+		}
+		mess <- exit_message
+	}()
+
+	/*
+		now := time.Now()
+		seed := now.UnixNano()
+		rand.Seed(seed)
+		num := rand.Int63()
+		fmt.Println(num)
+		if num%2 != 0 {
+			fmt.Println("1")
+			panic("not evening")
+		} else {
+			fmt.Println("0")
+			runtime.Goexit()
+		}
+	*/
+	RobotWorker()
+}
+
+func supervisor(mess chan message) {
+	for i := 0; i < worker_number; i++ {
+		m := <-mess
+		switch m.normal {
+		case true:
+			logger.Infoln("exit normal, nothing serious!")
+		case false:
+			logger.Infoln("exit abnormal, something went wrong")
+		}
+	}
+}
+
 func RunRobot() {
+	mess := make(chan message, 10)
+	for i := 0; i < worker_number; i++ {
+		go worker(mess)
+	}
+
+	supervisor(mess)
+}
+
+func RobotWorker() {
 	fmt.Println("env", Config["env"])
 	if Config["env"] == "dev" {
 		fmt.Println("test working...")
@@ -80,7 +136,7 @@ func RunRobot() {
 	} else if Option["tradecenter"] == "okcoin" {
 		tradeAPI = okcoin.NewOkcoin()
 	} else {
-		log.Fatalln("Please config the tradecenter firstly...")
+		logger.Fatalln("Please config the tradecenter firstly...")
 		return
 	}
 	peroid, _ := strconv.Atoi(Option["tick_interval"])

@@ -27,9 +27,6 @@
 	"fatalconsole": "1",
 	"debugconsole": "0",
 
-	"macd": "enable9",
-	"signalPeriod": "9",
-
 	"TresholdLevel": "1",
 
 	"env": "pro"

@@ -22,9 +22,7 @@ import (
 	. "config"
 	"entry"
 	"fmt"
-	"logger"
 	"math/rand"
-	"net/http"
 	"path/filepath"
 	"process"
 	"runtime"
@@ -38,8 +36,17 @@ func init() {
 }
 
 func main() {
+	SavePid()
 
-	version := "0.26"
+	printBanner()
+
+	go startWEBserver()
+
+	entry.RunRobot()
+}
+
+func printBanner() {
+	version := "0.27"
 	fmt.Println("[ ---------------------------------------------------------->>> ")
 	fmt.Println(" BTC/LTC robot version ", version)
 	fmt.Println(" *BTC/LTC操盘手自动化交易引擎*")
@@ -54,26 +61,6 @@ func main() {
 	fmt.Println(" *@请在浏览器中打开 http://127.0.0.1:9090 配置相关参数")
 	fmt.Println(" *@警告：API key和密码存放在conf/secret.json文件内，共享给他人前请务必删除，注意账号安全！！")
 	fmt.Println(" <<<----------------------------------------------------------] ")
-	SavePid()
-
-	go entry.RunRobot()
-
-	// 服务静态文件
-	http.Handle("/static/", http.FileServer(http.Dir(ROOT)))
-
-	router := initRouter()
-	http.Handle("/", router)
-	if Config["env"] == "test" {
-		logger.Infoln(http.ListenAndServe("0.0.0.0:9090", nil))
-	} else {
-		logger.Infoln(http.ListenAndServe(Config["host"], nil))
-	}
-
-	fmt.Println("[ ---------------------------------------------------------->>> ")
-	fmt.Println("start web server failed, please check if the port 9090 is already used.")
-	fmt.Println(" <<<----------------------------------------------------------] ")
-
-	time.Sleep(24 * time.Hour)
 }
 
 // 保存PID

@@ -130,21 +130,6 @@ func (emaStrategy *EMAStrategy) is_downcross(prevema, ema float64) bool {
 
 //EMA strategy
 func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
-
-	//
-	if len(Time) == 0 || len(Price) == 0 || len(Volumn) == 0 {
-		logger.Errorln("warning:detect exception data", len(Time), len(Price), len(Volumn))
-		return false
-	}
-
-	length := len(Price)
-
-	//check exception data in trade center
-	if checkException(Price[length-2], Price[length-1], Volumn[length-1]) == false {
-		logger.Errorln("detect exception data of trade center", Price[length-2], Price[length-1], Volumn[length-1])
-		return false
-	}
-
 	//read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
@@ -156,17 +141,18 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 	}
 	tradeAmount := Option["tradeAmount"]
 
-	//compute the indictor
-	emaShort := EMA(Price, shortEMA)
-	emaLong := EMA(Price, longEMA)
-	EMAdif := getEMAdif(emaShort, emaLong)
-
 	stoploss, err := strconv.ParseFloat(Option["stoploss"], 64)
 	if err != nil {
 		logger.Errorln("config item stoploss is not float")
 		return false
 	}
 
+	//compute the indictor
+	emaShort := EMA(Price, shortEMA)
+	emaLong := EMA(Price, longEMA)
+	EMAdif := getEMAdif(emaShort, emaLong)
+
+	length := len(Price)
 	if emaStrategy.PrevEMACross == "unknown" {
 		if is_uptrend(EMAdif[length-3]) {
 			emaStrategy.PrevEMACross = "up"
@@ -281,19 +267,6 @@ func backup(Time string) {
 	oldFile := "cache/TradeKLine_minute.data"
 	newFile := fmt.Sprintf("%s_%s", oldFile, Time)
 	os.Rename(oldFile, newFile)
-}
-
-//check exception data in trade center
-func checkException(yPrevPrice, Price, Volumn float64) bool {
-	if Price > yPrevPrice+10 && Volumn < 1 {
-		return false
-	}
-
-	if Price < yPrevPrice-10 && Volumn < 1 {
-		return false
-	}
-
-	return true
 }
 
 func getEMAdifAt(emaShort, emaLong []float64, idx int) float64 {
