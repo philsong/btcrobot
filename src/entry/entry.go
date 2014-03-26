@@ -54,8 +54,14 @@ func RunRobot() {
 	fmt.Println("env", Config["env"])
 	if Config["env"] == "dev" {
 		fmt.Println("test working...")
+		var tradeAPI common.TradeAPI
+		tradeAPI = huobi.NewHuobi()
+		tradeAPI.Get_account_info()
+		symbol := "btc_cny"
+		tradeAPI.GetOrderBook(symbol)
+
 		//testHuobiAPI()
-		testOkcoinLTCAPI()
+		//testOkcoinLTCAPI()
 		return
 	}
 
@@ -65,6 +71,7 @@ func RunRobot() {
 	var tradeAPI common.TradeAPI
 	tradeAPI = huobi.NewHuobi()
 	tradeAPI.Get_account_info()
+
 	tradeAPI = okcoin.NewOkcoin()
 	tradeAPI.Get_account_info()
 

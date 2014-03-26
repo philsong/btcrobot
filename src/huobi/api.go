@@ -24,6 +24,7 @@ import (
 	"logger"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type Huobi struct {
@@ -37,6 +38,11 @@ type Huobi struct {
 func NewHuobi() *Huobi {
 	w := new(Huobi)
 	return w
+}
+
+func (w Huobi) GetOrderBook(symbol string) (ret bool) {
+
+	return w.getOrderBook(symbol)
 }
 
 func (w Huobi) AnalyzeKLine(peroid int) (ret bool) {
@@ -93,8 +99,8 @@ func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
 		logger.Infoln("执行买入委托失败", tradePrice, tradeAmount)
 	}
 
+	time.Sleep(3 * time.Second)
 	_, ret := w.Get_account_info()
-
 	if !ret {
 		logger.Infoln("Get_account_info failed")
 	}
@@ -122,8 +128,8 @@ func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
 		logger.Infoln("执行卖出委托失败", tradePrice, tradeAmount)
 	}
 
+	time.Sleep(3 * time.Second)
 	_, ret := w.Get_account_info()
-
 	if !ret {
 		logger.Infoln("Get_account_info failed")
 	}

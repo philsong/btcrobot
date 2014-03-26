@@ -1,7 +1,6 @@
 /*
-  btcbot is a Bitcoin trading bot for HUOBI.com written
-  in golang, it features multiple trading methods using
-  technical analysis.
+  btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
+  it features multiple trading methods using technical analysis.
 
   Disclaimer:
 

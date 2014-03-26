@@ -24,6 +24,7 @@ import (
 	"logger"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type Okcoin struct {
@@ -37,6 +38,10 @@ type Okcoin struct {
 func NewOkcoin() *Okcoin {
 	w := new(Okcoin)
 	return w
+}
+
+func (w Okcoin) GetOrderBook(symbol string) (ret bool) {
+	return false
 }
 
 func (w Okcoin) AnalyzeKLine(peroid int) (ret bool) {
@@ -92,6 +97,7 @@ func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
 		logger.Infoln("执行买入委托失败", tradePrice, tradeAmount)
 	}
 
+	time.Sleep(3 * time.Second)
 	_, ret := w.Get_account_info()
 
 	if !ret {
@@ -121,6 +127,7 @@ func (w Okcoin) Sell(tradePrice, tradeAmount string) bool {
 		logger.Infoln("执行卖出委托失败", tradePrice, tradeAmount)
 	}
 
+	time.Sleep(3 * time.Second)
 	_, ret := w.Get_account_info()
 
 	if !ret {
