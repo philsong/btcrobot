@@ -24,6 +24,7 @@
 	"debug": "1",
 	"errorconsole": "1",
 	"infoconsole": "1",
+	"fatalconsole": "1",
 	"debugconsole": "0",
 
 	"macd": "enable9",

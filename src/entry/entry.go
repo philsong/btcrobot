@@ -63,6 +63,11 @@ func RunRobot() {
 	defer ticker.Stop()
 
 	var tradeAPI common.TradeAPI
+	tradeAPI = huobi.NewHuobi()
+	tradeAPI.Get_account_info()
+	tradeAPI = okcoin.NewOkcoin()
+	tradeAPI.Get_account_info()
+
 	if Option["tradecenter"] == "huobi" {
 		tradeAPI = huobi.NewHuobi()
 	} else if Option["tradecenter"] == "okcoin" {
@@ -78,14 +83,6 @@ func RunRobot() {
 	}
 
 	fmt.Println("robot working...")
-
-	account_info, ret := tradeAPI.Get_account_info()
-
-	if !ret {
-		logger.Infoln("Get_account_info failed")
-	} else {
-		logger.Infoln(account_info)
-	}
 
 	go func() {
 		for _ = range ticker.C {

@@ -18,7 +18,6 @@
 package huobi
 
 import (
-	"common"
 	. "config"
 	"crypto/md5"
 	"encoding/json"
@@ -168,7 +167,18 @@ func (w *HuobiTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool
 	return
 }
 
-func (w *HuobiTrade) Get_account_info() (m common.Account_info, ret bool) {
+type Account_info struct {
+	Total                 string
+	Net_asset             string
+	Available_cny_display string
+	Available_btc_display string
+	Frozen_cny_display    string
+	Frozen_btc_display    string
+	Loan_cny_display      string
+	Loan_btc_display      string
+}
+
+func (w *HuobiTrade) Get_account_info() (account_info Account_info, ret bool) {
 	pParams := make(map[string]string)
 	pParams["method"] = "get_account_info"
 	pParams["access_key"] = w.access_key
@@ -191,13 +201,13 @@ func (w *HuobiTrade) Get_account_info() (m common.Account_info, ret bool) {
 
 	doc := json.NewDecoder(strings.NewReader(body))
 
-	if err := doc.Decode(&m); err == io.EOF {
-		logger.Traceln(err)
+	if err := doc.Decode(&account_info); err == io.EOF {
+		logger.Fatal(err)
 	} else if err != nil {
 		logger.Fatal(err)
 	}
 
-	logger.Traceln(m)
+	logger.Traceln(account_info)
 
 	return
 }

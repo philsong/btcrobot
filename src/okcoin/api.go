@@ -26,14 +26,6 @@ import (
 	"strconv"
 )
 
-type TradeAPI interface {
-	AnalyzeKLine(peroid int) (ret bool)
-	Buy(price, amount string) bool
-	Sell(price, amount string) bool
-	GetTradePrice(tradeDirection string) string
-	Get_account_info(account_info common.Account_info, ret bool)
-}
-
 type Okcoin struct {
 	client *http.Client
 
@@ -52,17 +44,33 @@ func (w Okcoin) AnalyzeKLine(peroid int) (ret bool) {
 	return w.AnalyzeKLinePeroid(symbol, peroid)
 }
 
-func (w Okcoin) Get_account_info() (account_info common.Account_info, ret bool) {
+func (w Okcoin) Get_account_info() (userMoney common.UserMoney, ret bool) {
 	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 
-	account_info, ret = tradeAPI.Get_account_info()
+	userInfo, ret := tradeAPI.Get_account_info()
 
 	if !ret {
-		logger.Infoln("Get_account_info failed")
-
+		logger.Traceln("okcoin Get_account_info failed")
 		return
 	} else {
-		logger.Infoln(account_info)
+		logger.Traceln(userInfo)
+
+		userMoney.Available_cny = userInfo.Info.Funds.Free.CNY
+		userMoney.Available_btc = userInfo.Info.Funds.Free.BTC
+		userMoney.Available_ltc = userInfo.Info.Funds.Free.LTC
+
+		userMoney.Frozen_cny = userInfo.Info.Funds.Freezed.CNY
+		userMoney.Frozen_btc = userInfo.Info.Funds.Freezed.BTC
+		userMoney.Frozen_ltc = userInfo.Info.Funds.Freezed.LTC
+
+		logger.Infof("okcoin资产: \n 可用cny:%-10s \tbtc:%-10s \tltc:%-10s \n 冻结cny:%-10s \tbtc:%-10s \tltc:%-10s\n",
+			userMoney.Available_cny,
+			userMoney.Available_btc,
+			userMoney.Available_ltc,
+			userMoney.Frozen_cny,
+			userMoney.Frozen_btc,
+			userMoney.Frozen_ltc)
+		//logger.Infoln(userMoney)
 		return
 	}
 }
@@ -80,9 +88,19 @@ func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
 
 	if buyId != "0" {
 		logger.Infoln("执行买入委托成功", tradePrice, tradeAmount)
-		return true
 	} else {
 		logger.Infoln("执行买入委托失败", tradePrice, tradeAmount)
+	}
+
+	_, ret := w.Get_account_info()
+
+	if !ret {
+		logger.Infoln("Get_account_info failed")
+	}
+
+	if buyId != "0" {
+		return true
+	} else {
 		return false
 	}
 }
@@ -97,12 +115,21 @@ func (w Okcoin) Sell(tradePrice, tradeAmount string) bool {
 	} else if symbol == "ltc_cny" {
 		sellId = tradeAPI.SellLTC(tradePrice, tradeAmount)
 	}
-
 	if sellId != "0" {
 		logger.Infoln("执行卖出委托成功", tradePrice, tradeAmount)
-		return true
 	} else {
 		logger.Infoln("执行卖出委托失败", tradePrice, tradeAmount)
+	}
+
+	_, ret := w.Get_account_info()
+
+	if !ret {
+		logger.Infoln("Get_account_info failed")
+	}
+
+	if sellId != "0" {
+		return true
+	} else {
 		return false
 	}
 }

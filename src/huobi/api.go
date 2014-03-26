@@ -48,17 +48,31 @@ func (w Huobi) AnalyzeKLine(peroid int) (ret bool) {
 	}
 }
 
-func (w Huobi) Get_account_info() (account_info common.Account_info, ret bool) {
+func (w Huobi) Get_account_info() (userMoney common.UserMoney, ret bool) {
 	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
 
-	account_info, ret = tradeAPI.Get_account_info()
+	userInfo, ret := tradeAPI.Get_account_info()
 
 	if !ret {
-		logger.Infoln("Get_account_info failed")
+		logger.Traceln("Huobi Get_account_info failed")
 
 		return
 	} else {
-		logger.Infoln(account_info)
+		userMoney.Available_cny = userInfo.Available_cny_display
+		userMoney.Available_btc = userInfo.Available_btc_display
+		userMoney.Available_ltc = "N/A"
+
+		userMoney.Frozen_cny = userInfo.Frozen_cny_display
+		userMoney.Frozen_btc = userInfo.Frozen_btc_display
+		userMoney.Frozen_ltc = "N/A"
+
+		logger.Infof("Huobi资产: \n 可用cny:%-10s \tbtc:%-10s \tltc:%-10s \n 冻结cny:%-10s \tbtc:%-10s \tltc:%-10s\n",
+			userMoney.Available_cny,
+			userMoney.Available_btc,
+			userMoney.Available_ltc,
+			userMoney.Frozen_cny,
+			userMoney.Frozen_btc,
+			userMoney.Frozen_ltc)
 		return
 	}
 }
@@ -75,10 +89,19 @@ func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
 
 	if buyId != "0" {
 		logger.Infoln("执行买入委托成功", tradePrice, tradeAmount)
-
-		return true
 	} else {
 		logger.Infoln("执行买入委托失败", tradePrice, tradeAmount)
+	}
+
+	_, ret := w.Get_account_info()
+
+	if !ret {
+		logger.Infoln("Get_account_info failed")
+	}
+
+	if buyId != "0" {
+		return true
+	} else {
 		return false
 	}
 }
@@ -95,9 +118,19 @@ func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
 
 	if sellId != "0" {
 		logger.Infoln("执行卖出委托成功", tradePrice, tradeAmount)
-		return true
 	} else {
 		logger.Infoln("执行卖出委托失败", tradePrice, tradeAmount)
+	}
+
+	_, ret := w.Get_account_info()
+
+	if !ret {
+		logger.Infoln("Get_account_info failed")
+	}
+
+	if sellId != "0" {
+		return true
+	} else {
 		return false
 	}
 }

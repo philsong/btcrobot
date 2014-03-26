@@ -19,8 +19,6 @@ package okcoin
 
 import (
 	"compress/gzip"
-	//. "config"
-	"common"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -173,45 +171,6 @@ type OrderTable struct {
 	Orders []Order
 }
 
-type Money struct {
-	CNY float64
-	BTC float64
-	LTC float64
-}
-
-type Funds struct {
-	Free   Money
-	Frezed Money
-}
-
-type Info struct {
-	Funds Funds
-}
-
-type UserInfo struct {
-	Result bool
-	Info   Info
-}
-
-/*
-　｛
-　　　 　 "result":true,
-　　　 　 "info":{
-　　　 　　 "funds":{
-　　　　　 　"free":{
-　　　　　 　 　"cny":1000,
-　　　 　　 　　 "btc":10,
-　　　 　　 　　"ltc":0
-　　　　　　　 },
-　　　　　　　 "freezed":{
-　　　　　　　　 "cny":1000,
-　　　　 　　　　 "btc":10,
-　　　　 　 　　　"ltc":0
-　　　　　　　 }
-　　　 　　 }
-　　　　 }
-　　　 ｝
-*/
 func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool) {
 	if strings.Contains(body, "result") != true {
 		ret = false
@@ -236,7 +195,46 @@ func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret boo
 	return
 }
 
-func (w *OkcoinTrade) Get_account_info() (account_info common.Account_info, ret bool) {
+/*
+　｛
+　　　 　 "result":true,
+　　　 　 "info":{
+　　　 　　 "funds":{
+　　　　　 　"free":{
+　　　　　 　 　"cny":1000,
+　　　 　　 　　 "btc":10,
+　　　 　　 　　"ltc":0
+　　　　　　　 },
+　　　　　　　 "freezed":{
+　　　　　　　　 "cny":1000,
+　　　　 　　　　 "btc":10,
+　　　　 　 　　　"ltc":0
+　　　　　　　 }
+　　　 　　 }
+　　　　 }
+　　｝
+*/
+type Money struct {
+	CNY string
+	BTC string
+	LTC string
+}
+
+type Funds struct {
+	Free    Money
+	Freezed Money
+}
+
+type Info struct {
+	Funds Funds
+}
+
+type UserInfo struct {
+	Result bool
+	Info   Info
+}
+
+func (w *OkcoinTrade) Get_account_info() (userInfo UserInfo, ret bool) {
 	api_url := "https://www.okcoin.com/api/userinfo.do"
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
@@ -254,16 +252,18 @@ func (w *OkcoinTrade) Get_account_info() (account_info common.Account_info, ret 
 		return
 	}
 
+	logger.Traceln(body)
 	doc := json.NewDecoder(strings.NewReader(body))
 
-	var m UserInfo
-	if err := doc.Decode(&m); err == io.EOF {
+	if err := doc.Decode(&userInfo); err == io.EOF {
+		ret = false
 		logger.Traceln(err)
 	} else if err != nil {
+		ret = false
 		logger.Fatal(err)
 	}
 
-	logger.Infoln(m)
+	logger.Traceln(userInfo)
 
 	return
 }
