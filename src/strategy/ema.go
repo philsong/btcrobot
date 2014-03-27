@@ -254,8 +254,6 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 			}
 
 			go email.TriggerTrender(warning)
-
-			return true
 		}
 	}
 

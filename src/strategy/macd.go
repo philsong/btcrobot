@@ -120,7 +120,8 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 
 	//do sell when price is below stoploss point
 	if Price[length-1] < macdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
-		if Option["disable_trading"] != "1" {
+		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
+			macdStrategy.PrevMACDTrade = "sell"
 			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
 			logger.Infoln(warning)
 			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
@@ -130,8 +131,6 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 			}
 
 			go email.TriggerTrender(warning)
-
-			return true
 		}
 	}
 
