@@ -71,6 +71,18 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 		return false
 	}
 
+	MACDbuyThreshold, err := strconv.ParseFloat(Option["MACDbuyThreshold"], 64)
+	if err != nil {
+		logger.Errorln("config item MACDbuyThreshold is not float")
+		return false
+	}
+
+	MACDsellThreshold, err := strconv.ParseFloat(Option["MACDsellThreshold"], 64)
+	if err != nil {
+		logger.Errorln("config item MACDsellThreshold is not float")
+		return false
+	}
+
 	//compute the indictor
 	emaShort := EMA(Price, shortEMA)
 	emaLong := EMA(Price, longEMA)
@@ -86,7 +98,8 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 	}
 
 	//macd cross
-	if MACDHistogram[length-2] < 0 && MACDHistogram[length-1] > 0 {
+	if (MACDHistogram[length-2] < 0 && MACDHistogram[length-1] > MACDbuyThreshold) ||
+		(MACDHistogram[length-3] < 0 && MACDHistogram[length-2] > 0 && MACDHistogram[length-1] > MACDbuyThreshold) {
 		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "buy" {
 			macdStrategy.PrevMACDTrade = "buy"
 			warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("buy")
@@ -100,7 +113,8 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 
 			go email.TriggerTrender(warning)
 		}
-	} else if MACDHistogram[length-2] > 0 && MACDHistogram[length-1] < 0 {
+	} else if (MACDHistogram[length-2] > 0 && MACDHistogram[length-1] < MACDsellThreshold) ||
+		(MACDHistogram[length-3] > 0 && MACDHistogram[length-2] < 0 && MACDHistogram[length-1] < MACDsellThreshold) {
 		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
 			macdStrategy.PrevMACDTrade = "sell"
 			warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
