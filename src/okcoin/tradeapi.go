@@ -111,9 +111,11 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 	logger.Traceln(req)
 
 	if w.client == nil {
-		w.client = &http.Client{nil, nil, nil}
+		w.client = util.NewTimeoutClient()
 	}
+	logger.Tracef("HTTP req begin OkcoinTrade")
 	resp, err := w.client.Do(req)
+	logger.Tracef("HTTP req end OkcoinTrade")
 	if err != nil {
 		logger.Fatal(err)
 		return "", err

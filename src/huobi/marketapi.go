@@ -31,6 +31,7 @@ import (
 	"strategy"
 	"strconv"
 	"strings"
+	"util"
 )
 
 /*
@@ -70,9 +71,11 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 	logger.Traceln(req)
 
 	if w.client == nil {
-		w.client = &http.Client{nil, nil, nil}
+		w.client = util.NewTimeoutClient()
 	}
+	logger.Tracef("HTTP req begin AnalyzeKLinePeroid")
 	resp, err := w.client.Do(req)
+	logger.Tracef("HTTP req end AnalyzeKLinePeroid")
 	if err != nil {
 		logger.Errorln(err)
 		return false
@@ -140,7 +143,9 @@ func (w *Huobi) AnalyzeKLineMinute(symbol string) (ret bool) {
 	if w.client == nil {
 		w.client = &http.Client{nil, nil, nil}
 	}
+	logger.Tracef("HTTP req begin AnalyzeKLineMinute")
 	resp, err := w.client.Do(req)
+	logger.Tracef("HTTP req end AnalyzeKLineMinute")
 	if err != nil {
 		logger.Errorln(err)
 		return false

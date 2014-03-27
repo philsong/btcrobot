@@ -28,6 +28,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"util"
 )
 
 /*
@@ -80,9 +81,11 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 	logger.Traceln(req)
 
 	if w.client == nil {
-		w.client = &http.Client{nil, nil, nil}
+		w.client = util.NewTimeoutClient()
 	}
+	logger.Tracef("HTTP req begin AnalyzeKLinePeroid")
 	resp, err := w.client.Do(req)
+	logger.Tracef("HTTP req end AnalyzeKLinePeroid")
 	if err != nil {
 		logger.Errorln(err)
 		return false
@@ -112,14 +115,7 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 
 		logger.Traceln(resp.Header.Get("Content-Type"))
 
-		ret := strings.Contains(body, "您需要登录才能继续")
-		if ret {
-			logger.Traceln("您需要登录才能继续")
-			return false
-		} else {
-			return w.analyzePeroidLine(fmt.Sprintf("cache/okTradeKLine_%03d.data", peroid), body)
-		}
-
+		return w.analyzePeroidLine(fmt.Sprintf("cache/okTradeKLine_%03d.data", peroid), body)
 	} else {
 		logger.Tracef("HTTP returned status %v", resp)
 	}

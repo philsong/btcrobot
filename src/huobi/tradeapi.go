@@ -88,10 +88,11 @@ func (w *HuobiTrade) httpRequest(pParams map[string]string) (string, error) {
 	logger.Traceln(req)
 
 	if w.client == nil {
-		w.client = &http.Client{nil, nil, nil}
+		w.client = util.NewTimeoutClient()
 	}
-
+	logger.Tracef("HTTP req begin HuobiTrade")
 	resp, err := w.client.Do(req)
+	logger.Tracef("HTTP req end HuobiTrade")
 	if err != nil {
 		logger.Fatal(err)
 		return "", err
