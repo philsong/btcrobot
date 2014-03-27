@@ -85,7 +85,7 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 	resp, err := c.Do(req)
 	logger.Tracef("HTTP req end AnalyzeKLinePeroid")
 	if err != nil {
-		logger.Errorln(err)
+		logger.Traceln(err)
 		return false
 	}
 

@@ -22,7 +22,7 @@
 	"trade_flash_url": "http://www.huobi.com/market/huobi.php?a=market_flash_huobi_useapi&version=20130807",
 
 	"debug": "1",
-	"errorconsole": "1",
+	"errorconsole": "0",
 	"infoconsole": "1",
 	"fatalconsole": "1",
 	"debugconsole": "0",

@@ -76,7 +76,7 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 	resp, err := c.Do(req)
 	logger.Tracef("HTTP req end AnalyzeKLinePeroid")
 	if err != nil {
-		logger.Errorln(err)
+		logger.Traceln(err)
 		return false
 	}
 	defer resp.Body.Close()
@@ -144,7 +144,7 @@ func (w *Huobi) AnalyzeKLineMinute(symbol string) (ret bool) {
 	resp, err := c.Do(req)
 	logger.Tracef("HTTP req end AnalyzeKLineMinute")
 	if err != nil {
-		logger.Errorln(err)
+		logger.Traceln(err)
 		return false
 	}
 	defer resp.Body.Close()

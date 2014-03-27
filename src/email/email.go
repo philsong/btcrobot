@@ -101,7 +101,7 @@ func SendAlertEmail(receiver, alert string) error {
 	}
 	message += "\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
 
-	logger.Infoln("Try sending Mail to", to)
+	logger.Debugln("Try sending Mail to", to)
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
 	err := smtp.SendMail(
@@ -114,7 +114,7 @@ func SendAlertEmail(receiver, alert string) error {
 		logger.Infoln("Send Mail to", to, "error:", err)
 		return err
 	}
-	logger.Infoln("Send Mail to", to, "Successfully")
+	logger.Debugln("Send Mail to", to, "Successfully")
 	return nil
 }
 
