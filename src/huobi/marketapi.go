@@ -209,6 +209,7 @@ func (w *Huobi) analyzePeroidLine(filename string, content string) bool {
 	//logger.Infoln(filename)
 	PeroidRecords := parsePeroidCSV(filename)
 
+	//	var order []Order
 	var Time []string
 	var Price []float64
 	var Volumn []float64
