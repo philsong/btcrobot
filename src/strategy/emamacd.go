@@ -160,7 +160,7 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 
 	if MACDdif[length-1] != emamacdStrategy.PrevMACDdif {
 		emamacdStrategy.PrevMACDdif = MACDdif[length-1]
-		logger.Infof("MACD:d%5.03f\ts%5.03f\th%5.03f\t5.03f\tPrice:%5.02f\n", MACDdif[length-1], MACDSignal[length-1], MACDHistogram[length-2], MACDHistogram[length-1], Price[length-1])
+		logger.Infof("MACD:d%5.03f\ts%5.03f\tph%5.03f\th%5.03f\tPrice:%5.02f\n", MACDdif[length-1], MACDSignal[length-1], MACDHistogram[length-2], MACDHistogram[length-1], Price[length-1])
 	}
 
 	//go TriggerPrice(Price[length-1])
