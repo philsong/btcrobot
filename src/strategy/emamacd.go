@@ -220,6 +220,7 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 					var ematradeAmount string
 					if emamacdStrategy.PrevMACDTrade == "sell" {
 						ematradeAmount = MacdTradeAmount
+						emamacdStrategy.PrevMACDTrade = "init"
 					} else {
 						ematradeAmount = tradeAmount
 					}
