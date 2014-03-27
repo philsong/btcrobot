@@ -236,41 +236,41 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 			}
 		}
 
-		//macd cross
-		if MACDdif[length-1] > 0 {
-			if MACDHistogram[length-2] < 0 && MACDHistogram[length-1] > 0 {
-				if Option["disable_trading"] != "1" && emamacdStrategy.PrevMACDTrade == "sell" {
-					emamacdStrategy.PrevMACDTrade = "buy"
-					warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("buy")
-					logger.Infoln(warning)
-					if tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), MacdTradeAmount) {
-						emamacdStrategy.PrevBuyPirce = Price[length-1]
-						warning += "[委托成功]"
-					} else {
-						warning += "[委托失败]"
-					}
-
-					go email.TriggerTrender(warning)
-				}
-			} else if MACDHistogram[length-2] > 0 && MACDHistogram[length-1] < 0 {
-				if Option["disable_trading"] != "1" && emamacdStrategy.PrevMACDTrade != "sell" {
-					emamacdStrategy.PrevMACDTrade = "sell"
-					warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
-					logger.Infoln(warning)
-					if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), MacdTradeAmount) {
-						warning += "[委托成功]"
-					} else {
-						warning += "[委托失败]"
-					}
-
-					go email.TriggerTrender(warning)
-				}
-			}
-		}
-
 		//backup the kline data for analyze
 		if Config["env"] == "dev" {
 			backup(Time[length-1])
+		}
+	}
+
+	//macd cross
+	if MACDdif[length-1] > 0 {
+		if MACDHistogram[length-2] < 0 && MACDHistogram[length-1] > 0 {
+			if Option["disable_trading"] != "1" && emamacdStrategy.PrevMACDTrade == "sell" {
+				emamacdStrategy.PrevMACDTrade = "buy"
+				warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("buy")
+				logger.Infoln(warning)
+				if tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), MacdTradeAmount) {
+					emamacdStrategy.PrevBuyPirce = Price[length-1]
+					warning += "[委托成功]"
+				} else {
+					warning += "[委托失败]"
+				}
+
+				go email.TriggerTrender(warning)
+			}
+		} else if MACDHistogram[length-2] > 0 && MACDHistogram[length-1] < 0 {
+			if Option["disable_trading"] != "1" && emamacdStrategy.PrevMACDTrade != "sell" {
+				emamacdStrategy.PrevMACDTrade = "sell"
+				warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
+				logger.Infoln(warning)
+				if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), MacdTradeAmount) {
+					warning += "[委托成功]"
+				} else {
+					warning += "[委托失败]"
+				}
+
+				go email.TriggerTrender(warning)
+			}
 		}
 	}
 
