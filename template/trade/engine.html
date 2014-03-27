@@ -109,34 +109,34 @@
 <script type="text/javascript">
 function ShowHidden()
 {
- var obj = document.getElementById("strategy");
- var signalPeriod = document.getElementById("signalPeriod"); 
-  var buyThreshold = document.getElementById("buyThreshold"); 
-   var sellThreshold = document.getElementById("sellThreshold"); 
- console.log(obj.value);
- if (obj.value != "EMA")
- {
-   console.log("dispay");
-  signalPeriod.style.display = "block";
- }
- else
- { console.log("dispay none");
-  signalPeriod.style.display = "none";
- }
+	var obj = document.getElementById("strategy");
+	var signalPeriod = document.getElementById("signalPeriod"); 
+	var buyThreshold = document.getElementById("buyThreshold"); 
+	var sellThreshold = document.getElementById("sellThreshold"); 
+	console.log(obj.value);
+	if (obj.value != "EMA")
+	{
+		console.log("dispay");
+		signalPeriod.style.display = "block";
+	}
+	else
+	{ 
+		console.log("dispay none");
+		signalPeriod.style.display = "none";
+	}
 
- if (obj.value == "MACD")
- {
-  console.log("dispay none");
-  buyThreshold.style.display = "none";
-  sellThreshold.style.display = "none";
- }
- else
- { 
-    console.log("dispay block");
-    buyThreshold.style.display = "block";
-    sellThreshold.style.display = "block";
- }
-
+	if (obj.value == "MACD")
+	{
+		console.log("dispay none");
+		buyThreshold.style.display = "none";
+		sellThreshold.style.display = "none";
+	}
+	else
+	{ 
+		console.log("dispay block");
+		buyThreshold.style.display = "block";
+		sellThreshold.style.display = "block";
+	}
 }
 
 $(function(){
@@ -152,30 +152,31 @@ $(function(){
         }
         if (data.tick_interval) {
           $('#strategy').val(data.strategy);
-           var signalPeriod = document.getElementById("signalPeriod"); 
-             var buyThreshold = document.getElementById("buyThreshold"); 
-   var sellThreshold = document.getElementById("sellThreshold"); 
+          var signalPeriod = document.getElementById("signalPeriod"); 
+          var buyThreshold = document.getElementById("buyThreshold"); 
+			     var sellThreshold = document.getElementById("sellThreshold"); 
            if (data.strategy != "EMA")
            {
-             console.log("dispay");
-            signalPeriod.style.display = "block";
-           }
-           else
-           { console.log("dispay none");
-            signalPeriod.style.display = "none";
-           }
-
-            if (data.strategy == "MACD")
-           {
-            console.log("dispay none");
-            buyThreshold.style.display = "none";
-            sellThreshold.style.display = "none";
+    				console.log("dispay");
+    				signalPeriod.style.display = "block";
            }
            else
            { 
-              console.log("dispay block");
-              buyThreshold.style.display = "block";
-              sellThreshold.style.display = "block";
+    				console.log("dispay none");
+    				signalPeriod.style.display = "none";
+           }
+
+           if (data.strategy == "MACD")
+           {
+    				console.log("dispay none");
+    				buyThreshold.style.display = "none";
+    				sellThreshold.style.display = "none";
+           }
+           else
+           { 
+    				console.log("dispay block");
+    				buyThreshold.style.display = "block";
+    				sellThreshold.style.display = "block";
            }
         }
 
