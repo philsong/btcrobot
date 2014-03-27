@@ -51,8 +51,11 @@
   Version 0.26
   time 2014-03-25 fix diff bug in okcoin mode
   Version 0.27
-  time 2014-03-25 add supervisor to monitor the goroutine exception
+  time 2014-03-26 add supervisor to monitor the goroutine exception
                   add display user account information at launch/buy/sell point
                   add MACD strategy
+  Version 0.28
+  time 2014-03-27 fix the http request timeout issue,
+                  add MACD+EMA mix strategy
 
 */

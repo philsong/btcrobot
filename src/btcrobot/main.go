@@ -46,7 +46,7 @@ func main() {
 }
 
 func printBanner() {
-	version := "0.27"
+	version := "0.28"
 	fmt.Println("[ ---------------------------------------------------------->>> ")
 	fmt.Println(" BTC/LTC robot version ", version)
 	fmt.Println(" *BTC/LTC操盘手自动化交易引擎*")
