@@ -14,40 +14,48 @@
 
   Weibo:http://weibo.com/bocaicfa
 
- *@Version 0.10
- *@time 2014-01-06 support auto process: login/buy/sell/update/cancel/delegation query/auto trade
- *@Version 0.11
- *@time 2014-01-09 support query details transaction data:buy/sell/trade/topsell/topbuy/new/high/low/last/...
-  @Version 0.12
- *@time 2014-01-10 support query my trade info, 5min/1day/1week/... kline data and real trx data
+  Version 0.10
+  time 2014-01-06 support auto process: login/buy/sell/update/cancel/delegation query/auto trade
+  Version 0.11
+  time 2014-01-09 support query details transaction data:buy/sell/trade/topsell/topbuy/new/high/low/last/...
+  Version 0.12
+  time 2014-01-10 support query my trade info, 5min/1day/1week/... kline data and real trx data
  				   support okcoin.com K-line via highchart
- *@Version 0.13
- *@time 2014-01-13 support EMA line to indict the time to buy and sell simulately, support diff factor
+  Version 0.13
+  time 2014-01-13 support EMA line to indict the time to buy and sell simulately, support diff factor
  				   support web interface to display MA/EMA/MACD/Trender line too
- *@Version 0.14
- *@time 2014-01-14 support EMA line to indict the time to buy and sell in huobi.com
- *@Version 0.15
- *@time 2014-01-16 support send alert email when triger buy/sell point
- *@Version 0.16
- *@time 2014-01-27 support huibi official API,optimize MACD enter point
- *@Version 0.17
- *@time 2014-02-08 support the 5minutes momentum theory in fx
- *@Version 0.18
- *@time 2014-02-10 simplify the 5minutes momentum theory, only keep three key points:"enter"/"stop"/"exit" 
- *@Version 0.19
- *@time 2014-03-01 add the web UI to config option
- *@Version 0.20
- *@time 2014-03-13 add backtesting and fix crash bug
- *@Version 0.21
- *@time 2014-03-13 解决规避火币网K线数据一阳指的问题
- *@Version 0.22
- *@time 2014-03-17 0.重构代码 1.支持用户自己写交易策略。2.加入莱特币的支持。3.加入对okcoin支持。
- *@Version 0.23
- *@time 2014-03-21 add EMA diff factor(buyThreshold and sellThreshold) to deduce the fake buy/sell cross point
- *@Version 0.24
- *@time 2014-03-23 add stoploss交易停损
- *@Version 0.25
- *@time 2014-03-24 add  www-authenticate, default username/password is admin/123456
- *
- *
- */
+  Version 0.14
+  time 2014-01-14 support EMA line to indict the time to buy and sell in huobi.com
+  Version 0.15
+  time 2014-01-16 support send alert email when triger buy/sell point
+  Version 0.16
+  time 2014-01-27 support huibi official API,optimize MACD enter point
+  Version 0.17
+  time 2014-02-08 support the 5minutes momentum theory in fx
+  Version 0.18
+  time 2014-02-10 simplify the 5minutes momentum theory, only keep three key points:"enter"/"stop"/"exit" 
+  Version 0.19
+  time 2014-03-01 add the web UI to config option
+  Version 0.20
+  time 2014-03-13 add backtesting and fix crash bug
+  Version 0.21
+  time 2014-03-13 fliter the exception data in huobi.com
+  Version 0.22
+  time 2014-03-17 0.refactor 1.support customer strategy。2.support LTC。3.support OKcoin.com
+  Version 0.23
+  time 2014-03-21 add EMA diff factor(buyThreshold and sellThreshold) to deduce the fake buy/sell cross point
+  Version 0.24
+  time 2014-03-23 add stoploss
+  Version 0.25
+  time 2014-03-24 add  www-authenticate, default username/password is admin/123456
+  Version 0.26
+  time 2014-03-25 fix diff bug in okcoin mode
+  Version 0.27
+  time 2014-03-26 add supervisor to monitor the goroutine exception
+                  add display user account information at launch/buy/sell point
+                  add MACD strategy
+  Version 0.28
+  time 2014-03-27 fix the http request timeout issue,
+                  add MACD+EMA mix strategy
+
+*/

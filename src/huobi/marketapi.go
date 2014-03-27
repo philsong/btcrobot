@@ -1,7 +1,6 @@
 /*
-  btcbot is a Bitcoin trading bot for HUOBI.com written
-  in golang, it features multiple trading methods using
-  technical analysis.
+  btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
+  it features multiple trading methods using technical analysis.
 
   Disclaimer:
 
@@ -32,6 +31,7 @@ import (
 	"strategy"
 	"strconv"
 	"strings"
+	"util"
 )
 
 /*
@@ -70,10 +70,11 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 
 	logger.Traceln(req)
 
-	if w.client == nil {
-		w.client = &http.Client{nil, nil, nil}
-	}
-	resp, err := w.client.Do(req)
+	c := util.NewTimeoutClient()
+
+	logger.Tracef("HTTP req begin AnalyzeKLinePeroid")
+	resp, err := c.Do(req)
+	logger.Tracef("HTTP req end AnalyzeKLinePeroid")
 	if err != nil {
 		logger.Errorln(err)
 		return false
@@ -138,10 +139,10 @@ func (w *Huobi) AnalyzeKLineMinute(symbol string) (ret bool) {
 
 	logger.Traceln(req)
 
-	if w.client == nil {
-		w.client = &http.Client{nil, nil, nil}
-	}
-	resp, err := w.client.Do(req)
+	c := util.NewTimeoutClient()
+	logger.Tracef("HTTP req begin AnalyzeKLineMinute")
+	resp, err := c.Do(req)
+	logger.Tracef("HTTP req end AnalyzeKLineMinute")
 	if err != nil {
 		logger.Errorln(err)
 		return false

@@ -19,7 +19,6 @@ package okcoin
 
 import (
 	"compress/gzip"
-	//. "config"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -61,7 +60,6 @@ import (
 	https://www.okcoin.com/klineData.do?type=3&marketFrom=3
 */
 type OkcoinTrade struct {
-	client     *http.Client
 	partner    string
 	secret_key string
 }
@@ -111,10 +109,11 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)
 
-	if w.client == nil {
-		w.client = &http.Client{nil, nil, nil}
-	}
-	resp, err := w.client.Do(req)
+	c := util.NewTimeoutClient()
+
+	logger.Tracef("HTTP req begin OkcoinTrade")
+	resp, err := c.Do(req)
+	logger.Tracef("HTTP req end OkcoinTrade")
 	if err != nil {
 		logger.Fatal(err)
 		return "", err
@@ -196,12 +195,77 @@ func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret boo
 	return
 }
 
-func (w *OkcoinTrade) Get_account_info() (string, error) {
+/*
+　｛
+　　　 　 "result":true,
+　　　 　 "info":{
+　　　 　　 "funds":{
+　　　　　 　"free":{
+　　　　　 　 　"cny":1000,
+　　　 　　 　　 "btc":10,
+　　　 　　 　　"ltc":0
+　　　　　　　 },
+　　　　　　　 "freezed":{
+　　　　　　　　 "cny":1000,
+　　　　 　　　　 "btc":10,
+　　　　 　 　　　"ltc":0
+　　　　　　　 }
+　　　 　　 }
+　　　　 }
+　　｝
+*/
+type Money struct {
+	CNY string
+	BTC string
+	LTC string
+}
+
+type Funds struct {
+	Free    Money
+	Freezed Money
+}
+
+type Info struct {
+	Funds Funds
+}
+
+type UserInfo struct {
+	Result bool
+	Info   Info
+}
+
+func (w *OkcoinTrade) Get_account_info() (userInfo UserInfo, ret bool) {
 	api_url := "https://www.okcoin.com/api/userinfo.do"
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
 
-	return w.httpRequest(api_url, pParams)
+	ret = true
+
+	body, err := w.httpRequest(api_url, pParams)
+	if err != nil {
+		ret = false
+		return
+	}
+
+	_, ret = w.check_json_result(body)
+	if ret == false {
+		return
+	}
+
+	logger.Traceln(body)
+	doc := json.NewDecoder(strings.NewReader(body))
+
+	if err := doc.Decode(&userInfo); err == io.EOF {
+		ret = false
+		logger.Traceln(err)
+	} else if err != nil {
+		ret = false
+		logger.Fatal(err)
+	}
+
+	logger.Traceln(userInfo)
+
+	return
 }
 
 func (w *OkcoinTrade) Get_order(symbol, order_id string) (m OrderTable, ret bool) {

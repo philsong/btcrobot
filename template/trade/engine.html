@@ -31,7 +31,7 @@
                 <select name="tradecenter" id="tradecenter" class="select-1" >
                     <option value="huobi">huobi</option>
                     <option value="okcoin">okcoin</option>
-                </select>
+                </select>(改这个要重启控制台)
             </div>
           </div>
 
@@ -48,16 +48,15 @@
           <div class="control-group string optional">
             <label class="string optional control-label" for="strategy"><abbr title="required">*</abbr>交易策略</label>
             <div class="controls">
-                <select name="strategy" id="strategy" class="select-1" >
+                <select name="strategy" id="strategy" class="select-1" onChange="ShowHidden();">
                     <option value="EMA">EMA</option>
+                    <option value="MACD">MACD</option>
+                    <option value="EMAMACD">EMA+MACD混合策略</option>
                     <option value="XXX">XXX(自定义策略)</option>
                 </select>
             </div>
           </div>
 
-          <div class="control-group string optional"><label class="string optional control-label" for="shortEMA"><abbr title="required">*</abbr>短期EMA</label><div class="controls"><input class=" string optional span1" id="shortEMA" name="shortEMA" size="50" type="text" value="{{.config.shortEMA}}">(短期指数移动平均线)</div> </div>
-         
-          <div class="control-group string optional"><label class="string optional control-label" for="longEMA"><abbr title="required">*</abbr>长期EMA</label><div class="controls"><input class="string optional span1" id="longEMA" name="longEMA" size="50" type="text" value="{{.config.longEMA}}">(长期指数移动平均线)</div></div>
           
           <div class="control-group string optional">
             <label class="string optional control-label" for="tick_interval"><abbr title="required">*</abbr>K线周期</label>
@@ -69,9 +68,16 @@
                     <option value="15">15 分钟</option>
                     <option value="5">5 分钟</option>
                     <option value="1">1 分钟</option>
-                </select>
+                </select>(改这个要重启控制台)
             </div>
+            
           </div>
+
+          <div class="control-group string optional"><label class="string optional control-label" for="shortEMA"><abbr title="required">*</abbr>短期EMA</label><div class="controls"><input class=" string optional span1" id="shortEMA" name="shortEMA" size="50" type="text" value="{{.config.shortEMA}}">(短期指数移动平均线,单位为K线周期)</div> </div>
+         
+          <div class="control-group string optional"><label class="string optional control-label" for="longEMA"><abbr title="required">*</abbr>长期EMA</label><div class="controls"><input class="string optional span1" id="longEMA" name="longEMA" size="50" type="text" value="{{.config.longEMA}}">(长期指数移动平均线,单位为K线周期)</div></div>
+
+          <div class="control-group string optional" style="display: none" id="signalPeriod" ><label class="string optional control-label" for="signalPeriod"><abbr title="required">*</abbr>MACD信号线</label><div class="controls"><input class="string optional span1" id="signalPeriod" name="signalPeriod" size="50" type="text" value="{{.config.signalPeriod}}">(MACD信号线,单位为K线周期)</div></div>
 
           <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>交易数量</label><div class="controls"><input class="string optional span1" id="tradeAmount" name="tradeAmount" size="50" type="text" value="{{.config.tradeAmount}}">BTC/LTC（BTC最小0.01，LTC最小0.1）</div></div>
 
@@ -81,7 +87,7 @@
           
           <div class="control-group string optional"><label class="string optional control-label" for="sellThreshold"><abbr title="required">*</abbr>卖出diff阀值</label><div class="controls"><input class="string optional span1" id="sellThreshold" name="sellThreshold" size="50" type="text" value="{{.config.sellThreshold}}">(即使EMA死叉，直到EMA diff小于卖出diff阀值才进行卖出)</div></div>
           
-          <div class="control-group string optional"><label class="string optional control-label" for="stoploss"><abbr title="required">*</abbr>交易停损量</label><div class="controls"><input class="string optional span1" id="stoploss" name="stoploss" size="50" type="text" value="{{.config.stoploss}}">%  当市价低于EMA买入价*(1-交易停损量*0.01)，平仓止损</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="stoploss"><abbr title="required">*</abbr>交易停损量</label><div class="controls"><input class="string optional span1" id="stoploss" name="stoploss" size="50" type="text" value="{{.config.stoploss}}">%  当市价低于EMA买入价*(1-交易停损量*0.01)，平仓止损, 主要为防暴跌策略</div></div>
 
 
 
@@ -100,8 +106,22 @@
 
 {{define "js"}}
 
-
 <script type="text/javascript">
+function ShowHidden()
+{
+ var obj = document.getElementById("strategy");
+ var signalPeriod = document.getElementById("signalPeriod"); 
+ console.log(obj.value);
+ if (obj.value != "EMA")
+ {
+   console.log("dispay");
+  signalPeriod.style.display = "block";
+ }
+ else
+ { console.log("dispay none");
+  signalPeriod.style.display = "none";
+ }
+}
 
 $(function(){
     $.getJSON('/engineajax.json', function(data){
@@ -116,6 +136,16 @@ $(function(){
         }
         if (data.tick_interval) {
           $('#strategy').val(data.strategy);
+           var signalPeriod = document.getElementById("signalPeriod"); 
+           if (data.strategy != "EMA")
+           {
+             console.log("dispay");
+            signalPeriod.style.display = "block";
+           }
+           else
+           { console.log("dispay none");
+            signalPeriod.style.display = "none";
+           }
         }
 
         console.log(data.disable_trading)

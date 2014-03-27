@@ -50,7 +50,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 		}
 
 		if EMAdif > buyThreshold {
-			logger.Infof("EMAdif %0.03f arrive buyThreshold %0.03f\n", EMAdif, buyThreshold)
+			logger.Infof("EMAdif(%0.03f) > buyThreshold(%0.03f), trigger to buy\n", EMAdif, buyThreshold)
 			emaStrategy.LessBuyThreshold = false
 			return true
 		} else {
@@ -71,7 +71,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 		}
 
 		if EMAdif < sellThreshold {
-			logger.Infof("EMAdif(%0.03f) <  sellThreshold(%0.03f), trigger to buy\n", EMAdif, sellThreshold)
+			logger.Infof("EMAdif(%0.03f) <  sellThreshold(%0.03f), trigger to sell\n", EMAdif, sellThreshold)
 			emaStrategy.LessSellThreshold = false
 			return true
 		} else {
@@ -130,21 +130,6 @@ func (emaStrategy *EMAStrategy) is_downcross(prevema, ema float64) bool {
 
 //EMA strategy
 func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
-
-	//
-	if len(Time) == 0 || len(Price) == 0 || len(Volumn) == 0 {
-		logger.Errorln("warning:detect exception data", len(Time), len(Price), len(Volumn))
-		return false
-	}
-
-	length := len(Price)
-
-	//check exception data in trade center
-	if checkException(Price[length-2], Price[length-1], Volumn[length-1]) == false {
-		logger.Errorln("detect exception data of trade center", Price[length-2], Price[length-1], Volumn[length-1])
-		return false
-	}
-
 	//read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
@@ -156,17 +141,18 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 	}
 	tradeAmount := Option["tradeAmount"]
 
-	//compute the indictor
-	emaShort := EMA(Price, shortEMA)
-	emaLong := EMA(Price, longEMA)
-	EMAdif := getEMAdif(emaShort, emaLong)
-
 	stoploss, err := strconv.ParseFloat(Option["stoploss"], 64)
 	if err != nil {
 		logger.Errorln("config item stoploss is not float")
 		return false
 	}
 
+	//compute the indictor
+	emaShort := EMA(Price, shortEMA)
+	emaLong := EMA(Price, longEMA)
+	EMAdif := getEMAdif(emaShort, emaLong)
+
+	length := len(Price)
 	if emaStrategy.PrevEMACross == "unknown" {
 		if is_uptrend(EMAdif[length-3]) {
 			emaStrategy.PrevEMACross = "up"
@@ -180,6 +166,8 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 			logger.Infoln("上一个趋势是上涨，等待卖出点触发")
 		} else if is_downtrend(EMAdif[length-3]) {
 			logger.Infoln("上一个趋势是下跌，等待买入点触发")
+		} else {
+			logger.Infoln("上一个趋势是unknown。。。")
 		}
 	}
 
@@ -248,12 +236,15 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 		}
 
 		//backup the kline data for analyze
-		backup(Time[length-1])
+		if Config["env"] == "dev" {
+			backup(Time[length-1])
+		}
 	}
 
 	//do sell when price is below stoploss point
 	if Price[length-1] < emaStrategy.PrevBuyPirce*(1-stoploss*0.01) {
-		if Option["disable_trading"] != "1" {
+		if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrade != "sell" {
+			emaStrategy.PrevEMATrade = "sell"
 			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
 			logger.Infoln(warning)
 			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
@@ -263,8 +254,6 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 			}
 
 			go email.TriggerTrender(warning)
-
-			return true
 		}
 	}
 
@@ -277,19 +266,6 @@ func backup(Time string) {
 	oldFile := "cache/TradeKLine_minute.data"
 	newFile := fmt.Sprintf("%s_%s", oldFile, Time)
 	os.Rename(oldFile, newFile)
-}
-
-//check exception data in trade center
-func checkException(yPrevPrice, Price, Volumn float64) bool {
-	if Price > yPrevPrice+10 && Volumn < 1 {
-		return false
-	}
-
-	if Price < yPrevPrice-10 && Volumn < 1 {
-		return false
-	}
-
-	return true
 }
 
 func getEMAdifAt(emaShort, emaLong []float64, idx int) float64 {

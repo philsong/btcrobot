@@ -38,7 +38,6 @@ import (
 	http://www.huobi.com/help/index.php?a=api_help
 */
 type HuobiTrade struct {
-	client     *http.Client
 	access_key string
 	secret_key string
 }
@@ -87,11 +86,11 @@ func (w *HuobiTrade) httpRequest(pParams map[string]string) (string, error) {
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)
 
-	if w.client == nil {
-		w.client = &http.Client{nil, nil, nil}
-	}
+	c := util.NewTimeoutClient()
 
-	resp, err := w.client.Do(req)
+	logger.Tracef("HTTP req begin HuobiTrade")
+	resp, err := c.Do(req)
+	logger.Tracef("HTTP req end HuobiTrade")
 	if err != nil {
 		logger.Fatal(err)
 		return "", err
@@ -134,7 +133,7 @@ type ErrorMsg struct {
 	Time int
 }
 
-type DelegationsMsg struct {
+type Order struct {
 	Id               int
 	Type             int
 	order_price      string
@@ -167,7 +166,18 @@ func (w *HuobiTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool
 	return
 }
 
-func (w *HuobiTrade) Get_account_info() (string, error) {
+type Account_info struct {
+	Total                 string
+	Net_asset             string
+	Available_cny_display string
+	Available_btc_display string
+	Frozen_cny_display    string
+	Frozen_btc_display    string
+	Loan_cny_display      string
+	Loan_btc_display      string
+}
+
+func (w *HuobiTrade) Get_account_info() (account_info Account_info, ret bool) {
 	pParams := make(map[string]string)
 	pParams["method"] = "get_account_info"
 	pParams["access_key"] = w.access_key
@@ -175,10 +185,33 @@ func (w *HuobiTrade) Get_account_info() (string, error) {
 	pParams["created"] = strconv.FormatInt(now, 10)
 	pParams["sign"] = w.createSign(pParams)
 
-	return w.httpRequest(pParams)
+	ret = true
+
+	body, err := w.httpRequest(pParams)
+	if err != nil {
+		ret = false
+		return
+	}
+
+	_, ret = w.check_json_result(body)
+	if ret == false {
+		return
+	}
+
+	doc := json.NewDecoder(strings.NewReader(body))
+
+	if err := doc.Decode(&account_info); err == io.EOF {
+		logger.Fatal(err)
+	} else if err != nil {
+		logger.Fatal(err)
+	}
+
+	logger.Traceln(account_info)
+
+	return
 }
 
-func (w *HuobiTrade) Get_orders() (m []DelegationsMsg, ret bool) {
+func (w *HuobiTrade) Get_orders() (m []Order, ret bool) {
 	pParams := make(map[string]string)
 	pParams["method"] = "get_orders"
 	pParams["access_key"] = w.access_key

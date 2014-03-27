@@ -2,6 +2,7 @@ package strategy
 
 import (
 	"fmt"
+	"logger"
 )
 
 type TradeAPI interface {
@@ -38,5 +39,32 @@ func Perform(strageteyName string, tradeAPI TradeAPI, Time []string, Price []flo
 		return false
 	}
 
+	//
+	if len(Time) == 0 || len(Price) == 0 || len(Volumn) == 0 {
+		logger.Errorln("warning:detect exception data", len(Time), len(Price), len(Volumn))
+		return false
+	}
+
+	length := len(Price)
+
+	//check exception data in trade center
+	if checkException(Price[length-2], Price[length-1], Volumn[length-1]) == false {
+		logger.Errorln("detect exception data of trade center", Price[length-2], Price[length-1], Volumn[length-1])
+		return false
+	}
+
 	return strategy.Perform(tradeAPI, Time, Price, Volumn)
+}
+
+//check exception data in trade center
+func checkException(yPrevPrice, Price, Volumn float64) bool {
+	if Price > yPrevPrice+10 && Volumn < 1 {
+		return false
+	}
+
+	if Price < yPrevPrice-10 && Volumn < 1 {
+		return false
+	}
+
+	return true
 }

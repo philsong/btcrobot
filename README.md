@@ -51,7 +51,7 @@ https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%E
 	
 	git clone https://github.com/philsong/btcrobot
 
-2、下载安装依赖库（如果依赖库下载不下来可以联系我）
+2、下载安装依赖库
 
 	cd btcrobot/thirdparty
 	// windows/DOS下执行

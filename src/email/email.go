@@ -57,10 +57,10 @@ func SendMail(subject, content string, tos []string) error {
 	auth := smtp.PlainAuth("", SecretOption["smtp_username"], SecretOption["smtp_password"], SecretOption["smtp_host"])
 	err := smtp.SendMail(SecretOption["smtp_addr"], auth, Option["from_email"], tos, []byte(message))
 	if err != nil {
-		logger.Errorln("Send Mail to", strings.Join(tos, ","), "error:", err)
+		logger.Infoln("Send Mail to", strings.Join(tos, ","), "error:", err)
 		return err
 	}
-	logger.Debugln("Send Mail to", strings.Join(tos, ","), "Successfully")
+	logger.Infoln("Send Mail to", strings.Join(tos, ","), "Successfully")
 	return nil
 }
 
@@ -111,7 +111,7 @@ func SendAlertEmail(receiver, alert string) error {
 		[]string{to.Address},
 		[]byte(message))
 	if err != nil {
-		logger.Errorln("Send Mail to", to, "error:", err)
+		logger.Infoln("Send Mail to", to, "error:", err)
 		return err
 	}
 	logger.Infoln("Send Mail to", to, "Successfully")

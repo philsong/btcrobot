@@ -19,22 +19,15 @@
 package entry
 
 import (
+	"common"
 	. "config"
 	"fmt"
 	"huobi"
-	"log"
 	"logger"
 	"okcoin"
 	"strconv"
 	"time"
 )
-
-type TradeAPI interface {
-	AnalyzeKLine(peroid int) (ret bool)
-	Buy(price, amount string) bool
-	Sell(price, amount string) bool
-	GetTradePrice(tradeDirection string) string
-}
 
 /*
 func backtesting() {
@@ -56,24 +49,94 @@ func backtesting() {
 }
 */
 
+const worker_number = 1
+
+type message struct {
+	normal bool                   //true means exit normal, otherwise
+	state  map[string]interface{} //goroutine state
+}
+
+func worker(mess chan message) {
+	defer func() {
+		exit_message := message{state: make(map[string]interface{})}
+		i := recover()
+		if i != nil {
+			exit_message.normal = false
+		} else {
+			exit_message.normal = true
+		}
+		mess <- exit_message
+	}()
+
+	/*
+		now := time.Now()
+		seed := now.UnixNano()
+		rand.Seed(seed)
+		num := rand.Int63()
+		fmt.Println(num)
+		if num%2 != 0 {
+			fmt.Println("1")
+			panic("not evening")
+		} else {
+			fmt.Println("0")
+			runtime.Goexit()
+		}
+	*/
+	RobotWorker()
+}
+
+func supervisor(mess chan message) {
+	for i := 0; i < worker_number; i++ {
+		m := <-mess
+		switch m.normal {
+		case true:
+			logger.Infoln("exit normal, nothing serious!")
+		case false:
+			logger.Infoln("exit abnormal, something went wrong")
+		}
+	}
+}
+
 func RunRobot() {
+	mess := make(chan message, 10)
+	for i := 0; i < worker_number; i++ {
+		go worker(mess)
+	}
+
+	supervisor(mess)
+}
+
+func RobotWorker() {
 	fmt.Println("env", Config["env"])
 	if Config["env"] == "dev" {
 		fmt.Println("test working...")
+		var tradeAPI common.TradeAPI
+		tradeAPI = huobi.NewHuobi()
+		tradeAPI.Get_account_info()
+		symbol := "btc_cny"
+		tradeAPI.GetOrderBook(symbol)
+
 		//testHuobiAPI()
-		testOkcoinLTCAPI()
+		//testOkcoinLTCAPI()
 		return
 	}
 
-	ticker := time.NewTicker(2000 * time.Millisecond) //2s
+	ticker := time.NewTicker(2 * time.Second) //2s
+	defer ticker.Stop()
 
-	var tradeAPI TradeAPI
+	var tradeAPI common.TradeAPI
+	tradeAPI = huobi.NewHuobi()
+	tradeAPI.Get_account_info()
+
+	tradeAPI = okcoin.NewOkcoin()
+	tradeAPI.Get_account_info()
+
 	if Option["tradecenter"] == "huobi" {
 		tradeAPI = huobi.NewHuobi()
 	} else if Option["tradecenter"] == "okcoin" {
 		tradeAPI = okcoin.NewOkcoin()
 	} else {
-		log.Fatalln("Please config the tradecenter firstly...")
+		logger.Fatalln("Please config the tradecenter firstly...")
 		return
 	}
 	peroid, _ := strconv.Atoi(Option["tick_interval"])
@@ -90,13 +153,10 @@ func RunRobot() {
 		}
 	}()
 
-	oneHour := 60 * 60 * 1000 * time.Millisecond
-
 	logger.Infof("程序将持续运行%d小时后停止", time.Duration(totalHour))
 
-	time.Sleep(time.Duration(totalHour) * oneHour)
+	time.Sleep(time.Duration(totalHour) * time.Hour)
 
-	ticker.Stop()
 	logger.Infof("程序到达设定时长%d小时，停止运行。", time.Duration(totalHour))
 }
 

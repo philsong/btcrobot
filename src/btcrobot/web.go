@@ -19,10 +19,31 @@
 package main
 
 import (
+	. "config"
 	. "controller"
 	"filter"
+	"fmt"
 	"github.com/studygolang/mux"
+	"logger"
+	"net/http"
 )
+
+func startWEBserver() {
+	// 服务静态文件
+	http.Handle("/static/", http.FileServer(http.Dir(ROOT)))
+
+	router := initRouter()
+	http.Handle("/", router)
+	if Config["env"] == "test" {
+		logger.Infoln(http.ListenAndServe("0.0.0.0:9090", nil))
+	} else {
+		logger.Infoln(http.ListenAndServe(Config["host"], nil))
+	}
+
+	fmt.Println("[ ---------------------------------------------------------->>> ")
+	fmt.Printf("start web server failed, please check if %s is already used.", Config["host"])
+	fmt.Println(" <<<----------------------------------------------------------] ")
+}
 
 func initRouter() *mux.Router {
 

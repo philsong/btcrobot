@@ -28,6 +28,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"util"
 )
 
 /*
@@ -79,10 +80,10 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 
 	logger.Traceln(req)
 
-	if w.client == nil {
-		w.client = &http.Client{nil, nil, nil}
-	}
-	resp, err := w.client.Do(req)
+	c := util.NewTimeoutClient()
+	logger.Tracef("HTTP req begin AnalyzeKLinePeroid")
+	resp, err := c.Do(req)
+	logger.Tracef("HTTP req end AnalyzeKLinePeroid")
 	if err != nil {
 		logger.Errorln(err)
 		return false
@@ -112,14 +113,7 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 
 		logger.Traceln(resp.Header.Get("Content-Type"))
 
-		ret := strings.Contains(body, "您需要登录才能继续")
-		if ret {
-			logger.Traceln("您需要登录才能继续")
-			return false
-		} else {
-			return w.analyzePeroidLine(fmt.Sprintf("cache/okTradeKLine_%03d.data", peroid), body)
-		}
-
+		return w.analyzePeroidLine(fmt.Sprintf("cache/okTradeKLine_%03d.data", peroid), body)
 	} else {
 		logger.Tracef("HTTP returned status %v", resp)
 	}
@@ -132,9 +126,9 @@ type PeroidRecord struct {
 	zero1  int64
 	zero2  int64
 	Open   float64
-	High   float64
-	Low    float64
 	Close  float64
+	Low    float64
+	High   float64
 	Volumn float64
 }
 
@@ -148,7 +142,7 @@ func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
 		//logger.Traceln(value)
 		v := strings.Split(value, ",")
 		if len(v) < 8 {
-			logger.Traceln("wrong data")
+			logger.Debugln("wrong data")
 			return
 		}
 
@@ -176,7 +170,7 @@ func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
 			return
 		}
 
-		High, err := strconv.ParseFloat(v[4], 64)
+		Close, err := strconv.ParseFloat(v[4], 64)
 		if err != nil {
 			logger.Debugln("config item is not float")
 			return
@@ -188,7 +182,7 @@ func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
 			return
 		}
 
-		Close, err := strconv.ParseFloat(v[6], 64)
+		High, err := strconv.ParseFloat(v[6], 64)
 		if err != nil {
 			logger.Debugln("config item is not float")
 			return
