@@ -86,35 +86,32 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 	}
 
 	//macd cross
-	for i := 1; i < length; i++ {
-		if MACDHistogram[i-1] < 0 && MACDHistogram[i] > 0 {
-			if i == length-1 && macdStrategy.PrevMACDTrade != "buy" {
-				macdStrategy.PrevMACDTrade = "buy"
-				warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("buy")
-				logger.Infoln(warning)
-				if tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount) {
-					macdStrategy.PrevBuyPirce = Price[length-1]
-					warning += "[委托成功]"
-				} else {
-					warning += "[委托失败]"
-				}
-
-				go email.TriggerTrender(warning)
+	if MACDHistogram[length-2] < 0 && MACDHistogram[length-1] > 0 {
+		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "buy" {
+			macdStrategy.PrevMACDTrade = "buy"
+			warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("buy")
+			logger.Infoln(warning)
+			if tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount) {
+				macdStrategy.PrevBuyPirce = Price[length-1]
+				warning += "[委托成功]"
+			} else {
+				warning += "[委托失败]"
 			}
-		} else if MACDHistogram[i-1] > 0 && MACDHistogram[i] < 0 {
 
-			if i == length-1 && macdStrategy.PrevMACDTrade != "sell" {
-				macdStrategy.PrevMACDTrade = "sell"
-				warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
-				logger.Infoln(warning)
-				if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
-					warning += "[委托成功]"
-				} else {
-					warning += "[委托失败]"
-				}
-
-				go email.TriggerTrender(warning)
+			go email.TriggerTrender(warning)
+		}
+	} else if MACDHistogram[length-2] > 0 && MACDHistogram[length-1] < 0 {
+		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
+			macdStrategy.PrevMACDTrade = "sell"
+			warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
+			logger.Infoln(warning)
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
+				warning += "[委托成功]"
+			} else {
+				warning += "[委托失败]"
 			}
+
+			go email.TriggerTrender(warning)
 		}
 	}
 
