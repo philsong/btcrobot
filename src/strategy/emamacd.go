@@ -279,7 +279,15 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 			emamacdStrategy.PrevEMATrade = "sell"
 			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
 			logger.Infoln(warning)
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
+
+			var ematradeAmount string
+			if emamacdStrategy.PrevMACDTrade == "sell" {
+				ematradeAmount = MacdTradeAmount
+			} else {
+				ematradeAmount = tradeAmount
+			}
+
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), ematradeAmount) {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
