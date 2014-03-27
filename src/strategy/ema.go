@@ -243,7 +243,8 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 
 	//do sell when price is below stoploss point
 	if Price[length-1] < emaStrategy.PrevBuyPirce*(1-stoploss*0.01) {
-		if Option["disable_trading"] != "1" {
+		if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrade != "sell" {
+			emaStrategy.PrevEMATrade = "sell"
 			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
 			logger.Infoln(warning)
 			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
