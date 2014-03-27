@@ -80,11 +80,9 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 
 	logger.Traceln(req)
 
-	if w.client == nil {
-		w.client = util.NewTimeoutClient()
-	}
+	c := util.NewTimeoutClient()
 	logger.Tracef("HTTP req begin AnalyzeKLinePeroid")
-	resp, err := w.client.Do(req)
+	resp, err := c.Do(req)
 	logger.Tracef("HTTP req end AnalyzeKLinePeroid")
 	if err != nil {
 		logger.Errorln(err)

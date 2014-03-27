@@ -38,7 +38,6 @@ import (
 	http://www.huobi.com/help/index.php?a=api_help
 */
 type HuobiTrade struct {
-	client     *http.Client
 	access_key string
 	secret_key string
 }
@@ -87,11 +86,10 @@ func (w *HuobiTrade) httpRequest(pParams map[string]string) (string, error) {
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)
 
-	if w.client == nil {
-		w.client = util.NewTimeoutClient()
-	}
+	c := util.NewTimeoutClient()
+
 	logger.Tracef("HTTP req begin HuobiTrade")
-	resp, err := w.client.Do(req)
+	resp, err := c.Do(req)
 	logger.Tracef("HTTP req end HuobiTrade")
 	if err != nil {
 		logger.Fatal(err)

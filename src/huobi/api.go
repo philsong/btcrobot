@@ -22,14 +22,11 @@ import (
 	. "config"
 	"fmt"
 	"logger"
-	"net/http"
 	"strconv"
 	"time"
 )
 
 type Huobi struct {
-	client *http.Client
-
 	Time   []string
 	Price  []float64
 	Volumn []float64

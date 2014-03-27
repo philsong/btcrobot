@@ -60,7 +60,6 @@ import (
 	https://www.okcoin.com/klineData.do?type=3&marketFrom=3
 */
 type OkcoinTrade struct {
-	client     *http.Client
 	partner    string
 	secret_key string
 }
@@ -110,11 +109,10 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)
 
-	if w.client == nil {
-		w.client = util.NewTimeoutClient()
-	}
+	c := util.NewTimeoutClient()
+
 	logger.Tracef("HTTP req begin OkcoinTrade")
-	resp, err := w.client.Do(req)
+	resp, err := c.Do(req)
 	logger.Tracef("HTTP req end OkcoinTrade")
 	if err != nil {
 		logger.Fatal(err)
