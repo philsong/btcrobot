@@ -136,7 +136,7 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 
 	_, err := strconv.ParseFloat(Option["tradeAmount"], 64)
 	if err != nil {
-		logger.Debugln("config item tradeAmount is not float")
+		logger.Errorln("config item tradeAmount is not float")
 		return false
 	}
 	tradeAmount := Option["tradeAmount"]
@@ -201,8 +201,12 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 				emaStrategy.PrevEMACross = "up"
 
 				if emaStrategy.checkThreshold("buy", EMAdif[length-1]) {
+
 					emaStrategy.PrevEMATrade = "buy"
-					warning := "EMA up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("buy")
+
+					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
+					warning := "EMA up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") +
+						",委托价" + tradeAPI.GetTradePrice("buy") + ",diff" + diff
 					logger.Infoln(warning)
 					if tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount) {
 						emaStrategy.PrevBuyPirce = Price[length-1]
@@ -220,9 +224,15 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 		if emaStrategy.is_downcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessSellThreshold {
 			emaStrategy.PrevEMACross = "down"
 			if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrade != "sell" {
+
 				if emaStrategy.checkThreshold("sell", EMAdif[length-1]) {
+
 					emaStrategy.PrevEMATrade = "sell"
-					warning := "EMA down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
+
+					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
+					warning := "EMA down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") +
+						",委托价" + tradeAPI.GetTradePrice("sell") + ",diff" + diff
+
 					logger.Infoln(warning)
 					if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
 						warning += "[委托成功]"

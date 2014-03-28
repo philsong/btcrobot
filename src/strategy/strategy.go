@@ -1,7 +1,6 @@
 package strategy
 
 import (
-	"fmt"
 	"logger"
 )
 
@@ -37,7 +36,7 @@ func Register(strageteyName string, strategy Strategy) {
 func Perform(strageteyName string, tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
 	strategy, ok := strategys[strageteyName]
 	if !ok {
-		fmt.Errorf("sql: unknown strategy %q (forgotten import?)", strageteyName)
+		logger.Errorf("sql: unknown strategy %q (forgotten import?)", strageteyName)
 		return false
 	}
 

@@ -52,7 +52,7 @@
                     <option value="EMA">EMA</option>
                     <option value="MACD">MACD</option>
                     <option value="EMAMACD">EMA+MACD混合策略</option>
-                    <option value="XXX">XXX(自定义策略)</option>
+                    <option value="xxx">xxx(自定义策略)</option>
                 </select>
             </div>
           </div>
@@ -91,7 +91,7 @@
           
           <div class="control-group string optional" style="display: none" id="MACDsellThreshold"><label class="string optional control-label" for="MACDsellThreshold"><abbr title="required">*</abbr>卖出Histogram阀值</label><div class="controls"><input class="string optional span1" id="MACDsellThreshold" name="MACDsellThreshold" size="50" type="text" value="{{.config.MACDsellThreshold}}">(即使MACD死叉，直到MACD Histogram小于卖出Histogram阀值才进行卖出)</div></div>
 
-          <div class="control-group string optional"><label class="string optional control-label" for="stoploss"><abbr title="required">*</abbr>交易停损量</label><div class="controls"><input class="string optional span1" id="stoploss" name="stoploss" size="50" type="text" value="{{.config.stoploss}}">%  当市价低于EMA买入价*(1-交易停损量*0.01)，平仓止损, 主要为防暴跌策略</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="stoploss"><abbr title="required">*</abbr>交易止损量</label><div class="controls"><input class="string optional span1" id="stoploss" name="stoploss" size="50" type="text" value="{{.config.stoploss}}">%  当市价低于EMA/MACD买入价*(1-交易停损量*0.01)时，平仓止损防暴跌</div></div>
 
 
 
