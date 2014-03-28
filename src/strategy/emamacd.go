@@ -290,6 +290,7 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 	if Price[length-1] < emamacdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["disable_trading"] != "1" && emamacdStrategy.PrevEMATrade != "sell" {
 			emamacdStrategy.PrevEMATrade = "sell"
+			emamacdStrategy.PrevMACDTrade = "sell"
 			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
 			logger.Infoln(warning)
 
