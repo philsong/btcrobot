@@ -83,10 +83,14 @@
 
           <div class="control-group string optional"><label class="string optional control-label" for="slippage"><abbr title="required">*</abbr>交易滑动量</label><div class="controls"><input class="string optional span1" id="slippage" name="slippage" size="50" type="text" value="{{.config.slippage}}">‰  买入价=市价*(1+交易滑动量*0.001)，卖出价=市价*(1-交易滑动量*0.001)</div></div>
 
-          <div class="control-group string optional"><label class="string optional control-label" for="buyThreshold"><abbr title="required">*</abbr>买入diff阀值</label><div class="controls"><input class="string optional span1" id="buyThreshold" name="buyThreshold" size="50" type="text" value="{{.config.buyThreshold}}">(即使EMA金叉，直到EMA diff大于买入diff阀值才进行买入)</div></div>
+          <div class="control-group string optional" style="display: none" id="buyThreshold"><label class="string optional control-label" for="buyThreshold"><abbr title="required">*</abbr>买入diff阀值</label><div class="controls"><input class="string optional span1" id="buyThreshold" name="buyThreshold" size="50" type="text" value="{{.config.buyThreshold}}">(即使EMA金叉，直到EMA diff大于买入diff阀值才进行买入)</div></div>
           
-          <div class="control-group string optional"><label class="string optional control-label" for="sellThreshold"><abbr title="required">*</abbr>卖出diff阀值</label><div class="controls"><input class="string optional span1" id="sellThreshold" name="sellThreshold" size="50" type="text" value="{{.config.sellThreshold}}">(即使EMA死叉，直到EMA diff小于卖出diff阀值才进行卖出)</div></div>
+          <div class="control-group string optional" style="display: none" id="sellThreshold"><label class="string optional control-label" for="sellThreshold"><abbr title="required">*</abbr>卖出diff阀值</label><div class="controls"><input class="string optional span1" id="sellThreshold" name="sellThreshold" size="50" type="text" value="{{.config.sellThreshold}}">(即使EMA死叉，直到EMA diff小于卖出diff阀值才进行卖出)</div></div>
+     
+          <div class="control-group string optional" style="display: none" id="MACDbuyThreshold"><label class="string optional control-label" for="MACDbuyThreshold"><abbr title="required">*</abbr>买入Histogram阀值</label><div class="controls"><input class="string optional span1" id="MACDbuyThreshold" name="MACDbuyThreshold" size="50" type="text" value="{{.config.MACDbuyThreshold}}">(即使MACD金叉，直到MACD Histogram大于买入Histogram阀值才进行买入)</div></div>
           
+          <div class="control-group string optional" style="display: none" id="MACDsellThreshold"><label class="string optional control-label" for="MACDsellThreshold"><abbr title="required">*</abbr>卖出Histogram阀值</label><div class="controls"><input class="string optional span1" id="MACDsellThreshold" name="MACDsellThreshold" size="50" type="text" value="{{.config.MACDsellThreshold}}">(即使MACD死叉，直到MACD Histogram小于卖出Histogram阀值才进行卖出)</div></div>
+
           <div class="control-group string optional"><label class="string optional control-label" for="stoploss"><abbr title="required">*</abbr>交易停损量</label><div class="controls"><input class="string optional span1" id="stoploss" name="stoploss" size="50" type="text" value="{{.config.stoploss}}">%  当市价低于EMA买入价*(1-交易停损量*0.01)，平仓止损, 主要为防暴跌策略</div></div>
 
 
@@ -109,18 +113,42 @@
 <script type="text/javascript">
 function ShowHidden()
 {
- var obj = document.getElementById("strategy");
- var signalPeriod = document.getElementById("signalPeriod"); 
- console.log(obj.value);
- if (obj.value != "EMA")
- {
-   console.log("dispay");
-  signalPeriod.style.display = "block";
- }
- else
- { console.log("dispay none");
-  signalPeriod.style.display = "none";
- }
+	var obj = document.getElementById("strategy");
+	
+	var buyThreshold = document.getElementById("buyThreshold"); 
+	var sellThreshold = document.getElementById("sellThreshold"); 
+  var signalPeriod = document.getElementById("signalPeriod"); 
+  var MACDbuyThreshold = document.getElementById("MACDbuyThreshold"); 
+  var MACDsellThreshold = document.getElementById("MACDsellThreshold"); 
+	console.log(obj.value);
+	if (obj.value != "EMA")
+	{
+		console.log("dispay");
+		signalPeriod.style.display = "block";
+    MACDbuyThreshold.style.display = "block";
+    MACDsellThreshold.style.display = "block";
+	}
+	else
+	{ 
+		console.log("dispay none");
+		signalPeriod.style.display = "none";
+    MACDbuyThreshold.style.display = "none";
+    MACDsellThreshold.style.display = "none";
+	}
+
+	if (obj.value == "MACD")
+	{
+		console.log("dispay none");
+		buyThreshold.style.display = "none";
+		sellThreshold.style.display = "none";
+
+	}
+	else
+	{ 
+		console.log("dispay block");
+		buyThreshold.style.display = "block";
+		sellThreshold.style.display = "block";
+	}
 }
 
 $(function(){
@@ -136,15 +164,38 @@ $(function(){
         }
         if (data.tick_interval) {
           $('#strategy').val(data.strategy);
-           var signalPeriod = document.getElementById("signalPeriod"); 
+          
+          var buyThreshold = document.getElementById("buyThreshold"); 
+			    var sellThreshold = document.getElementById("sellThreshold");
+          var signalPeriod = document.getElementById("signalPeriod");  
+          var MACDbuyThreshold = document.getElementById("MACDbuyThreshold"); 
+          var MACDsellThreshold = document.getElementById("MACDsellThreshold"); 
            if (data.strategy != "EMA")
            {
-             console.log("dispay");
-            signalPeriod.style.display = "block";
+    				console.log("dispay");
+    				signalPeriod.style.display = "block";
+            MACDbuyThreshold.style.display = "block";
+            MACDsellThreshold.style.display = "block";
            }
            else
-           { console.log("dispay none");
-            signalPeriod.style.display = "none";
+           { 
+    				console.log("dispay none");
+    				signalPeriod.style.display = "none";
+            MACDbuyThreshold.style.display = "none";
+            MACDsellThreshold.style.display = "none";
+           }
+
+           if (data.strategy == "MACD")
+           {
+    				console.log("dispay none");
+    				buyThreshold.style.display = "none";
+    				sellThreshold.style.display = "none";
+           }
+           else
+           { 
+    				console.log("dispay block");
+    				buyThreshold.style.display = "block";
+    				sellThreshold.style.display = "block";
            }
         }
 

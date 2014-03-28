@@ -211,6 +211,8 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 		config.Option["totalHour"] = req.FormValue("totalHour")
 		config.Option["buyThreshold"] = req.FormValue("buyThreshold")
 		config.Option["sellThreshold"] = req.FormValue("sellThreshold")
+		config.Option["MACDbuyThreshold"] = req.FormValue("MACDbuyThreshold")
+		config.Option["MACDsellThreshold"] = req.FormValue("MACDsellThreshold")
 
 		config.Option["stoploss"] = req.FormValue("stoploss")
 

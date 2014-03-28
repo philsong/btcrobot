@@ -6,9 +6,11 @@ import (
 )
 
 type TradeAPI interface {
+	AnalyzeKLine(peroid int) bool
 	Buy(price, amount string) bool
 	Sell(price, amount string) bool
 	GetTradePrice(tradeDirection string) string
+	GetOrderBook(string) bool
 }
 
 // Strategy is the interface that must be implemented by a strategy driver.
