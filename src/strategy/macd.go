@@ -133,6 +133,7 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 	if Price[length-1] < macdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
 			macdStrategy.PrevMACDTrade = "sell"
+			macdStrategy.PrevBuyPirce = 0
 			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
 			logger.Infoln(warning)
 			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
