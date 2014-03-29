@@ -178,7 +178,7 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 	//go TriggerPrice(Price[length-1])
 	if EMAdif[length-1] != emamacdStrategy.PrevEMAdif {
 		emamacdStrategy.PrevEMAdif = EMAdif[length-1]
-		logger.Infof("EMA Diff:%0.03f\t%0.03f\tPrice:%0.02f\n", EMAdif[length-2], EMAdif[length-1], Price[length-1])
+		logger.Infof("EMA Diff: %0.03f\t%0.03f\t%0.03f\tPrice:%0.02f\n", emaLong[length-1], EMAdif[length-2], EMAdif[length-1], Price[length-1])
 	}
 
 	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
@@ -277,8 +277,9 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 
 				go email.TriggerTrender(warning)
 			}
-		} else if (MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) ||
-			(emamacdStrategy.PrevMACDTrade == "buy" && MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] < MACDsellThreshold) {
+		} else if (Price[length-1] < emaLong[length-1]) &&
+			((MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) ||
+				(emamacdStrategy.PrevMACDTrade == "buy" && MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] < MACDsellThreshold)) {
 			if Option["disable_trading"] != "1" && emamacdStrategy.PrevMACDTrade != "sell" {
 				emamacdStrategy.PrevMACDTrade = "sell"
 				histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])

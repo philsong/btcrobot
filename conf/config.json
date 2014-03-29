@@ -15,7 +15,7 @@
 	"trade_update_url": "https://www.huobi.com/trade/?a=update",
 	"trade_cancel_url": "https://www.huobi.com/trade/?a=cancel&id=%s",
 	"trade_delegation": "https://www.huobi.com/trade/index.php?a=delegation",
-	"trade_detail": "http://detail.huobi.com/staticmarket/detail.html?jsoncallback=jQuery%s_%d&_=%d",
+	"trade_detail": "http://market.huobi.com/staticmarket/detail.html?jsoncallback=jQuery%s_%d&_=%d",
 	"account_info": "https://www.huobi.com/account/ajax.php?m=my_trade_info&r=%f",
 	"trade_kline_url": "https://market.huobi.com/market/huobi.php?a=kline&period=%03d&r=%f",
 	"trade_fenshi": "http://market.huobi.com/market/huobi.php?a=td",
