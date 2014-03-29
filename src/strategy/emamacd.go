@@ -260,7 +260,8 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 
 	//macd cross
 	if MACDdif[length-1] > 0 {
-		if MACDHistogram[length-2] < 0 && MACDHistogram[length-1] > MACDbuyThreshold {
+		if (MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) ||
+			(emamacdStrategy.PrevMACDTrade == "sell" && MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) {
 			if Option["disable_trading"] != "1" && emamacdStrategy.PrevMACDTrade == "sell" {
 				emamacdStrategy.PrevMACDTrade = "buy"
 				histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
@@ -276,7 +277,8 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 
 				go email.TriggerTrender(warning)
 			}
-		} else if MACDHistogram[length-2] > 0 && MACDHistogram[length-1] < MACDsellThreshold {
+		} else if (MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) ||
+			(emamacdStrategy.PrevMACDTrade == "buy" && MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] < MACDsellThreshold) {
 			if Option["disable_trading"] != "1" && emamacdStrategy.PrevMACDTrade != "sell" {
 				emamacdStrategy.PrevMACDTrade = "sell"
 				histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])

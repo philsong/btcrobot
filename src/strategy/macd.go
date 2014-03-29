@@ -99,8 +99,8 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 	}
 
 	//macd cross
-	if (MACDHistogram[length-2] < 0 && MACDHistogram[length-1] > MACDbuyThreshold) ||
-		(MACDHistogram[length-3] < 0 && MACDHistogram[length-2] > 0 && MACDHistogram[length-1] > MACDbuyThreshold) {
+	if (MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) ||
+		(macdStrategy.PrevMACDTrade == "sell" && MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) {
 		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "buy" {
 			macdStrategy.PrevMACDTrade = "buy"
 
@@ -117,8 +117,8 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 
 			go email.TriggerTrender(warning)
 		}
-	} else if (MACDHistogram[length-2] > 0 && MACDHistogram[length-1] < MACDsellThreshold) ||
-		(MACDHistogram[length-3] > 0 && MACDHistogram[length-2] < 0 && MACDHistogram[length-1] < MACDsellThreshold) {
+	} else if (MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) ||
+		(macdStrategy.PrevMACDTrade == "buy" && MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] < MACDsellThreshold) {
 		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
 			macdStrategy.PrevMACDTrade = "sell"
 
