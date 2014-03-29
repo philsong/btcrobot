@@ -320,7 +320,7 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 			go email.TriggerTrender(warning)
 
 			emamacdStrategy.PrevEMATrade = "sell"
-			emamacdStrategy.PrevMACDTrade = "sell"
+			emamacdStrategy.PrevMACDTrade = "init"
 			emamacdStrategy.PrevBuyPirce = 0
 		}
 	}
