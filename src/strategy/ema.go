@@ -150,7 +150,7 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 	//compute the indictor
 	emaShort := EMA(Price, shortEMA)
 	emaLong := EMA(Price, longEMA)
-	EMAdif := getEMAdif(emaShort, emaLong)
+	EMAdif := getMACDdif(emaShort, emaLong)
 
 	length := len(Price)
 	if emaStrategy.PrevEMACross == "unknown" {
@@ -174,7 +174,7 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 	//go TriggerPrice(Price[length-1])
 	if EMAdif[length-1] != emaStrategy.PrevEMAdif {
 		emaStrategy.PrevEMAdif = EMAdif[length-1]
-		logger.Infof("EMA Diff:%0.03f\t%0.03f\tPrice:%0.02f\n", EMAdif[length-2], EMAdif[length-1], Price[length-1])
+		logger.Infof("EMA [%0.02f,%0.02f,%0.02f] Diff:%0.03f\t%0.03f\n", Price[length-1], emaShort[length-1], emaLong[length-1], EMAdif[length-2], EMAdif[length-1])
 	}
 
 	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
