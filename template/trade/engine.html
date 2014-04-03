@@ -51,7 +51,8 @@
                 <select name="strategy" id="strategy" class="select-1" onChange="ShowHidden();">
                     <option value="EMA">EMA</option>
                     <option value="MACD">MACD</option>
-                    <option value="EMAMACD">EMA+MACD混合策略</option>
+                    <option value="EMAMACDEMA">EMA+MACD(多次)+EMA</option>
+                    <option value="EMAMACD">EMA+MACD</option>
                     <option value="xxx">xxx(自定义策略)</option>
                 </select>
             </div>
@@ -136,6 +137,7 @@ function ShowHidden()
     MACDsellThreshold.style.display = "none";
 	}
 
+
 	if (obj.value == "MACD")
 	{
 		console.log("dispay none");
@@ -149,6 +151,11 @@ function ShowHidden()
 		buyThreshold.style.display = "block";
 		sellThreshold.style.display = "block";
 	}
+
+  if (obj.value == "EMAMACD"){
+      MACDbuyThreshold.style.display = "none";
+      sellThreshold.style.display = "none";
+  }
 }
 
 $(function(){
@@ -197,6 +204,11 @@ $(function(){
     				buyThreshold.style.display = "block";
     				sellThreshold.style.display = "block";
            }
+
+            if (data.strategy== "EMAMACD"){
+                MACDbuyThreshold.style.display = "none";
+                sellThreshold.style.display = "none";
+            }
         }
 
         console.log(data.disable_trading)
