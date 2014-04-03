@@ -44,11 +44,7 @@ func (w Huobi) GetOrderBook(symbol string) (ret bool) {
 
 func (w Huobi) AnalyzeKLine(peroid int) (ret bool) {
 	symbol := Option["symbol"]
-	if peroid == 1 {
-		return w.AnalyzeKLineMinute(symbol)
-	} else {
-		return w.AnalyzeKLinePeroid(symbol, peroid)
-	}
+	return w.AnalyzeKLinePeroid(symbol, peroid)
 }
 
 func (w Huobi) Get_account_info() (userMoney common.UserMoney, ret bool) {

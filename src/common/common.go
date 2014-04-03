@@ -19,3 +19,13 @@ type TradeAPI interface {
 	Get_account_info() (UserMoney, bool)
 	GetOrderBook(string) bool
 }
+
+type Record struct {
+	TimeStr string
+	Time    int64
+	Open    float64
+	High    float64
+	Low     float64
+	Close   float64
+	Volumn  float64
+}

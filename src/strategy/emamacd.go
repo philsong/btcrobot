@@ -18,6 +18,7 @@
 package strategy
 
 import (
+	. "common"
 	. "config"
 	"email"
 	"fmt"
@@ -108,7 +109,7 @@ func (emamacdStrategy *EMAMACDStrategy) is_downcross(prevema, ema float64) bool 
 }
 
 //EMA strategy
-func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
+func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	//read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
@@ -126,6 +127,17 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 	if err != nil {
 		logger.Errorln("config item MACDsellThreshold is not float")
 		return false
+	}
+
+	var Time []string
+	var Price []float64
+	var Volumn []float64
+	for _, v := range records {
+		Time = append(Time, v.TimeStr)
+		Price = append(Price, v.Close)
+		Volumn = append(Volumn, v.Volumn)
+		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
+		//Price = append(Price, v.Low)
 	}
 
 	//compute the indictor
@@ -221,6 +233,9 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, Time []string
 			emamacdStrategy.PrevMACDTrade != "sell" {
 			if Option["disable_trading"] != "1" && emamacdStrategy.PrevMACDTrade != "sell" {
 				emamacdStrategy.PrevMACDTrade = "sell"
+				emamacdStrategy.PrevBuyPirce = 0
+				emamacdStrategy.PrevEMATrade = "sell"
+
 				histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
 				warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") +
 					",委托价" + tradeAPI.GetTradePrice("sell") + ",histogram" + histogram

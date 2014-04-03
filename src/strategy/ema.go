@@ -18,6 +18,7 @@
 package strategy
 
 import (
+	. "common"
 	. "config"
 	"email"
 	"fmt"
@@ -129,7 +130,7 @@ func (emaStrategy *EMAStrategy) is_downcross(prevema, ema float64) bool {
 }
 
 //EMA strategy
-func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
+func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	//read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
@@ -145,6 +146,17 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, Time []string, Price 
 	if err != nil {
 		logger.Errorln("config item stoploss is not float")
 		return false
+	}
+
+	var Time []string
+	var Price []float64
+	var Volumn []float64
+	for _, v := range records {
+		Time = append(Time, v.TimeStr)
+		Price = append(Price, v.Close)
+		Volumn = append(Volumn, v.Volumn)
+		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
+		//Price = append(Price, v.Low)
 	}
 
 	//compute the indictor

@@ -18,6 +18,7 @@
 package strategy
 
 import (
+	. "common"
 	. "config"
 	"email"
 	"fmt"
@@ -51,7 +52,7 @@ func getMACDHistogram(MACDdif, MACDSignal []float64) []float64 {
 }
 
 //MACD strategy
-func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
+func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	//read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
@@ -82,6 +83,17 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 	if err != nil {
 		logger.Errorln("config item MACDsellThreshold is not float")
 		return false
+	}
+
+	var Time []string
+	var Price []float64
+	var Volumn []float64
+	for _, v := range records {
+		Time = append(Time, v.TimeStr)
+		Price = append(Price, v.Close)
+		Volumn = append(Volumn, v.Volumn)
+		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
+		//Price = append(Price, v.Low)
 	}
 
 	//compute the indictor

@@ -19,6 +19,7 @@
 package okcoin
 
 import (
+	. "common"
 	. "config"
 	"fmt"
 	"io/ioutil"
@@ -121,18 +122,7 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 	return false
 }
 
-type PeroidRecord struct {
-	Time   int64
-	zero1  int64
-	zero2  int64
-	Open   float64
-	Close  float64
-	Low    float64
-	High   float64
-	Volumn float64
-}
-
-func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
+func parsePeroidArray(content string) (ret bool, records []Record) {
 	logger.Traceln("Okcoin parsePeroidArray begin....")
 	content = strings.TrimPrefix(content, "[[")
 	content = strings.TrimSuffix(content, "]]")
@@ -146,19 +136,19 @@ func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
 			return
 		}
 
-		var peroidRecord PeroidRecord
+		var record Record
 		Time, err := strconv.ParseInt(v[0], 0, 64)
 		if err != nil {
 			logger.Debugln("config item is not float")
 			return
 		}
 
-		zero1, err := strconv.ParseInt(v[1], 0, 64)
+		_, err = strconv.ParseInt(v[1], 0, 64)
 		if err != nil {
 			logger.Debugln("config item is not float")
 			return
 		}
-		zero2, err := strconv.ParseInt(v[2], 0, 64)
+		_, err = strconv.ParseInt(v[2], 0, 64)
 		if err != nil {
 			logger.Debugln("config item is not float")
 			return
@@ -194,19 +184,19 @@ func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
 			return
 		}
 
-		peroidRecord.Time = Time
-		peroidRecord.zero1 = zero1
-		peroidRecord.zero2 = zero2
+		const layout = "2006-01-02 15:04:05"
+		t := time.Unix(Time, 0)
+		record.TimeStr = t.Format(layout)
+		record.Time = Time
+		record.Open = Open
+		record.High = High
+		record.Low = Low
+		record.Close = Close
+		record.Volumn = Volumn
 
-		peroidRecord.Open = Open
-		peroidRecord.High = High
-		peroidRecord.Low = Low
-		peroidRecord.Close = Close
-		peroidRecord.Volumn = Volumn
+		//logger.Traceln(records)
 
-		//logger.Traceln(peroidRecord)
-
-		PeroidRecords = append(PeroidRecords, peroidRecord)
+		records = append(records, record)
 	}
 
 	logger.Traceln("Okcoin parsePeroidArray end....")
@@ -217,30 +207,14 @@ func parsePeroidArray(content string) (ret bool, PeroidRecords []PeroidRecord) {
 func (w *Okcoin) analyzePeroidLine(filename string, content string) bool {
 	//logger.Infoln(content)
 	//logger.Infoln(filename)
-	ret, PeroidRecords := parsePeroidArray(content)
+	ret, records := parsePeroidArray(content)
 	if ret == false {
 		logger.Errorln("Okcoin parsePeroidArray failed....")
 		return false
 	}
-	//logger.Traceln(PeroidRecords)
-	//return true
-	var Time []string
-	var Price []float64
-	var Volumn []float64
-	for _, v := range PeroidRecords {
-		const layout = "2006-01-02 15:04:05"
-		t := time.Unix(v.Time, 0)
-		Time = append(Time, t.Format(layout))
-		Price = append(Price, v.Close)
-		Volumn = append(Volumn, v.Volumn)
-	}
 
-	//logger.Infoln(Time[len(Time)-1], Price[len(Time)-1], Volumn[len(Time)-1])
-	w.Time = Time
-	w.Price = Price
-	w.Volumn = Volumn
 	strategyName := Option["strategy"]
-	strategy.Perform(strategyName, *w, Time, Price, Volumn)
+	strategy.Perform(strategyName, *w, records)
 
 	return true
 }

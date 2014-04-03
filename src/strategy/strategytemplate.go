@@ -18,6 +18,7 @@
 package strategy
 
 import (
+	. "common"
 	"fmt"
 )
 
@@ -29,7 +30,7 @@ func init() {
 }
 
 //xxx strategy
-func (xxxStrategy XXXStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
+func (xxxStrategy XXXStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	fmt.Println("empty strgatey template, you can realize your own trade strategy in here")
 	//实现自己的策略
 	return false

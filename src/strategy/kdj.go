@@ -18,18 +18,10 @@
 package strategy
 
 import (
+	. "common"
 	"fmt"
 )
 
-type Record struct {
-	Time   string
-	Open   float64
-	High   float64
-	Low    float64
-	Close  float64
-	Volumn float64
-	Amount float64
-}
 type KDJStrategy struct{}
 
 func init() {
@@ -38,7 +30,7 @@ func init() {
 }
 
 //xxx strategy
-func (kdjStrategy KDJStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
+func (kdjStrategy KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	fmt.Println("empty strgatey template, you can realize your own trade strategy in here")
 	//实现自己的策略
 	return false
