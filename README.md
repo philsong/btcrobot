@@ -2,6 +2,7 @@ BTC/LTC Robot
 ===========
 BTC/LTC自动化算法交易引擎
 
+![btcrobot logo](https://github.com/philsong/btcrobot/blob/master/static/img/hacking-bitcoin-with-go.png)
 
   btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
   it features multiple trading methods using technical analysis.
