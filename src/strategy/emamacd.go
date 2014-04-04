@@ -205,10 +205,10 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Rec
 					emamacdStrategy.PrevEMATrade = "buy"
 					emamacdStrategy.PrevMACDTrade = "init"
 					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
-					warning := "EMA up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") +
-						",委托价" + tradeAPI.GetTradePrice("buy") + ",diff" + diff
+					warning := "EMA up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+						",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1]) + ",diff" + diff
 					logger.Infoln(warning)
-					if tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount) {
+					if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) {
 						emamacdStrategy.PrevBuyPirce = Price[length-1]
 						warning += "[委托成功]"
 					} else {
@@ -227,7 +227,8 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Rec
 	}
 
 	//macd cross
-	if MACDdif[length-1] > 0 {
+	if EMAdif[length-1] > 0 {
+		logger.Infoln(Option["disable_trading"], emamacdStrategy.PrevMACDTrade)
 		if (Price[length-1] < emaLong[length-1]) &&
 			(MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) &&
 			emamacdStrategy.PrevMACDTrade != "sell" {
@@ -237,10 +238,10 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Rec
 				emamacdStrategy.PrevEMATrade = "sell"
 
 				histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
-				warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") +
-					",委托价" + tradeAPI.GetTradePrice("sell") + ",histogram" + histogram
+				warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+					",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1]) + ",histogram" + histogram
 				logger.Infoln(warning)
-				if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
+				if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
 					warning += "[委托成功]"
 				} else {
 					warning += "[委托失败]"
@@ -255,10 +256,10 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Rec
 	if Price[length-1] < emamacdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["disable_trading"] != "1" && emamacdStrategy.PrevEMATrade != "sell" {
 
-			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
+			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) + ",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
 
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"

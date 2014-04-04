@@ -19,6 +19,7 @@
 package controller
 
 import (
+	. "common"
 	"config"
 	"crypto/sha256"
 	"crypto/subtle"
@@ -33,13 +34,6 @@ import (
 	"net/http"
 	"okcoin"
 )
-
-type TradeAPI interface {
-	AnalyzeKLine(peroid int) (ret bool)
-	Buy(price, amount string) bool
-	Sell(price, amount string) bool
-	GetTradePrice(tradeDirection string) string
-}
 
 func NotFoundHandler(rw http.ResponseWriter, req *http.Request) {
 	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/404.html")

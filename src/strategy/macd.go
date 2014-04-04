@@ -117,10 +117,10 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, records []Record) b
 			macdStrategy.PrevMACDTrade = "buy"
 
 			histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
-			warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") +
-				",委托价" + tradeAPI.GetTradePrice("buy") + ",histogram" + histogram
+			warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+				",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1]) + ",histogram" + histogram
 			logger.Infoln(warning)
-			if tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount) {
+			if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) {
 				macdStrategy.PrevBuyPirce = Price[length-1]
 				warning += "[委托成功]"
 			} else {
@@ -135,10 +135,10 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, records []Record) b
 			macdStrategy.PrevMACDTrade = "sell"
 
 			histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
-			warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") +
-				",委托价" + tradeAPI.GetTradePrice("sell") + ",histogram" + histogram
+			warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+				",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1]) + ",histogram" + histogram
 			logger.Infoln(warning)
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
@@ -152,9 +152,9 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, records []Record) b
 	if Price[length-1] < macdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
 
-			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
+			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) + ",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
