@@ -228,7 +228,7 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Rec
 
 	//macd cross
 	if EMAdif[length-1] > 0 || emamacdStrategy.PrevEMATrade == "buy" {
-		logger.Infoln(Option["disable_trading"], emamacdStrategy.PrevMACDTrade)
+		logger.Debugln(Option["disable_trading"], emamacdStrategy.PrevMACDTrade)
 		if (Price[length-1] < emaLong[length-1]) &&
 			(MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) &&
 			emamacdStrategy.PrevMACDTrade != "sell" {
