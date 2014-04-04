@@ -55,7 +55,8 @@ func initRouter() *mux.Router {
 	formValidateFilter := new(filter.FormValidateFilter)
 	router.FilterChain(mux.NewFilterChain([]mux.Filter{formValidateFilter, frontViewFilter}...))
 
-	router.HandleFunc("/", EngineHandler)
+	router.HandleFunc("/", GuideHandler)
+	router.HandleFunc("/guide", GuideHandler)
 	router.HandleFunc("/huobi", HuobiIndictorHandler)
 	router.HandleFunc("/okcoin", OkcoinIndictorHandler)
 	router.HandleFunc("/secret{json:(|.json)}", SecretHandler)

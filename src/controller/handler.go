@@ -62,6 +62,14 @@ func Basic(rw http.ResponseWriter, req *http.Request) bool {
 	return true
 }
 
+func GuideHandler(rw http.ResponseWriter, req *http.Request) {
+	if !Basic(rw, req) {
+		return
+	}
+	//util.Redirect(rw, req, "/static/trade")
+	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/guide.html")
+}
+
 // 用户个人首页
 // URI: /trade/{username}
 func HuobiIndictorHandler(rw http.ResponseWriter, req *http.Request) {
