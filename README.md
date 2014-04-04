@@ -1,6 +1,6 @@
 BTC/LTC Robot
 ===========
-BTC/LTC操盘手自动化交易引擎
+BTC/LTC自动化算法交易引擎
 
 
   btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
@@ -96,7 +96,7 @@ https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%E
 
 修改btcrobot/conf目录下的secret.sample文件名为secret.json
 
-像火币或者OKcoin申请交易API，并填入secret.json中
+向火币或者OKcoin申请交易API，并填入secret.json中
 
 5、运行 btcrobot。
 
