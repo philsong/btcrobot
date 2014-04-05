@@ -166,13 +166,13 @@ func parsePeroidArray(content string) (ret bool, records []Record) {
 			return
 		}
 
-		Low, err := strconv.ParseFloat(v[5], 64)
+		High, err := strconv.ParseFloat(v[5], 64)
 		if err != nil {
 			logger.Debugln("config item is not float")
 			return
 		}
 
-		High, err := strconv.ParseFloat(v[6], 64)
+		Low, err := strconv.ParseFloat(v[6], 64)
 		if err != nil {
 			logger.Debugln("config item is not float")
 			return
