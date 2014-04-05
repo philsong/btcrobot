@@ -75,27 +75,39 @@
             
           </div>
 
-          <div class="control-group string optional"><label class="string optional control-label" for="shortEMA"><abbr title="required">*</abbr>短期EMA</label><div class="controls"><input class=" string optional span1" id="shortEMA" name="shortEMA" size="50" type="text" value="{{.config.shortEMA}}">(短期指数移动平均线,单位为K线周期)</div> </div>
-         
-          <div class="control-group string optional"><label class="string optional control-label" for="longEMA"><abbr title="required">*</abbr>长期EMA</label><div class="controls"><input class="string optional span1" id="longEMA" name="longEMA" size="50" type="text" value="{{.config.longEMA}}">(长期指数移动平均线,单位为K线周期)</div></div>
-
-          <div class="control-group string optional" style="display: none" id="signalPeriod" ><label class="string optional control-label" for="signalPeriod"><abbr title="required">*</abbr>MACD信号线</label><div class="controls"><input class="string optional span1" id="signalPeriod" name="signalPeriod" size="50" type="text" value="{{.config.signalPeriod}}">(MACD信号线,单位为K线周期)</div></div>
-
           <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>交易数量</label><div class="controls"><input class="string optional span1" id="tradeAmount" name="tradeAmount" size="50" type="text" value="{{.config.tradeAmount}}">BTC/LTC（BTC最小0.01，LTC最小0.1）</div></div>
 
           <div class="control-group string optional"><label class="string optional control-label" for="slippage"><abbr title="required">*</abbr>交易滑动量</label><div class="controls"><input class="string optional span1" id="slippage" name="slippage" size="50" type="text" value="{{.config.slippage}}">‰  买入价=市价*(1+交易滑动量*0.001)，卖出价=市价*(1-交易滑动量*0.001)</div></div>
 
-          <div class="control-group string optional" style="display: none" id="buyThreshold"><label class="string optional control-label" for="buyThreshold"><abbr title="required">*</abbr>买入diff阀值</label><div class="controls"><input class="string optional span1" id="buyThreshold" name="buyThreshold" size="50" type="text" value="{{.config.buyThreshold}}">(即使EMA金叉，直到EMA diff大于买入diff阀值才进行买入)</div></div>
-          
-          <div class="control-group string optional" style="display: none" id="sellThreshold"><label class="string optional control-label" for="sellThreshold"><abbr title="required">*</abbr>卖出diff阀值</label><div class="controls"><input class="string optional span1" id="sellThreshold" name="sellThreshold" size="50" type="text" value="{{.config.sellThreshold}}">(即使EMA死叉，直到EMA diff小于卖出diff阀值才进行卖出)</div></div>
-     
-          <div class="control-group string optional" style="display: none" id="MACDbuyThreshold"><label class="string optional control-label" for="MACDbuyThreshold"><abbr title="required">*</abbr>买入Histogram阀值</label><div class="controls"><input class="string optional span1" id="MACDbuyThreshold" name="MACDbuyThreshold" size="50" type="text" value="{{.config.MACDbuyThreshold}}">(即使MACD金叉，直到MACD Histogram大于买入Histogram阀值才进行买入)</div></div>
-          
-          <div class="control-group string optional" style="display: none" id="MACDsellThreshold"><label class="string optional control-label" for="MACDsellThreshold"><abbr title="required">*</abbr>卖出Histogram阀值</label><div class="controls"><input class="string optional span1" id="MACDsellThreshold" name="MACDsellThreshold" size="50" type="text" value="{{.config.MACDsellThreshold}}">(即使MACD死叉，直到MACD Histogram小于卖出Histogram阀值才进行卖出)</div></div>
-
           <div class="control-group string optional"><label class="string optional control-label" for="stoploss"><abbr title="required">*</abbr>交易止损量</label><div class="controls"><input class="string optional span1" id="stoploss" name="stoploss" size="50" type="text" value="{{.config.stoploss}}">%  当市价低于EMA/MACD买入价*(1-交易停损量*0.01)时，平仓止损防暴跌</div></div>
+          
+          <div id="kdj">
+            <div class="control-group string optional"><label class="string optional control-label" for="k"><abbr title="required">*</abbr>K</label><div class="controls"><input class=" string optional span1" id="k" name="k" size="50" type="text" value="9" disabled="disabled"></div> </div>
+         
+          
+            <div class="control-group string optional"><label class="string optional control-label" for="d"><abbr title="required">*</abbr>D</label><div class="controls"><input class="string optional span1" id="d" name="ç" size="50" type="text" value="3" disabled="disabled"></div></div>
+
+            <div class="control-group string optional"><label class="string optional control-label" for="j"><abbr title="required">*</abbr>J</label><div class="controls"><input class="string optional span1" id="j" name="j" size="50" type="text" value="3" disabled="disabled"> </div></div>
+          </div>
 
 
+          <div id="ema">
+            <div class="control-group string optional"><label class="string optional control-label" for="shortEMA"><abbr title="required">*</abbr>短期EMA</label><div class="controls"><input class=" string optional span1" id="shortEMA" name="shortEMA" size="50" type="text" value="{{.config.shortEMA}}">(短期指数移动平均线,单位为K线周期)</div> </div>
+         
+          
+            <div class="control-group string optional"><label class="string optional control-label" for="longEMA"><abbr title="required">*</abbr>长期EMA</label><div class="controls"><input class="string optional span1" id="longEMA" name="longEMA" size="50" type="text" value="{{.config.longEMA}}">(长期指数移动平均线,单位为K线周期)</div></div>
+
+            <div class="control-group string optional" style="display: none" id="signalPeriod" ><label class="string optional control-label" for="signalPeriod"><abbr title="required">*</abbr>MACD信号线</label><div class="controls"><input class="string optional span1" id="signalPeriod" name="signalPeriod" size="50" type="text" value="{{.config.signalPeriod}}">(MACD信号线,单位为K线周期)</div></div>
+
+
+            <div class="control-group string optional" style="display: none" id="buyThreshold"><label class="string optional control-label" for="buyThreshold"><abbr title="required">*</abbr>买入diff阀值</label><div class="controls"><input class="string optional span1" id="buyThreshold" name="buyThreshold" size="50" type="text" value="{{.config.buyThreshold}}">(即使EMA金叉，直到EMA diff大于买入diff阀值才进行买入)</div></div>
+            
+            <div class="control-group string optional" style="display: none" id="sellThreshold"><label class="string optional control-label" for="sellThreshold"><abbr title="required">*</abbr>卖出diff阀值</label><div class="controls"><input class="string optional span1" id="sellThreshold" name="sellThreshold" size="50" type="text" value="{{.config.sellThreshold}}">(即使EMA死叉，直到EMA diff小于卖出diff阀值才进行卖出)</div></div>
+       
+            <div class="control-group string optional" style="display: none" id="MACDbuyThreshold"><label class="string optional control-label" for="MACDbuyThreshold"><abbr title="required">*</abbr>买入Histogram阀值</label><div class="controls"><input class="string optional span1" id="MACDbuyThreshold" name="MACDbuyThreshold" size="50" type="text" value="{{.config.MACDbuyThreshold}}">(即使MACD金叉，直到MACD Histogram大于买入Histogram阀值才进行买入)</div></div>
+            
+            <div class="control-group string optional" style="display: none" id="MACDsellThreshold"><label class="string optional control-label" for="MACDsellThreshold"><abbr title="required">*</abbr>卖出Histogram阀值</label><div class="controls"><input class="string optional span1" id="MACDsellThreshold" name="MACDsellThreshold" size="50" type="text" value="{{.config.MACDsellThreshold}}">(即使MACD死叉，直到MACD Histogram小于卖出Histogram阀值才进行卖出)</div></div>
+          </div>
 
           <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>运行时长</label><div class="controls"><input class="string optional span1" id="totalHour" name="totalHour" size="50" type="text" value="{{.config.totalHour}}">小时</div></div>
 
@@ -122,6 +134,8 @@ function ShowHidden()
   var signalPeriod = document.getElementById("signalPeriod"); 
   var MACDbuyThreshold = document.getElementById("MACDbuyThreshold"); 
   var MACDsellThreshold = document.getElementById("MACDsellThreshold"); 
+  var emaid = document.getElementById("ema"); 
+  var kdjid = document.getElementById("kdj"); 
 	console.log(obj.value);
 	if (obj.value != "EMA")
 	{
@@ -157,6 +171,15 @@ function ShowHidden()
       MACDbuyThreshold.style.display = "none";
       sellThreshold.style.display = "none";
   }
+
+  if (obj.value == "KDJ"){
+      emaid.style.display = "none";
+      kdjid.style.display = "block"
+  }else{
+     emaid.style.display = "block";
+      kdjid.style.display = "none"
+  }
+  
 }
 
 $(function(){
@@ -178,6 +201,14 @@ $(function(){
           var signalPeriod = document.getElementById("signalPeriod");  
           var MACDbuyThreshold = document.getElementById("MACDbuyThreshold"); 
           var MACDsellThreshold = document.getElementById("MACDsellThreshold"); 
+          var emaid = document.getElementById("ema"); 
+            if (data.strategy== "KDJ"){
+                emaid.style.display = "none";
+                kdjid.style.display = "block"
+            }else{
+                emaid.style.display = "block";
+                kdjid.style.display = "none"
+            }
            if (data.strategy != "EMA")
            {
     				console.log("dispay");
@@ -206,10 +237,16 @@ $(function(){
     				sellThreshold.style.display = "block";
            }
 
-            if (data.strategy== "EMAMACD"){
-                MACDbuyThreshold.style.display = "none";
-                sellThreshold.style.display = "none";
-            }
+          if (data.strategy== "EMAMACD"){
+              MACDbuyThreshold.style.display = "none";
+              sellThreshold.style.display = "none";
+          }
+
+          if (data.strategy== "KDJ"){
+            signalPeriod.style.display = "none";
+            MACDbuyThreshold.style.display = "none";
+            MACDsellThreshold.style.display = "none";
+          }
         }
 
         console.log(data.disable_trading)

@@ -71,40 +71,47 @@ func (kdjStrategy *KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) boo
 		logger.Infof("%0.02f\t%0.02f\t%0.02f\n", k[length-1], d[length-1], j[length-1])
 	}
 
-	if (k[length-2] <= 20 || kdjStrategy.PrevKDJTrade == "sell") &&
-		(j[length-2] < k[length-2] && k[length-2] < d[length-2]) &&
+	if (j[length-2] < k[length-2] && k[length-2] < d[length-2]) &&
 		(j[length-1] > k[length-1] && k[length-1] > d[length-1]) {
-		//do buy
-		warning := "KDJ up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
-			",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1])
-		logger.Infoln(warning)
-		if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) {
-			warning += "[委托成功]"
-		} else {
-			warning += "[委托失败]"
+		logger.Infoln("KDJ up cross")
+		if k[length-2] <= 20 || kdjStrategy.PrevKDJTrade == "sell" {
+			//do buy
+			warning := "KDJ up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+				",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1])
+			logger.Infoln(warning)
+			if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) {
+				warning += "[委托成功]"
+			} else {
+				warning += "[委托失败]"
+			}
+
+			kdjStrategy.PrevKDJTrade = "buy"
+
+			go email.TriggerTrender(warning)
 		}
 
-		kdjStrategy.PrevKDJTrade = "buy"
-
-		go email.TriggerTrender(warning)
 	}
 
-	if (k[length-2] >= 80 || kdjStrategy.PrevKDJTrade == "buy") &&
-		(j[length-2] > k[length-2] && k[length-2] > k[length-2]) &&
+	if (j[length-2] > k[length-2] && k[length-2] > k[length-2]) &&
 		(j[length-1] < k[length-1] && k[length-1] < d[length-1]) {
-		//do sell
-		warning := "KDJ down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
-			",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
-		logger.Infoln(warning)
-		if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
-			warning += "[委托成功]"
-		} else {
-			warning += "[委托失败]"
+
+		logger.Infoln("KDJ down cross")
+		if k[length-2] >= 80 || kdjStrategy.PrevKDJTrade == "buy" {
+			//do sell
+			warning := "KDJ down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+				",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
+			logger.Infoln(warning)
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
+				warning += "[委托成功]"
+			} else {
+				warning += "[委托失败]"
+			}
+
+			kdjStrategy.PrevKDJTrade = "sell"
+
+			go email.TriggerTrender(warning)
 		}
 
-		kdjStrategy.PrevKDJTrade = "sell"
-
-		go email.TriggerTrender(warning)
 	}
 
 	return true
