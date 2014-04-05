@@ -138,6 +138,15 @@ function ShowHidden()
   var emaid = document.getElementById("ema"); 
   var kdjid = document.getElementById("kdj"); 
 	console.log(obj.value);
+
+    if (obj.value == "KDJ"){
+      emaid.style.display = "none";
+      kdjid.style.display = "block"
+  }else{
+     emaid.style.display = "block";
+      kdjid.style.display = "none"
+  }
+  
 	if (obj.value != "EMA")
 	{
 		console.log("dispay");
@@ -173,13 +182,7 @@ function ShowHidden()
       sellThreshold.style.display = "none";
   }
 
-  if (obj.value == "KDJ"){
-      emaid.style.display = "none";
-      kdjid.style.display = "block"
-  }else{
-     emaid.style.display = "block";
-      kdjid.style.display = "none"
-  }
+
   
 }
 
