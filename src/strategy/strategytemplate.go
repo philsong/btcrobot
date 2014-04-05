@@ -25,12 +25,12 @@ import (
 type XXXStrategy struct{}
 
 func init() {
-	xxxStrategy := XXXStrategy{}
+	xxxStrategy := new(XXXStrategy)
 	Register("xxx", xxxStrategy)
 }
 
 //xxx strategy
-func (xxxStrategy XXXStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
+func (xxxStrategy *XXXStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	fmt.Println("empty strgatey template, you can realize your own trade strategy in here")
 	//实现自己的策略
 	return false

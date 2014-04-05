@@ -19,25 +19,95 @@ package strategy
 
 import (
 	. "common"
+	. "config"
+	"email"
 	"logger"
 )
 
-type KDJStrategy struct{}
+type KDJStrategy struct {
+	PrevKDJTrade string
+	PrevTime     string
+	PrevPrice    float64
+}
 
 func init() {
-	kdjStrategy := KDJStrategy{}
+	kdjStrategy := new(KDJStrategy)
 	Register("KDJ", kdjStrategy)
 }
 
 //xxx strategy
-func (kdjStrategy KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
+func (kdjStrategy *KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	//实现自己的策略
 
-	k, d, j := getKDJ(records)
+	tradeAmount := Option["tradeAmount"]
+
+	var Time []string
+	var Price []float64
+	var Volumn []float64
+	for _, v := range records {
+		Time = append(Time, v.TimeStr)
+		Price = append(Price, v.Close)
+		Volumn = append(Volumn, v.Volumn)
+		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
+		//Price = append(Price, v.Low)
+	}
+
 	length := len(records)
-	logger.Infoln(records[length-1].TimeStr, records[length-1].Close)
-	logger.Infof("%0.02f\t%0.02f\t%0.02f\n", k[length-1], d[length-1], j[length-1])
-	return false
+
+	if kdjStrategy.PrevTime == records[length-1].TimeStr &&
+		kdjStrategy.PrevPrice == records[length-1].Close {
+		return false
+	}
+
+	//K线为白，D线为黄，J线为红,K in middle
+	k, d, j := getKDJ(records)
+
+	if kdjStrategy.PrevTime != records[length-1].TimeStr ||
+		kdjStrategy.PrevPrice != records[length-1].Close {
+		kdjStrategy.PrevTime = records[length-1].TimeStr
+		kdjStrategy.PrevPrice = records[length-1].Close
+
+		logger.Infoln(records[length-1].TimeStr, records[length-1].Close)
+		logger.Infof("%0.02f\t%0.02f\t%0.02f\n", k[length-1], d[length-1], j[length-1])
+	}
+
+	if (k[length-2] <= 20 || kdjStrategy.PrevKDJTrade == "sell") &&
+		(j[length-2] < k[length-2] && k[length-2] < d[length-2]) &&
+		(j[length-1] > k[length-1] && k[length-1] > d[length-1]) {
+		//do buy
+		warning := "KDJ up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+			",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1])
+		logger.Infoln(warning)
+		if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) {
+			warning += "[委托成功]"
+		} else {
+			warning += "[委托失败]"
+		}
+
+		kdjStrategy.PrevKDJTrade = "buy"
+
+		go email.TriggerTrender(warning)
+	}
+
+	if (k[length-2] >= 80 || kdjStrategy.PrevKDJTrade == "buy") &&
+		(j[length-2] > k[length-2] && k[length-2] > k[length-2]) &&
+		(j[length-1] < k[length-1] && k[length-1] < d[length-1]) {
+		//do sell
+		warning := "KDJ down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+			",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
+		logger.Infoln(warning)
+		if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
+			warning += "[委托成功]"
+		} else {
+			warning += "[委托失败]"
+		}
+
+		kdjStrategy.PrevKDJTrade = "sell"
+
+		go email.TriggerTrender(warning)
+	}
+
+	return true
 }
 
 /*
