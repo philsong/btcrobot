@@ -92,7 +92,7 @@ func (kdjStrategy *KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) boo
 
 	}
 
-	if (j[length-2] > k[length-2] && k[length-2] > k[length-2]) &&
+	if (j[length-2] > k[length-2] && k[length-2] > d[length-2]) &&
 		(j[length-1] < k[length-1] && k[length-1] < d[length-1]) {
 
 		logger.Infoln("KDJ down cross")
