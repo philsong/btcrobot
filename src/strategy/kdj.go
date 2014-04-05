@@ -32,6 +32,7 @@ type KDJStrategy struct {
 
 func init() {
 	kdjStrategy := new(KDJStrategy)
+	kdjStrategy.PrevKDJTrade = "init"
 	Register("KDJ", kdjStrategy)
 }
 
@@ -74,7 +75,7 @@ func (kdjStrategy *KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) boo
 	if (j[length-2] < k[length-2] && k[length-2] < d[length-2]) &&
 		(j[length-1] > k[length-1] && k[length-1] > d[length-1]) {
 		logger.Infoln("KDJ up cross")
-		if k[length-2] <= 20 || kdjStrategy.PrevKDJTrade == "sell" {
+		if (kdjStrategy.PrevKDJTrade == "init" && k[length-2] <= 20) || kdjStrategy.PrevKDJTrade == "sell" {
 			//do buy
 			warning := "KDJ up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
 				",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1])
@@ -96,7 +97,7 @@ func (kdjStrategy *KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) boo
 		(j[length-1] < k[length-1] && k[length-1] < d[length-1]) {
 
 		logger.Infoln("KDJ down cross")
-		if k[length-2] >= 80 || kdjStrategy.PrevKDJTrade == "buy" {
+		if (kdjStrategy.PrevKDJTrade == "init" && k[length-2] >= 80) || kdjStrategy.PrevKDJTrade == "buy" {
 			//do sell
 			warning := "KDJ down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
 				",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
