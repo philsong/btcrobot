@@ -3,6 +3,9 @@
 *.a
 *.so
 
+# mac file
+.DS_Store
+
 # Folders
 _obj
 _test

@@ -18,18 +18,10 @@
 package strategy
 
 import (
-	"fmt"
+	. "common"
+	"logger"
 )
 
-type Record struct {
-	Time   string
-	Open   float64
-	High   float64
-	Low    float64
-	Close  float64
-	Volumn float64
-	Amount float64
-}
 type KDJStrategy struct{}
 
 func init() {
@@ -38,9 +30,13 @@ func init() {
 }
 
 //xxx strategy
-func (kdjStrategy KDJStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
-	fmt.Println("empty strgatey template, you can realize your own trade strategy in here")
+func (kdjStrategy KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	//实现自己的策略
+
+	k, d, j := getKDJ(records)
+	length := len(records)
+	logger.Infoln(records[length-1].TimeStr, records[length-1].Close)
+	logger.Infof("%0.02f\t%0.02f\t%0.02f\n", k[length-1], d[length-1], j[length-1])
 	return false
 }
 
@@ -56,9 +52,9 @@ LLV means lowest value in period
 HHV means highest value in period
 SMA is Simple Moving Average
 */
-func doKDJ(records []Record) ([]float64, []float64, []float64) {
-	periods := 9
-	k, d := kd(records, periods)
+func getKDJ(records []Record) ([]float64, []float64, []float64) {
+	period := 9
+	k, d := kd(records, period)
 	j := j(k, d)
 	return k, d, j
 }
@@ -76,7 +72,7 @@ func j(k, d []float64) []float64 {
 	return j
 }
 
-func kd(records []Record, periods int) ([]float64, []float64) {
+func kd(records []Record, period int) ([]float64, []float64) {
 	var periodLowArr, periodHighArr []float64
 	length := len(records)
 	var rsv []float64 = make([]float64, length)
@@ -92,7 +88,7 @@ func kd(records []Record, periods int) ([]float64, []float64) {
 		// 1: Check if array is "filled" else create null point in line.
 		// 2: Calculate average.
 		// 3: Remove first value.
-		if periods == len(periodLowArr) {
+		if period == len(periodLowArr) {
 			lowest := arrayLowest(periodLowArr)
 			highest := arrayHighest(periodHighArr)
 			//logger.Infoln(i, records[i].Close, lowest, highest)

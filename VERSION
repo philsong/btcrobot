@@ -23,7 +23,7 @@
  				   support okcoin.com K-line via highchart
   Version 0.13
   time 2014-01-13 support EMA line to indict the time to buy and sell simulately, support diff factor
- 				   support web interface to display MA/EMA/MACD/Trender line too
+ 				   support web interface to display huobi MA/EMA/MACD/Trender line too
   Version 0.14
   time 2014-01-14 support EMA line to indict the time to buy and sell in huobi.com
   Version 0.15
@@ -57,5 +57,7 @@
   Version 0.28
   time 2014-03-27 fix the http request timeout issue,
                   add MACD+EMA mix strategy
-
+  Version 0.29
+  time 2014-04-02 change the EMA diff to MACD diff,
+                  support web interface to display okcoin MA/EMA/MACD/Trender line
 */

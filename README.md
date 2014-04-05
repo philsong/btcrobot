@@ -1,7 +1,8 @@
 BTC/LTC Robot
 ===========
-BTC/LTC操盘手自动化交易引擎
+BTC/LTC自动化算法交易引擎
 
+![btcrobot logo](https://raw.githubusercontent.com/philsong/btcrobot/master/static/img/hacking-bitcoin-with-go.png)
 
   btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
   it features multiple trading methods using technical analysis.
@@ -21,23 +22,22 @@ BTC/LTC操盘手自动化交易引擎
 
 支持多个交易平台-火币、OKCoin，自动买卖，机器人EMA算法，MACD算法，MIX算法
 
-关于高买低卖：程序不可能在大势下跌时，还能保证盈利，只是达成如下目标：上涨时获取中间段的利润；下跌时比大盘跌的少；横盘时可能高买低卖，所以如果在跌势，还想赚钱，神仙也帮不了你，我也没办法。。
+程序达成如下目标：上涨时获取中间段的利润；下跌时逃顶，跑赢大盘，比大盘跌的少；横盘时可能高买低卖，需要自行配置参数调整。。
 还有一种策略叫买入并持有，buy and hold，亦是一种选择。
 
 
-我举个例子，假设一个IT男，上班时根本没时间一直看盘。
+举个例子，假设一个IT男，上班时根本没时间一直看盘。
 往往去厕所的时间大盘爬上去了，下班的路上，大盘暴跌了，所以如何在利润锁定的范围内，降低这些突发性的风险？
 而且，人是很贪婪的，涨的很高，都不想卖，看着下跌，就等死套牢,这个机器人就是辅助你的眼睛，控制你的贪心，至于高买低卖，那个波动，因为这是为了获取拉升的一个机会风险,是否在你可忍受范围内，需要自我把握，
 
 配置可能是伴随市场动态调整的，所以也没什么赚钱的标准配置，需要自己体会。
 
-这个机器人有从众效应，假设很多人用同一个参数配置，很容易产生共振，被人利用，
-这个机器人完全是开源的，如果你会点程序，可以自己写点策略，实现自己的目标
+这个机器人有共振效应，假设很多人用同一个参数配置，很容易产生共振，被人利用，
+本机器人完全是开源的，如果你会点golang程序，可以自己写点策略，实现自己的操盘目标
 每个人的目标都不太一样
 有的人为了赚法币，有的为了赚比特币；）
 那算法可能不太一样
 
-而且
 
 若你有自己的方法，大把时间， 不一定非要用机器人
 有时候你自己操盘利润可能更多，不然操盘手都失业了。。
@@ -45,9 +45,9 @@ BTC/LTC操盘手自动化交易引擎
 使用指南如下:
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
 
-BTC捐赠地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
+BTC捐助地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
-LTC捐赠地址：LXwX5XeZeVfXM2b4GRs6HM1mNn4K9En3F4
+LTC捐助地址：LXwX5XeZeVfXM2b4GRs6HM1mNn4K9En3F4
 
 捐助清单如下：
 https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E5%BC%80%E5%8F%91%E7%9A%84%E4%BA%BA
@@ -97,7 +97,7 @@ https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%E
 
 修改btcrobot/conf目录下的secret.sample文件名为secret.json
 
-像火币或者OKcoin申请交易API，并填入secret.json中
+向火币或者OKcoin申请交易API，并填入secret.json中
 
 5、运行 btcrobot。
 

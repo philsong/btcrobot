@@ -18,8 +18,10 @@
 package strategy
 
 import (
+	. "common"
 	. "config"
 	"email"
+	"fmt"
 	"logger"
 	"strconv"
 )
@@ -50,7 +52,7 @@ func getMACDHistogram(MACDdif, MACDSignal []float64) []float64 {
 }
 
 //MACD strategy
-func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
+func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	//read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
@@ -83,6 +85,17 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 		return false
 	}
 
+	var Time []string
+	var Price []float64
+	var Volumn []float64
+	for _, v := range records {
+		Time = append(Time, v.TimeStr)
+		Price = append(Price, v.Close)
+		Volumn = append(Volumn, v.Volumn)
+		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
+		//Price = append(Price, v.Low)
+	}
+
 	//compute the indictor
 	emaShort := EMA(Price, shortEMA)
 	emaLong := EMA(Price, longEMA)
@@ -94,17 +107,20 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 
 	if MACDdif[length-1] != macdStrategy.PrevMACDdif {
 		macdStrategy.PrevMACDdif = MACDdif[length-1]
-		logger.Infof("MACD:d%5.03f\ts%5.03f\th%5.03f\tPrice:%5.02f\n", MACDdif[length-1], MACDSignal[length-1], MACDHistogram[length-1], Price[length-1])
+		logger.Infof("MACD:d%5.03f\ts%5.03f\tph%5.03f\th%5.03f\tPrice:%5.02f\n", MACDdif[length-1], MACDSignal[length-1], MACDHistogram[length-2], MACDHistogram[length-1], Price[length-1])
 	}
 
 	//macd cross
-	if (MACDHistogram[length-2] < 0 && MACDHistogram[length-1] > MACDbuyThreshold) ||
-		(MACDHistogram[length-3] < 0 && MACDHistogram[length-2] > 0 && MACDHistogram[length-1] > MACDbuyThreshold) {
+	if (MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) ||
+		(macdStrategy.PrevMACDTrade == "sell" && MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) {
 		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "buy" {
 			macdStrategy.PrevMACDTrade = "buy"
-			warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("buy")
+
+			histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
+			warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+				",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1]) + ",histogram" + histogram
 			logger.Infoln(warning)
-			if tradeAPI.Buy(tradeAPI.GetTradePrice("buy"), tradeAmount) {
+			if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) {
 				macdStrategy.PrevBuyPirce = Price[length-1]
 				warning += "[委托成功]"
 			} else {
@@ -113,13 +129,16 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 
 			go email.TriggerTrender(warning)
 		}
-	} else if (MACDHistogram[length-2] > 0 && MACDHistogram[length-1] < MACDsellThreshold) ||
-		(MACDHistogram[length-3] > 0 && MACDHistogram[length-2] < 0 && MACDHistogram[length-1] < MACDsellThreshold) {
+	} else if (MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) ||
+		(macdStrategy.PrevMACDTrade == "buy" && MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] < MACDsellThreshold) {
 		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
 			macdStrategy.PrevMACDTrade = "sell"
-			warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
+
+			histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
+			warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
+				",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1]) + ",histogram" + histogram
 			logger.Infoln(warning)
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
@@ -132,17 +151,19 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, Time []string, Pric
 	//do sell when price is below stoploss point
 	if Price[length-1] < macdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
-			macdStrategy.PrevMACDTrade = "sell"
-			macdStrategy.PrevBuyPirce = 0
-			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("") + ",委托价" + tradeAPI.GetTradePrice("sell")
+
+			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) + ",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell"), tradeAmount) {
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
 			}
 
 			go email.TriggerTrender(warning)
+
+			macdStrategy.PrevMACDTrade = "sell"
+			macdStrategy.PrevBuyPirce = 0
 		}
 	}
 

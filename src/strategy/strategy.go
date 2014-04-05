@@ -1,21 +1,13 @@
 package strategy
 
 import (
-	"fmt"
+	. "common"
 	"logger"
 )
 
-type TradeAPI interface {
-	AnalyzeKLine(peroid int) bool
-	Buy(price, amount string) bool
-	Sell(price, amount string) bool
-	GetTradePrice(tradeDirection string) string
-	GetOrderBook(string) bool
-}
-
 // Strategy is the interface that must be implemented by a strategy driver.
 type Strategy interface {
-	Perform(tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool
+	Perform(tradeAPI TradeAPI, records []Record) bool
 }
 
 var strategys = make(map[string]Strategy)
@@ -34,37 +26,44 @@ func Register(strageteyName string, strategy Strategy) {
 }
 
 //entry call
-func Perform(strageteyName string, tradeAPI TradeAPI, Time []string, Price []float64, Volumn []float64) bool {
+func Perform(strageteyName string, tradeAPI TradeAPI, records []Record) bool {
 	strategy, ok := strategys[strageteyName]
 	if !ok {
-		fmt.Errorf("sql: unknown strategy %q (forgotten import?)", strageteyName)
+		logger.Errorf("sql: unknown strategy %q (forgotten import?)", strageteyName)
 		return false
 	}
 
 	//
-	if len(Time) == 0 || len(Price) == 0 || len(Volumn) == 0 {
-		logger.Errorln("warning:detect exception data", len(Time), len(Price), len(Volumn))
+	if len(records) == 0 {
+		logger.Errorln("warning:detect exception data", len(records))
 		return false
+	}
+
+	var Price []float64
+	var Volumn []float64
+	for _, v := range records {
+		Price = append(Price, v.Close)
+		Volumn = append(Volumn, v.Volumn)
 	}
 
 	length := len(Price)
 
 	//check exception data in trade center
-	if checkException(Price[length-2], Price[length-1], Volumn[length-1]) == false {
+	if checkException(records[length-2], records[length-1]) == false {
 		logger.Errorln("detect exception data of trade center", Price[length-2], Price[length-1], Volumn[length-1])
 		return false
 	}
 
-	return strategy.Perform(tradeAPI, Time, Price, Volumn)
+	return strategy.Perform(tradeAPI, records)
 }
 
 //check exception data in trade center
-func checkException(yPrevPrice, Price, Volumn float64) bool {
-	if Price > yPrevPrice+10 && Volumn < 1 {
+func checkException(recordPrev, recordNow Record) bool {
+	if recordNow.Close > recordPrev.Close+10 && recordNow.Volumn < 1 {
 		return false
 	}
 
-	if Price < yPrevPrice-10 && Volumn < 1 {
+	if recordNow.Close < recordPrev.Close-10 && recordNow.Volumn < 1 {
 		return false
 	}
 

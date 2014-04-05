@@ -19,6 +19,7 @@
 package controller
 
 import (
+	. "common"
 	"config"
 	"crypto/sha256"
 	"crypto/subtle"
@@ -33,13 +34,6 @@ import (
 	"net/http"
 	"okcoin"
 )
-
-type TradeAPI interface {
-	AnalyzeKLine(peroid int) (ret bool)
-	Buy(price, amount string) bool
-	Sell(price, amount string) bool
-	GetTradePrice(tradeDirection string) string
-}
 
 func NotFoundHandler(rw http.ResponseWriter, req *http.Request) {
 	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/404.html")
@@ -68,14 +62,30 @@ func Basic(rw http.ResponseWriter, req *http.Request) bool {
 	return true
 }
 
-// 用户个人首页
-// URI: /trade/{username}
-func IndictorHandler(rw http.ResponseWriter, req *http.Request) {
+func GuideHandler(rw http.ResponseWriter, req *http.Request) {
 	if !Basic(rw, req) {
 		return
 	}
 	//util.Redirect(rw, req, "/static/trade")
-	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/indictor.html")
+	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/guide.html")
+}
+
+// 用户个人首页
+// URI: /trade/{username}
+func HuobiIndictorHandler(rw http.ResponseWriter, req *http.Request) {
+	if !Basic(rw, req) {
+		return
+	}
+	//util.Redirect(rw, req, "/static/trade")
+	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/indictor_huobi.html")
+}
+
+func OkcoinIndictorHandler(rw http.ResponseWriter, req *http.Request) {
+	if !Basic(rw, req) {
+		return
+	}
+	//util.Redirect(rw, req, "/static/trade")
+	req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/indictor_okcoin.html")
 }
 
 func TradeHandler(rw http.ResponseWriter, req *http.Request) {

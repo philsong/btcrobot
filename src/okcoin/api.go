@@ -22,17 +22,11 @@ import (
 	. "config"
 	"fmt"
 	"logger"
-	"net/http"
 	"strconv"
 	"time"
 )
 
 type Okcoin struct {
-	client *http.Client
-
-	Time   []string
-	Price  []float64
-	Volumn []float64
 }
 
 func NewOkcoin() *Okcoin {
@@ -141,12 +135,7 @@ func (w Okcoin) Sell(tradePrice, tradeAmount string) bool {
 	}
 }
 
-func (w Okcoin) GetTradePrice(tradeDirection string) string {
-	if len(w.Price) == 0 {
-		logger.Errorln("get price failed, array len=0")
-		return "false"
-	}
-
+func (w Okcoin) GetTradePrice(tradeDirection string, price float64) string {
 	slippage, err := strconv.ParseFloat(Option["slippage"], 64)
 	if err != nil {
 		logger.Debugln("config item slippage is not float")
@@ -155,11 +144,12 @@ func (w Okcoin) GetTradePrice(tradeDirection string) string {
 
 	var finalTradePrice float64
 	if tradeDirection == "buy" {
-		finalTradePrice = w.Price[len(w.Price)-1] * (1 + slippage*0.001)
+		finalTradePrice = price * (1 + slippage*0.001)
 	} else if tradeDirection == "sell" {
-		finalTradePrice = w.Price[len(w.Price)-1] * (1 - slippage*0.001)
+		finalTradePrice = price * (1 - slippage*0.001)
 	} else {
-		finalTradePrice = w.Price[len(w.Price)-1]
+		finalTradePrice = price
 	}
+
 	return fmt.Sprintf("%0.02f", finalTradePrice)
 }
