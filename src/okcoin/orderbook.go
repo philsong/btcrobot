@@ -24,6 +24,9 @@ import (
 	"io/ioutil"
 	"logger"
 	"net/http"
+	//"strconv"
+	//"strings"
+	"reflect"
 	"util"
 )
 
@@ -101,9 +104,64 @@ func (w *Okcoin) analyzeOrderBook(content string) (ret bool, orderBook OrderBook
 	//logger.Infoln(orderBook.Asks)
 	logger.Infoln((okOrderBook.Asks[len(okOrderBook.Asks)-1]))
 	logger.Infoln(okOrderBook.Bids[0])
+	/*
+		i := 0
+		for _, value := range okOrderBook.Bids {
 
+			value = strings.TrimPrefix(value.(type)(string), "[")
+			value = strings.TrimSuffix(value, "]")
+			//logger.Traceln(value)
+			v := strings.Split(value, ",")
+			if len(v) < 2 {
+				logger.Debugln("wrong data")
+				return
+			}
+
+			orderBook.Bids[i].Price, err = strconv.ParseFloat(v[0], 64)
+			if err != nil {
+				logger.Debugln("config item is not float")
+				return
+			}
+			orderBook.Bids[i].Amount, err = strconv.ParseFloat(v[1], 64)
+			if err != nil {
+				logger.Debugln("config item is not float")
+				return
+			}
+			i++
+			if i == 9 {
+				break
+			}
+		}
+
+		i = 0
+		for _, value := range okOrderBook.Asks {
+			if i < 51 {
+				continue
+			}
+			value = strings.TrimPrefix(value, "[")
+			value = strings.TrimSuffix(value, "]")
+			//logger.Traceln(value)
+			v := strings.Split(value, ",")
+			if len(v) < 2 {
+				logger.Debugln("wrong data")
+				return
+			}
+
+			orderBook.Asks[i].Price, err = strconv.ParseFloat(v[0], 64)
+			if err != nil {
+				logger.Debugln("config item is not float")
+				return
+			}
+			orderBook.Asks[i].Amount, err = strconv.ParseFloat(v[1], 64)
+			if err != nil {
+				logger.Debugln("config item is not float")
+				return
+			}
+			i++
+		}
+	*/
 	var sells_buys_data [60]OKMarketOrder
-	parse_array(okOrderBook.Asks, &sells_buys_data)
+	parse_array(okOrderBook.Bids, &sells_buys_data)
 	/*
 		for i := 0; i < 10; i++ {
 			orderBook.Asks[i].Price = okOrderBook.Asks[i].Price
@@ -133,11 +191,23 @@ func parse_array(sells_buys [60]interface{}, sells_buys_data *[60]OKMarketOrder)
 				}
 			}
 		default:
-			logger.Errorln(k, v)
-			logger.Fatalln("don't know the type, crash!")
-			return false
+			logger.Fatalln(k, v)
+
+			logger.Fatalln(vt)
+
+			switch reflect.TypeOf(vt).Kind() {
+			case reflect.Slice:
+				s := reflect.ValueOf(vt)
+				fmt.Println(s)
+
+				for i := 0; i < s.Len(); i++ {
+					fmt.Println(s.Index(i))
+					fmt.Println(util.InterfaceToFloat64(s.Index(i)))
+				}
+			}
+			return true
 		}
 	}
 
-	return true
+	return false
 }

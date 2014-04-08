@@ -36,10 +36,8 @@ func init() {
 	Register("KDJ-EX", kdjexStrategy)
 }
 
-//xxx strategy
+//KDJ-EX strategy
 func (kdjexStrategy *KDJexStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
-	//实现自己的策略
-
 	tradeAmount := Option["tradeAmount"]
 
 	var Time []string

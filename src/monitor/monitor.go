@@ -48,6 +48,68 @@ func backtesting() {
 }
 */
 
+func RobotWorker() {
+	fmt.Println("env", Config["env"])
+	if DebugEnv || Config["env"] == "dev" {
+		fmt.Println("test working...")
+
+		var tradeAPI common.TradeAPI
+		tradeAPI = okcoin.NewOkcoin()
+		tradeAPI.Get_account_info()
+		symbol := "ltc_cny"
+		tradeAPI.GetOrderBook(symbol)
+
+		/*
+			tradeAPI = huobi.NewHuobi()
+			tradeAPI.Get_account_info()
+			symbol = "btc_cny"
+			ret, orderbook := tradeAPI.GetOrderBook(symbol)
+			fmt.Println(ret, orderbook)
+		*/
+		//testHuobiAPI()
+		//testOkcoinLTCAPI()
+		return
+	}
+
+	ticker := time.NewTicker(2 * time.Second) //2s
+	defer ticker.Stop()
+
+	var tradeAPI common.TradeAPI
+	tradeAPI = huobi.NewHuobi()
+	tradeAPI.Get_account_info()
+
+	tradeAPI = okcoin.NewOkcoin()
+	tradeAPI.Get_account_info()
+
+	if Option["tradecenter"] == "huobi" {
+		tradeAPI = huobi.NewHuobi()
+	} else if Option["tradecenter"] == "okcoin" {
+		tradeAPI = okcoin.NewOkcoin()
+	} else {
+		logger.Fatalln("Please config the tradecenter firstly...")
+		return
+	}
+	peroid, _ := strconv.Atoi(Option["tick_interval"])
+	totalHour, _ := strconv.ParseInt(Option["totalHour"], 0, 64)
+	if totalHour < 1 {
+		totalHour = 1
+	}
+
+	fmt.Println("robot working...")
+
+	go func() {
+		for _ = range ticker.C {
+			tradeAPI.AnalyzeKLine(peroid)
+		}
+	}()
+
+	logger.Infof("程序将持续运行%d小时后停止", time.Duration(totalHour))
+
+	time.Sleep(time.Duration(totalHour) * time.Hour)
+
+	logger.Infof("程序到达设定时长%d小时，停止运行。", time.Duration(totalHour))
+}
+
 const worker_number = 1
 
 type message struct {
@@ -103,66 +165,6 @@ func RunRobot() {
 	}
 
 	supervisor(mess)
-}
-
-func RobotWorker() {
-	fmt.Println("env", Config["env"])
-	if DebugEnv || Config["env"] == "dev" {
-		fmt.Println("test working...")
-
-		var tradeAPI common.TradeAPI
-		tradeAPI = okcoin.NewOkcoin()
-		//tradeAPI.Get_account_info()
-		symbol := "ltc_cny"
-		//tradeAPI.GetOrderBook(symbol)
-
-		tradeAPI = huobi.NewHuobi()
-		//tradeAPI.Get_account_info()
-		symbol = "btc_cny"
-		ret, orderbook := tradeAPI.GetOrderBook(symbol)
-		fmt.Println(ret, orderbook)
-		//testHuobiAPI()
-		//testOkcoinLTCAPI()
-		return
-	}
-
-	ticker := time.NewTicker(2 * time.Second) //2s
-	defer ticker.Stop()
-
-	var tradeAPI common.TradeAPI
-	tradeAPI = huobi.NewHuobi()
-	tradeAPI.Get_account_info()
-
-	tradeAPI = okcoin.NewOkcoin()
-	tradeAPI.Get_account_info()
-
-	if Option["tradecenter"] == "huobi" {
-		tradeAPI = huobi.NewHuobi()
-	} else if Option["tradecenter"] == "okcoin" {
-		tradeAPI = okcoin.NewOkcoin()
-	} else {
-		logger.Fatalln("Please config the tradecenter firstly...")
-		return
-	}
-	peroid, _ := strconv.Atoi(Option["tick_interval"])
-	totalHour, _ := strconv.ParseInt(Option["totalHour"], 0, 64)
-	if totalHour < 1 {
-		totalHour = 1
-	}
-
-	fmt.Println("robot working...")
-
-	go func() {
-		for _ = range ticker.C {
-			tradeAPI.AnalyzeKLine(peroid)
-		}
-	}()
-
-	logger.Infof("程序将持续运行%d小时后停止", time.Duration(totalHour))
-
-	time.Sleep(time.Duration(totalHour) * time.Hour)
-
-	logger.Infof("程序到达设定时长%d小时，停止运行。", time.Duration(totalHour))
 }
 
 func testHuobiAPI() {
