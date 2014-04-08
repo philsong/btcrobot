@@ -11,15 +11,6 @@ type UserMoney struct {
 	Frozen_ltc    string
 }
 
-type TradeAPI interface {
-	AnalyzeKLine(peroid int) bool
-	Buy(price, amount string) bool
-	Sell(price, amount string) bool
-	GetTradePrice(tradeDirection string, price float64) string
-	Get_account_info() (UserMoney, bool)
-	GetOrderBook(string) bool
-}
-
 type Record struct {
 	TimeStr string
 	Time    int64
@@ -28,4 +19,23 @@ type Record struct {
 	Low     float64
 	Close   float64
 	Volumn  float64
+}
+
+type _MarketOrder struct {
+	Price  float64 //价格
+	Amount float64 //委单量
+}
+
+type OrderBook struct {
+	Asks [10]_MarketOrder //sell
+	Bids [10]_MarketOrder //buy
+}
+
+type TradeAPI interface {
+	AnalyzeKLine(peroid int) bool
+	Buy(price, amount string) bool
+	Sell(price, amount string) bool
+	GetTradePrice(tradeDirection string, price float64) string
+	Get_account_info() (UserMoney, bool)
+	GetOrderBook(string) (ret bool, orderBook OrderBook)
 }

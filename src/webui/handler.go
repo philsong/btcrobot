@@ -16,7 +16,7 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package controller
+package webui
 
 import (
 	. "common"

@@ -21,14 +21,16 @@ package config
 import (
 	"encoding/json"
 	//"fmt"
+	"flag"
 	"io/ioutil"
+	"os"
 	"path"
-	"process"
+	"path/filepath"
 )
 
 // 项目根目录
 var ROOT string
-
+var DebugEnv bool
 var Config map[string]string
 var Option map[string]string
 var TradeOption map[string]string
@@ -40,6 +42,10 @@ func init() {
 	//fmt.Println(Option)
 	//fmt.Println(Licence)
 	//fmt.Println(Remind)
+	var pDebugEnv *bool
+	pDebugEnv = flag.Bool("d", false, "enable debug for dev")
+	flag.Parse()
+	DebugEnv = *pDebugEnv
 }
 
 func LoadAll() {
@@ -49,7 +55,7 @@ func LoadAll() {
 }
 
 func load_config(file string) (config map[string]string, err error) {
-	binDir, err := process.ExecutableDir()
+	binDir, err := ExecutableDir()
 	if err != nil {
 		return nil, (err)
 	}
@@ -71,7 +77,7 @@ func load_config(file string) (config map[string]string, err error) {
 }
 
 func save_config(file string, config map[string]string) (err error) {
-	binDir, err := process.ExecutableDir()
+	binDir, err := ExecutableDir()
 	if err != nil {
 		return (err)
 	}
@@ -144,4 +150,13 @@ func LoadSecretOption() (err error) {
 
 func SaveSecretOption() error {
 	return save_config("/conf/secret.json", SecretOption)
+}
+
+// 获得可执行程序所在目录
+func ExecutableDir() (string, error) {
+	pathAbs, err := filepath.Abs(os.Args[0])
+	if err != nil {
+		return "", err
+	}
+	return filepath.Dir(pathAbs), nil
 }

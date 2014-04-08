@@ -4,7 +4,7 @@
 // https://github.com/philsong/
 // Author：Phil	78623269@qq.com
 
-package huobi
+package util
 
 import (
 	"compress/gzip"

@@ -56,8 +56,13 @@
                   add MACD strategy
   Version 0.28
   time 2014-03-27 fix the http request timeout issue,
-                  add MACD+EMA mix strategy
+                  add EMA+MACD+EMA mix strategy
   Version 0.29
   time 2014-04-02 change the EMA diff to MACD diff,
                   support web interface to display okcoin MA/EMA/MACD/Trender line
+  Version 0.30
+  time 2014-04-08 support KDJ,
+                  support EMA+MACD(once),
+                  support order book API
+                  optimize code structure
 */

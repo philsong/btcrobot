@@ -1,7 +1,6 @@
 /*
-  btcbot is a Bitcoin trading bot for HUOBI.com written
-  in golang, it features multiple trading methods using
-  technical analysis.
+  btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
+  it features multiple trading methods using technical analysis.
 
   Disclaimer:
 
@@ -16,7 +15,7 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package entry
+package monitor
 
 import (
 	"common"
@@ -108,14 +107,20 @@ func RunRobot() {
 
 func RobotWorker() {
 	fmt.Println("env", Config["env"])
-	if Config["env"] == "dev" {
+	if DebugEnv || Config["env"] == "dev" {
 		fmt.Println("test working...")
-		var tradeAPI common.TradeAPI
-		tradeAPI = huobi.NewHuobi()
-		tradeAPI.Get_account_info()
-		symbol := "btc_cny"
-		tradeAPI.GetOrderBook(symbol)
 
+		var tradeAPI common.TradeAPI
+		tradeAPI = okcoin.NewOkcoin()
+		//tradeAPI.Get_account_info()
+		symbol := "ltc_cny"
+		//tradeAPI.GetOrderBook(symbol)
+
+		tradeAPI = huobi.NewHuobi()
+		//tradeAPI.Get_account_info()
+		symbol = "btc_cny"
+		ret, orderbook := tradeAPI.GetOrderBook(symbol)
+		fmt.Println(ret, orderbook)
 		//testHuobiAPI()
 		//testOkcoinLTCAPI()
 		return

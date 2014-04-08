@@ -18,7 +18,7 @@
 package okcoin
 
 import (
-	"common"
+	. "common"
 	. "config"
 	"fmt"
 	"logger"
@@ -34,8 +34,8 @@ func NewOkcoin() *Okcoin {
 	return w
 }
 
-func (w Okcoin) GetOrderBook(symbol string) (ret bool) {
-	return false
+func (w Okcoin) GetOrderBook(symbol string) (ret bool, orderBook OrderBook) {
+	return w.getOrderBook(symbol)
 }
 
 func (w Okcoin) AnalyzeKLine(peroid int) (ret bool) {
@@ -43,7 +43,7 @@ func (w Okcoin) AnalyzeKLine(peroid int) (ret bool) {
 	return w.AnalyzeKLinePeroid(symbol, peroid)
 }
 
-func (w Okcoin) Get_account_info() (userMoney common.UserMoney, ret bool) {
+func (w Okcoin) Get_account_info() (userMoney UserMoney, ret bool) {
 	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 
 	userInfo, ret := tradeAPI.Get_account_info()

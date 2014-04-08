@@ -16,11 +16,10 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package main
+package webui
 
 import (
 	. "config"
-	. "controller"
 	"filter"
 	"fmt"
 	"github.com/studygolang/mux"
@@ -28,7 +27,7 @@ import (
 	"net/http"
 )
 
-func startWEBserver() {
+func RunServer() {
 	// 服务静态文件
 	http.Handle("/static/", http.FileServer(http.Dir(ROOT)))
 

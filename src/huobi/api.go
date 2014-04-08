@@ -18,7 +18,7 @@
 package huobi
 
 import (
-	"common"
+	. "common"
 	. "config"
 	"fmt"
 	"logger"
@@ -34,7 +34,7 @@ func NewHuobi() *Huobi {
 	return w
 }
 
-func (w Huobi) GetOrderBook(symbol string) (ret bool) {
+func (w Huobi) GetOrderBook(symbol string) (ret bool, orderBook OrderBook) {
 
 	return w.getOrderBook(symbol)
 }
@@ -44,7 +44,7 @@ func (w Huobi) AnalyzeKLine(peroid int) (ret bool) {
 	return w.AnalyzeKLinePeroid(symbol, peroid)
 }
 
-func (w Huobi) Get_account_info() (userMoney common.UserMoney, ret bool) {
+func (w Huobi) Get_account_info() (userMoney UserMoney, ret bool) {
 	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
 
 	userInfo, ret := tradeAPI.Get_account_info()

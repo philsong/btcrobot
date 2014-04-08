@@ -108,7 +108,7 @@ func (w *HuobiTrade) httpRequest(pParams map[string]string) (string, error) {
 
 		switch contentEncoding {
 		case "gzip":
-			body = DumpGZIP(resp.Body)
+			body = util.DumpGZIP(resp.Body)
 
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
