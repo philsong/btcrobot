@@ -144,8 +144,8 @@ func (w *Okcoin) analyzeOrderBook(content string) (ret bool, orderBook OrderBook
 	//fmt.Println(okOrderBook)
 
 	for i := 0; i < 10; i++ {
-		orderBook.Asks[i].Price = okOrderBook.Asks[len(_okOrderBook.Asks)-1-i].Price
-		orderBook.Asks[i].Amount = okOrderBook.Asks[len(_okOrderBook.Asks)-1-i].Amount
+		orderBook.Asks[i].Price = okOrderBook.Asks[len(_okOrderBook.Asks)-10+i].Price
+		orderBook.Asks[i].Amount = okOrderBook.Asks[len(_okOrderBook.Asks)-10+i].Amount
 		orderBook.Bids[i].Price = okOrderBook.Bids[i].Price
 		orderBook.Bids[i].Amount = okOrderBook.Bids[i].Amount
 	}

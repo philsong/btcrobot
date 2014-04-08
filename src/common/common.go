@@ -26,6 +26,7 @@ type _MarketOrder struct {
 	Amount float64 //委单量
 }
 
+//price from high to low: asks[0] > .....>asks[9] > bids[0] > ......> bids[9]
 type OrderBook struct {
 	Asks [10]_MarketOrder //sell
 	Bids [10]_MarketOrder //buy
