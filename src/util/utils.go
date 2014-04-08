@@ -45,6 +45,7 @@ func InterfaceToFloat64(iv interface{}) (retV float64) {
 			}
 		}
 	default:
+		logger.Fatalln(ivTo)
 		logger.Fatalln("don't know the type, crash!")
 		return 0
 	}

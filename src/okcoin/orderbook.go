@@ -26,7 +26,6 @@ import (
 	"net/http"
 	//"strconv"
 	//"strings"
-	"reflect"
 	"util"
 )
 
@@ -87,127 +86,71 @@ type OKMarketOrder struct {
 	Amount float64 //委单量
 }
 
-type OKOrderBook struct {
+type _OKOrderBook struct {
 	Asks [60]interface{}
 	Bids [60]interface{}
+}
+
+type OKOrderBook struct {
+	Asks [60]OKMarketOrder
+	Bids [60]OKMarketOrder
+}
+
+func convert2struct(_okOrderBook _OKOrderBook) (okOrderBook OKOrderBook) {
+	for k, v := range _okOrderBook.Asks {
+		switch vt := v.(type) {
+		case []interface{}:
+			for ik, iv := range vt {
+				switch ik {
+				case 0:
+					okOrderBook.Asks[k].Price = util.InterfaceToFloat64(iv)
+				case 1:
+					okOrderBook.Asks[k].Amount = util.InterfaceToFloat64(iv)
+				}
+			}
+		}
+	}
+
+	for k, v := range _okOrderBook.Bids {
+		switch vt := v.(type) {
+		case []interface{}:
+			for ik, iv := range vt {
+				switch ik {
+				case 0:
+					okOrderBook.Bids[k].Price = util.InterfaceToFloat64(iv)
+				case 1:
+					okOrderBook.Bids[k].Amount = util.InterfaceToFloat64(iv)
+				}
+			}
+		}
+	}
+	return
 }
 
 func (w *Okcoin) analyzeOrderBook(content string) (ret bool, orderBook OrderBook) {
 	//init to false
 	ret = false
-	var okOrderBook OKOrderBook
-	if err := json.Unmarshal([]byte(content), &okOrderBook); err != nil {
+	var _okOrderBook _OKOrderBook
+	if err := json.Unmarshal([]byte(content), &_okOrderBook); err != nil {
 		logger.Infoln(err)
 		return
 	}
 
 	//logger.Infoln(orderBook.Asks)
-	logger.Infoln((okOrderBook.Asks[len(okOrderBook.Asks)-1]))
-	logger.Infoln(okOrderBook.Bids[0])
-	/*
-		i := 0
-		for _, value := range okOrderBook.Bids {
+	logger.Infoln((_okOrderBook.Asks[len(_okOrderBook.Asks)-1]))
+	logger.Infoln(_okOrderBook.Bids[0])
 
-			value = strings.TrimPrefix(value.(type)(string), "[")
-			value = strings.TrimSuffix(value, "]")
-			//logger.Traceln(value)
-			v := strings.Split(value, ",")
-			if len(v) < 2 {
-				logger.Debugln("wrong data")
-				return
-			}
+	okOrderBook := convert2struct(_okOrderBook)
+	//fmt.Println(okOrderBook)
 
-			orderBook.Bids[i].Price, err = strconv.ParseFloat(v[0], 64)
-			if err != nil {
-				logger.Debugln("config item is not float")
-				return
-			}
-			orderBook.Bids[i].Amount, err = strconv.ParseFloat(v[1], 64)
-			if err != nil {
-				logger.Debugln("config item is not float")
-				return
-			}
-			i++
-			if i == 9 {
-				break
-			}
-		}
-
-		i = 0
-		for _, value := range okOrderBook.Asks {
-			if i < 51 {
-				continue
-			}
-			value = strings.TrimPrefix(value, "[")
-			value = strings.TrimSuffix(value, "]")
-			//logger.Traceln(value)
-			v := strings.Split(value, ",")
-			if len(v) < 2 {
-				logger.Debugln("wrong data")
-				return
-			}
-
-			orderBook.Asks[i].Price, err = strconv.ParseFloat(v[0], 64)
-			if err != nil {
-				logger.Debugln("config item is not float")
-				return
-			}
-			orderBook.Asks[i].Amount, err = strconv.ParseFloat(v[1], 64)
-			if err != nil {
-				logger.Debugln("config item is not float")
-				return
-			}
-			i++
-		}
-	*/
-	var sells_buys_data [60]OKMarketOrder
-	parse_array(okOrderBook.Bids, &sells_buys_data)
-	/*
-		for i := 0; i < 10; i++ {
-			orderBook.Asks[i].Price = okOrderBook.Asks[i].Price
-			orderBook.Asks[i].Amount = okOrderBook.Asks[i].Amount
-			orderBook.Bids[i].Price = okOrderBook.Bids[i].Price
-			orderBook.Bids[i].Amount = okOrderBook.Bids[i].Amount
-		}
-	*/
-	//OrderBook
-	//logger.Infoln(orderBook)
-	return
-}
-
-func parse_array(sells_buys [60]interface{}, sells_buys_data *[60]OKMarketOrder) bool {
-	for k, v := range sells_buys {
-		switch vt := v.(type) {
-		case map[string]interface{}:
-			logger.Debugln(k, " is a map:")
-			logger.Debugf("sells/buys[%d]\n", k)
-
-			for ik, iv := range vt {
-				switch ik {
-				case "price":
-					sells_buys_data[k].Price = util.InterfaceToFloat64(iv)
-				case "amount":
-					sells_buys_data[k].Amount = util.InterfaceToFloat64(iv)
-				}
-			}
-		default:
-			logger.Fatalln(k, v)
-
-			logger.Fatalln(vt)
-
-			switch reflect.TypeOf(vt).Kind() {
-			case reflect.Slice:
-				s := reflect.ValueOf(vt)
-				fmt.Println(s)
-
-				for i := 0; i < s.Len(); i++ {
-					fmt.Println(s.Index(i))
-					fmt.Println(util.InterfaceToFloat64(s.Index(i)))
-				}
-			}
-			return true
-		}
+	for i := 0; i < 10; i++ {
+		orderBook.Asks[i].Price = okOrderBook.Asks[len(_okOrderBook.Asks)-1-i].Price
+		orderBook.Asks[i].Amount = okOrderBook.Asks[len(_okOrderBook.Asks)-1-i].Amount
+		orderBook.Bids[i].Price = okOrderBook.Bids[i].Price
+		orderBook.Bids[i].Amount = okOrderBook.Bids[i].Amount
 	}
 
-	return false
+	//OrderBook
+	logger.Infoln(orderBook)
+	return
 }
