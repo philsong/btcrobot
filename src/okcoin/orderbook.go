@@ -147,5 +147,6 @@ func (w *Okcoin) analyzeOrderBook(content string) (ret bool, orderBook OrderBook
 
 	//OrderBook
 	//logger.Infoln(orderBook)
+	ret = true
 	return
 }

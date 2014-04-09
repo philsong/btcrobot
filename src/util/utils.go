@@ -28,14 +28,14 @@ func AddRecord(record, filename string) {
 }
 
 func InterfaceToFloat64(iv interface{}) (retV float64) {
-	logger.Debugf("iv=%v\n", iv)
+	//logger.Debugf("iv=%v\n", iv)
 
 	switch ivTo := iv.(type) {
 	case float64:
-		logger.Traceln(ivTo, "is float64")
+		//	logger.Traceln(ivTo, "is float64")
 		retV = ivTo
 	case string:
-		logger.Traceln(ivTo, "is string")
+		//	logger.Traceln(ivTo, "is string")
 		{
 			var err error
 			retV, err = strconv.ParseFloat(ivTo, 64)
