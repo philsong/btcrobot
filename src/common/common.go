@@ -36,6 +36,7 @@ type TradeAPI interface {
 	AnalyzeKLine(peroid int) bool
 	Buy(price, amount string) string
 	Sell(price, amount string) string
+	CancelOrder(order_id string) bool
 	GetTradePrice(tradeDirection string, price float64) string
 	Get_account_info() (UserMoney, bool)
 	GetOrderBook() (ret bool, orderBook OrderBook)

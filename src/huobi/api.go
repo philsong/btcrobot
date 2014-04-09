@@ -34,6 +34,18 @@ func NewHuobi() *Huobi {
 	return w
 }
 
+func (w Huobi) CancelOrder(order_id string) (ret bool) {
+	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
+	symbol := Option["symbol"]
+	if symbol == "btc_cny" {
+		return tradeAPI.Cancel_order(order_id)
+	} else if symbol == "ltc_cny" {
+		return false
+	}
+
+	return false
+}
+
 func (w Huobi) GetOrderBook() (ret bool, orderBook OrderBook) {
 	symbol := Option["symbol"]
 	return w.getOrderBook(symbol)

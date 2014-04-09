@@ -34,6 +34,12 @@ func NewOkcoin() *Okcoin {
 	return w
 }
 
+func (w Okcoin) CancelOrder(order_id string) (ret bool) {
+	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+	symbol := Option["symbol"]
+	return tradeAPI.Cancel_order(symbol, order_id)
+}
+
 func (w Okcoin) GetOrderBook() (ret bool, orderBook OrderBook) {
 	symbol := Option["symbol"]
 	return w.getOrderBook(symbol)
