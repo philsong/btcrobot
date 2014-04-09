@@ -38,5 +38,5 @@ type TradeAPI interface {
 	Sell(price, amount string) string
 	GetTradePrice(tradeDirection string, price float64) string
 	Get_account_info() (UserMoney, bool)
-	GetOrderBook(string) (ret bool, orderBook OrderBook)
+	GetOrderBook() (ret bool, orderBook OrderBook)
 }

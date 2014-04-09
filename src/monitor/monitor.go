@@ -56,13 +56,11 @@ func RobotWorker() {
 		var tradeAPI common.TradeAPI
 		tradeAPI = okcoin.NewOkcoin()
 		tradeAPI.Get_account_info()
-		symbol := "ltc_cny"
-		tradeAPI.GetOrderBook(symbol)
+		tradeAPI.GetOrderBook()
 
 		tradeAPI = huobi.NewHuobi()
 		tradeAPI.Get_account_info()
-		symbol = "btc_cny"
-		ret, orderbook := tradeAPI.GetOrderBook(symbol)
+		ret, orderbook := tradeAPI.GetOrderBook()
 		fmt.Println(ret, orderbook)
 
 		//testHuobiAPI()

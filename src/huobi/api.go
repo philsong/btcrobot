@@ -34,8 +34,8 @@ func NewHuobi() *Huobi {
 	return w
 }
 
-func (w Huobi) GetOrderBook(symbol string) (ret bool, orderBook OrderBook) {
-
+func (w Huobi) GetOrderBook() (ret bool, orderBook OrderBook) {
+	symbol := Option["symbol"]
 	return w.getOrderBook(symbol)
 }
 

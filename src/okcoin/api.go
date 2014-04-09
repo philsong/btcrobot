@@ -34,7 +34,8 @@ func NewOkcoin() *Okcoin {
 	return w
 }
 
-func (w Okcoin) GetOrderBook(symbol string) (ret bool, orderBook OrderBook) {
+func (w Okcoin) GetOrderBook() (ret bool, orderBook OrderBook) {
+	symbol := Option["symbol"]
 	return w.getOrderBook(symbol)
 }
 

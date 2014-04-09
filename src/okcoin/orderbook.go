@@ -136,12 +136,7 @@ func (w *Okcoin) analyzeOrderBook(content string) (ret bool, orderBook OrderBook
 		return
 	}
 
-	//logger.Infoln(orderBook.Asks)
-	logger.Infoln((_okOrderBook.Asks[len(_okOrderBook.Asks)-1]))
-	logger.Infoln(_okOrderBook.Bids[0])
-
 	okOrderBook := convert2struct(_okOrderBook)
-	//fmt.Println(okOrderBook)
 
 	for i := 0; i < 10; i++ {
 		orderBook.Asks[i].Price = okOrderBook.Asks[len(_okOrderBook.Asks)-10+i].Price
