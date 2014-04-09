@@ -18,7 +18,6 @@
 package okcoin
 
 import (
-	"compress/gzip"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -131,7 +130,7 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 
 		switch contentEncoding {
 		case "gzip":
-			body = DumpGZIP(resp.Body)
+			body = util.DumpGZIP(resp.Body)
 
 		default:
 			bodyByte, _ := ioutil.ReadAll(resp.Body)
@@ -435,23 +434,4 @@ func (w *OkcoinTrade) BuyMarketLTC(price, amount string) string {
 func (w *OkcoinTrade) SellMarketLTC(price, amount string) string {
 	sellId := w.doTrade("ltc_cny", "sell_market", price, amount)
 	return (fmt.Sprintf("%d", sellId))
-}
-
-func DumpGZIP(r io.Reader) string {
-	var body string
-	reader, _ := gzip.NewReader(r)
-	for {
-		buf := make([]byte, 1024)
-		n, err := reader.Read(buf)
-
-		if err != nil && err != io.EOF {
-			panic(err)
-		}
-
-		if n == 0 {
-			break
-		}
-		body += string(buf)
-	}
-	return body
 }

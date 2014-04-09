@@ -64,7 +64,7 @@ func (w *Okcoin) getOrderBook(symbol string) (ret bool, orderBook OrderBook) {
 	logger.Tracef("HTTP returned Content-Encoding %s", contentEncoding)
 	switch contentEncoding {
 	case "gzip":
-		body = DumpGZIP(resp.Body)
+		body = util.DumpGZIP(resp.Body)
 
 	default:
 		bodyByte, err := ioutil.ReadAll(resp.Body)
