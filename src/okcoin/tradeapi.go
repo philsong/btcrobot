@@ -182,6 +182,7 @@ func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret boo
 		logger.Traceln(err)
 	} else if err != nil {
 		logger.Fatal(err)
+		logger.Fatalln(body)
 	}
 
 	if errorMsg.Result != true {
