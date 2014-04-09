@@ -34,8 +34,8 @@ type OrderBook struct {
 
 type TradeAPI interface {
 	AnalyzeKLine(peroid int) bool
-	Buy(price, amount string) bool
-	Sell(price, amount string) bool
+	Buy(price, amount string) string
+	Sell(price, amount string) string
 	GetTradePrice(tradeDirection string, price float64) string
 	Get_account_info() (UserMoney, bool)
 	GetOrderBook(string) (ret bool, orderBook OrderBook)

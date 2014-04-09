@@ -73,10 +73,9 @@ func (w Huobi) Get_account_info() (userMoney UserMoney, ret bool) {
 	}
 }
 
-func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
+func (w Huobi) Buy(tradePrice, tradeAmount string) (buyId string) {
 	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
 
-	var buyId string
 	if Option["symbol"] == "btc_cny" {
 		buyId = tradeAPI.BuyBTC(tradePrice, tradeAmount)
 	} else if Option["symbol"] == "ltc_cny" {
@@ -95,17 +94,12 @@ func (w Huobi) Buy(tradePrice, tradeAmount string) bool {
 		logger.Infoln("Get_account_info failed")
 	}
 
-	if buyId != "0" {
-		return true
-	} else {
-		return false
-	}
+	return buyId
 }
 
-func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
+func (w Huobi) Sell(tradePrice, tradeAmount string) (sellId string) {
 	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
 
-	var sellId string
 	if Option["symbol"] == "btc_cny" {
 		sellId = tradeAPI.SellBTC(tradePrice, tradeAmount)
 	} else if Option["symbol"] == "ltc_cny" {
@@ -124,11 +118,7 @@ func (w Huobi) Sell(tradePrice, tradeAmount string) bool {
 		logger.Infoln("Get_account_info failed")
 	}
 
-	if sellId != "0" {
-		return true
-	} else {
-		return false
-	}
+	return sellId
 }
 
 func (w Huobi) GetTradePrice(tradeDirection string, price float64) string {

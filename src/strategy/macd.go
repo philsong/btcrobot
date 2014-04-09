@@ -120,7 +120,7 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, records []Record) b
 			warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
 				",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1]) + ",histogram" + histogram
 			logger.Infoln(warning)
-			if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) {
+			if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
 				macdStrategy.PrevBuyPirce = Price[length-1]
 				warning += "[委托成功]"
 			} else {
@@ -138,7 +138,7 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, records []Record) b
 			warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
 				",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1]) + ",histogram" + histogram
 			logger.Infoln(warning)
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
@@ -154,7 +154,7 @@ func (macdStrategy *MACDStrategy) Perform(tradeAPI TradeAPI, records []Record) b
 
 			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) + ",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) {
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"

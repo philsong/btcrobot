@@ -74,10 +74,9 @@ func (w Okcoin) Get_account_info() (userMoney UserMoney, ret bool) {
 	}
 }
 
-func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
+func (w Okcoin) Buy(tradePrice, tradeAmount string) (buyId string) {
 	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 
-	var buyId string
 	symbol := Option["symbol"]
 	if symbol == "btc_cny" {
 		buyId = tradeAPI.BuyBTC(tradePrice, tradeAmount)
@@ -98,17 +97,12 @@ func (w Okcoin) Buy(tradePrice, tradeAmount string) bool {
 		logger.Infoln("Get_account_info failed")
 	}
 
-	if buyId != "0" {
-		return true
-	} else {
-		return false
-	}
+	return buyId
 }
 
-func (w Okcoin) Sell(tradePrice, tradeAmount string) bool {
+func (w Okcoin) Sell(tradePrice, tradeAmount string) (sellId string) {
 	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 
-	var sellId string
 	symbol := Option["symbol"]
 	if symbol == "btc_cny" {
 		sellId = tradeAPI.SellBTC(tradePrice, tradeAmount)
@@ -128,11 +122,7 @@ func (w Okcoin) Sell(tradePrice, tradeAmount string) bool {
 		logger.Infoln("Get_account_info failed")
 	}
 
-	if sellId != "0" {
-		return true
-	} else {
-		return false
-	}
+	return sellId
 }
 
 func (w Okcoin) GetTradePrice(tradeDirection string, price float64) string {

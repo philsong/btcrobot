@@ -137,14 +137,14 @@ func TradeHandler(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		var ret bool
+		var ret string
 		if msgtype == "dobuy" {
 			ret = tradeAPI.Buy(config.TradeOption["buyprice"], config.TradeOption["buyamount"])
 		} else if msgtype == "dosell" {
 			ret = tradeAPI.Sell(config.TradeOption["sellprice"], config.TradeOption["sellamount"])
 		}
 
-		if ret != true {
+		if ret != "0" {
 			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "交易委托失败", `"}`)
 			return
 		} else {

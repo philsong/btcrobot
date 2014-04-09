@@ -221,7 +221,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Perform(tradeAPI TradeAPI, records
 					warning := "EMA up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
 						",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1]) + ",diff" + diff
 					logger.Infoln(warning)
-					if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) {
+					if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
 						emamacdemaStrategy.PrevBuyPirce = Price[length-1]
 						warning += "[委托成功]"
 					} else {
@@ -252,7 +252,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Perform(tradeAPI TradeAPI, records
 						ematradeAmount = tradeAmount
 					}
 
-					if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), ematradeAmount) {
+					if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), ematradeAmount) != "0" {
 						warning += "[委托成功]"
 					} else {
 						warning += "[委托失败]"
@@ -279,7 +279,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Perform(tradeAPI TradeAPI, records
 				warning := "MACD up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
 					",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1]) + ",histogram" + histogram
 				logger.Infoln(warning)
-				if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), MacdTradeAmount) {
+				if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), MacdTradeAmount) != "0" {
 					emamacdemaStrategy.PrevBuyPirce = Price[length-1]
 					warning += "[委托成功]"
 				} else {
@@ -297,7 +297,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Perform(tradeAPI TradeAPI, records
 				warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
 					",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1]) + ",histogram" + histogram
 				logger.Infoln(warning)
-				if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), MacdTradeAmount) {
+				if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), MacdTradeAmount) != "0" {
 					warning += "[委托成功]"
 				} else {
 					warning += "[委托失败]"
@@ -322,7 +322,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Perform(tradeAPI TradeAPI, records
 				ematradeAmount = tradeAmount
 			}
 
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), ematradeAmount) {
+			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), ematradeAmount) != "0" {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
