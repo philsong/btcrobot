@@ -45,6 +45,11 @@ func (w Okcoin) GetOrderBook() (ret bool, orderBook OrderBook) {
 	return w.getOrderBook(symbol)
 }
 
+func (w Okcoin) GetOpenOrder() (ret bool, orderBook OrderBook) {
+	symbol := Option["symbol"]
+	return w.getOrderBook(symbol)
+}
+
 func (w Okcoin) AnalyzeKLine(peroid int) (ret bool) {
 	symbol := Option["symbol"]
 	return w.AnalyzeKLinePeroid(symbol, peroid)
@@ -97,12 +102,7 @@ func (w Okcoin) Buy(tradePrice, tradeAmount string) (buyId string) {
 		logger.Infoln("执行买入委托失败", tradePrice, tradeAmount)
 	}
 
-	time.Sleep(3 * time.Second)
-	_, ret := w.Get_account_info()
-
-	if !ret {
-		logger.Infoln("Get_account_info failed")
-	}
+	time.Sleep(2 * time.Second)
 
 	return buyId
 }
