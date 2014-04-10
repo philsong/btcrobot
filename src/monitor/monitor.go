@@ -68,7 +68,7 @@ func RobotWorker() {
 		return
 	}
 
-	ticker := time.NewTicker(2 * time.Second) //2s
+	ticker := time.NewTicker(1 * time.Second) //2s
 	defer ticker.Stop()
 
 	var tradeAPI common.TradeAPI
