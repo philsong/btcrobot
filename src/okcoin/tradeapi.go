@@ -18,6 +18,7 @@
 package okcoin
 
 import (
+	. "config"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -235,13 +236,12 @@ type UserInfo struct {
 }
 
 func (w *OkcoinTrade) Get_account_info() (userInfo UserInfo, ret bool) {
-	api_url := "https://www.okcoin.com/api/userinfo.do"
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
 
 	ret = true
 
-	body, err := w.httpRequest(api_url, pParams)
+	body, err := w.httpRequest(Config["ok_api_userinfo"], pParams)
 	if err != nil {
 		ret = false
 		return
@@ -269,7 +269,6 @@ func (w *OkcoinTrade) Get_account_info() (userInfo UserInfo, ret bool) {
 }
 
 func (w *OkcoinTrade) Get_order(symbol, order_id string) (m OrderTable, ret bool) {
-	api_url := "https://www.okcoin.com/api/getorder.do"
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
 	pParams["symbol"] = symbol
@@ -277,7 +276,7 @@ func (w *OkcoinTrade) Get_order(symbol, order_id string) (m OrderTable, ret bool
 
 	ret = true
 
-	body, err := w.httpRequest(api_url, pParams)
+	body, err := w.httpRequest(Config["ok_api_getorder"], pParams)
 	if err != nil {
 		ret = false
 		return
@@ -310,13 +309,12 @@ func (w *OkcoinTrade) Get_LTCorder(order_id string) (m OrderTable, ret bool) {
 }
 
 func (w *OkcoinTrade) Cancel_order(symbol, order_id string) bool {
-	api_url := "https://www.okcoin.com/api/cancelorder.do"
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
 	pParams["symbol"] = symbol
 	pParams["order_id"] = order_id
 
-	body, err := w.httpRequest(api_url, pParams)
+	body, err := w.httpRequest(Config["ok_api_cancelorder"], pParams)
 	if err != nil {
 		return false
 	}
@@ -357,7 +355,6 @@ func (w *OkcoinTrade) Cancel_LTCorder(order_id string) (ret bool) {
 }
 
 func (w *OkcoinTrade) doTrade(symbol, method, rate, amount string) int {
-	api_url := "https://www.okcoin.com/api/trade.do"
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
 	pParams["symbol"] = symbol
@@ -365,7 +362,7 @@ func (w *OkcoinTrade) doTrade(symbol, method, rate, amount string) int {
 	pParams["rate"] = rate
 	pParams["amount"] = amount
 
-	body, err := w.httpRequest(api_url, pParams)
+	body, err := w.httpRequest(Config["ok_api_trade"], pParams)
 	if err != nil {
 		return 0
 	}

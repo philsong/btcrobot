@@ -59,13 +59,13 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 		return false
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf(Config["trade_kline_url"], peroid, rand.Float64()), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf(Config["hb_kline_url"], peroid, rand.Float64()), nil)
 	if err != nil {
 		logger.Fatal(err)
 		return false
 	}
 
-	req.Header.Set("Referer", Config["trade_flash_url"])
+	req.Header.Set("Referer", Config["hb_base_url"])
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 
@@ -98,7 +98,7 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 			} else {
 				body = string(bodyByte)
 
-				ioutil.WriteFile(fmt.Sprintf("cache/TradeKLine_%03d.data", peroid), bodyByte, 0644)
+				ioutil.WriteFile(fmt.Sprintf("cache/hbKLine_%03d.data", peroid), bodyByte, 0644)
 			}
 		}
 
@@ -109,7 +109,7 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 			logger.Traceln("您需要登录才能继续")
 			return false
 		} else {
-			return w.analyzePeroidLine(fmt.Sprintf("cache/TradeKLine_%03d.data", peroid), body)
+			return w.analyzePeroidLine(fmt.Sprintf("cache/hbKLine_%03d.data", peroid), body)
 		}
 
 	} else {

@@ -74,14 +74,14 @@ func (w *HuobiTrade) httpRequest(pParams map[string]string) (string, error) {
 		v.Add(key, val)
 	}
 
-	req, err := http.NewRequest("POST", Config["api_url"], strings.NewReader(v.Encode()))
+	req, err := http.NewRequest("POST", Config["hb_api_url"], strings.NewReader(v.Encode()))
 	if err != nil {
 		logger.Fatal(err)
 		return "", err
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Referer", "https://www.huobi.com/")
+	req.Header.Set("Referer", Config["hb_base_url"])
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)

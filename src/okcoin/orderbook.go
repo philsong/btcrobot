@@ -19,6 +19,7 @@ package okcoin
 
 import (
 	. "common"
+	. "config"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -32,13 +33,13 @@ import (
 func (w *Okcoin) getOrderBook(symbol string) (ret bool, orderBook OrderBook) {
 	//init to false
 	ret = false
-	req, err := http.NewRequest("GET", fmt.Sprintf("https://www.okcoin.com/api/depth.do?symbol=%s", symbol), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf(Config["ok_depth_url"], symbol), nil)
 	if err != nil {
 		logger.Fatal(err)
 		return
 	}
 
-	req.Header.Set("Referer", "https://www.okcoin.com/")
+	req.Header.Set("Referer", Config["ok_base_url"])
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 

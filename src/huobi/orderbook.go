@@ -47,7 +47,7 @@ func (w *Huobi) getOrderBook(symbol string) (ret bool, hbOrderBook OrderBook) {
 
 	now := time.Now().UnixNano() / 1000000
 
-	req, err := http.NewRequest("GET", fmt.Sprintf(Config["trade_detail"], rnd, now, now), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf(Config["hb_trade_detail"], rnd, now, now), nil)
 	if err != nil {
 		logger.Fatal(err)
 		return
