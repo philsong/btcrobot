@@ -204,7 +204,7 @@ func parsePeroidArray(content string) (ret bool, records []Record) {
 	return
 }
 
-func (w *Okcoin) analyzePeroidLine(filename string, content string) bool {
+func (w *Okcoin) analyzePeroidLine(content string) bool {
 	//logger.Infoln(content)
 	//logger.Infoln(filename)
 	ret, records := parsePeroidArray(content)

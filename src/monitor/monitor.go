@@ -68,9 +68,6 @@ func RobotWorker() {
 		return
 	}
 
-	ticker := time.NewTicker(1 * time.Second) //2s
-	defer ticker.Stop()
-
 	var tradeAPI common.TradeAPI
 	tradeAPI = huobi.NewHuobi()
 	tradeAPI.Get_account_info()
@@ -86,6 +83,10 @@ func RobotWorker() {
 		logger.Fatalln("Please config the tradecenter firstly...")
 		return
 	}
+
+	ticker := time.NewTicker(1 * time.Second) //2s
+	defer ticker.Stop()
+
 	peroid, _ := strconv.Atoi(Option["tick_interval"])
 	totalHour, _ := strconv.ParseInt(Option["totalHour"], 0, 64)
 	if totalHour < 1 {

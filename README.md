@@ -103,7 +103,7 @@ https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%E
 
 	// windows 下执行
 	start.bat
-	// linux/mac 下执行
+	// linux/mac或者Git Bash 下执行
 	sh start
 
 一切顺利的话，btcrobot应该就启动了。
