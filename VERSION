@@ -65,4 +65,10 @@
                   support EMA+MACD(once),
                   support order book API
                   optimize code structure
+  Version 0.31
+  time 2014-04-13 support Open order strategy,
+                  support KDJ_EX(internal) strategy,
+                  optimize code
+
+
 */
