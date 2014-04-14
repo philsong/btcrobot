@@ -145,10 +145,10 @@ func TradeHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		if ret != "0" {
-			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "交易委托失败", `"}`)
+			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "交易委托成功", `"}`)
 			return
 		} else {
-			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "交易委托成功", `"}`)
+			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "交易委托失败", `"}`)
 			return
 		}
 	}

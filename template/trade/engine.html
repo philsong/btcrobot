@@ -54,8 +54,9 @@
                     <option value="EMAMACDEMA">EMA+多次MACD+EMA</option>
                     <option value="EMAMACD">EMA+单次MACD</option>
                     <option value="KDJ">KDJ</option>
-                    <option value="KDJ-EX">KDJ-EX(internal)</option>     
-                    <option value="OPENORDER">OPENORDER(盘口对冲)</option>                     
+                    <option value="KDJ-EX">KDJ-EX(自用)</option>     
+                    <option value="KDJ-XC">KDJ-XC(小菜策略)</option>    
+                    <option value="OPENORDER">OPENORDER(盘口对冲,高风险)</option>                     
                     <option value="RSI">RSI(TODO!)</option>
                     <option value="xxx">xxx(自定义策略)</option>
                 </select>
@@ -128,132 +129,78 @@
 {{define "js"}}
 
 <script type="text/javascript">
-function ShowHidden()
+
+function _showhide(strategy)
 {
-	var obj = document.getElementById("strategy");
-	
-	var buyThreshold = document.getElementById("buyThreshold"); 
-	var sellThreshold = document.getElementById("sellThreshold"); 
+  var buyThreshold = document.getElementById("buyThreshold"); 
+  var sellThreshold = document.getElementById("sellThreshold"); 
   var signalPeriod = document.getElementById("signalPeriod"); 
   var MACDbuyThreshold = document.getElementById("MACDbuyThreshold"); 
   var MACDsellThreshold = document.getElementById("MACDsellThreshold"); 
   var emaid = document.getElementById("ema"); 
   var kdjid = document.getElementById("kdj"); 
-	console.log(obj.value);
+  console.log(strategy);
 
-    if (obj.value == "KDJ" || obj.value == "KDJ-EX"){
-      emaid.style.display = "none";
-      kdjid.style.display = "block"
+  if (strategy == "KDJ" || strategy == "KDJ-EX" || strategy == "KDJ-XC"){
+    emaid.style.display = "none";
+    kdjid.style.display = "block"
   }else{
-     emaid.style.display = "block";
-      kdjid.style.display = "none"
+    emaid.style.display = "block";
+    kdjid.style.display = "none";
   }
-  
-	if (obj.value != "EMA")
-	{
-		console.log("dispay");
-		signalPeriod.style.display = "block";
+
+
+  if (strategy != "EMA") {
+    console.log("dispay");
+    signalPeriod.style.display = "block";
     MACDbuyThreshold.style.display = "block";
     MACDsellThreshold.style.display = "block";
-	}
-	else
-	{ 
-		console.log("dispay none");
-		signalPeriod.style.display = "none";
+  } else { 
+    console.log("dispay none");
+    signalPeriod.style.display = "none";
     MACDbuyThreshold.style.display = "none";
     MACDsellThreshold.style.display = "none";
-	}
-
-
-	if (obj.value == "MACD")
-	{
-		console.log("dispay none");
-		buyThreshold.style.display = "none";
-		sellThreshold.style.display = "none";
-
-	}
-	else
-	{ 
-		console.log("dispay block");
-		buyThreshold.style.display = "block";
-		sellThreshold.style.display = "block";
-	}
-
-  if (obj.value == "EMAMACD"){
-      MACDbuyThreshold.style.display = "none";
-      sellThreshold.style.display = "none";
   }
 
 
-  
+  if (strategy == "MACD") {
+    console.log("dispay none");
+    buyThreshold.style.display = "none";
+    sellThreshold.style.display = "none";
+  } else { 
+    console.log("dispay block");
+    buyThreshold.style.display = "block";
+    sellThreshold.style.display = "block";
+  }
+
+  if (strategy == "EMAMACD"){
+    MACDbuyThreshold.style.display = "none";
+    sellThreshold.style.display = "none";
+  }
+
+}
+
+function ShowHidden()
+{
+	var obj = document.getElementById("strategy");
+  var strategy = obj.value
+	_showhide(strategy)
 }
 
 $(function(){
     $.getJSON('/engineajax.json', function(data){
         if (data.tick_interval) {
           $('#tick_interval').val(data.tick_interval);
-        }
-        if (data.tick_interval) {
+
           $('#tradecenter').val(data.tradecenter);
-        }
-        if (data.tick_interval) {
+
           $('#symbol').val(data.symbol);
-        }
-        if (data.tick_interval) {
-          $('#strategy').val(data.strategy);
+ 
+          var strategy = data.strategy 
           
-          var buyThreshold = document.getElementById("buyThreshold"); 
-			    var sellThreshold = document.getElementById("sellThreshold");
-          var signalPeriod = document.getElementById("signalPeriod");  
-          var MACDbuyThreshold = document.getElementById("MACDbuyThreshold"); 
-          var MACDsellThreshold = document.getElementById("MACDsellThreshold"); 
-          var emaid = document.getElementById("ema"); 
-          var kdjid = document.getElementById("kdj"); 
-            if (data.strategy== "KDJ" || data.strategy== "KDJ-EX"){
-                emaid.style.display = "none";
-                kdjid.style.display = "block"
-            }else{
-                emaid.style.display = "block";
-                kdjid.style.display = "none"
-            }
-           if (data.strategy != "EMA")
-           {
-    				console.log("dispay");
-    				signalPeriod.style.display = "block";
-            MACDbuyThreshold.style.display = "block";
-            MACDsellThreshold.style.display = "block";
-           }
-           else
-           { 
-    				console.log("dispay none");
-    				signalPeriod.style.display = "none";
-            MACDbuyThreshold.style.display = "none";
-            MACDsellThreshold.style.display = "none";
-           }
-
-           if (data.strategy == "MACD")
-           {
-    				console.log("dispay none");
-    				buyThreshold.style.display = "none";
-    				sellThreshold.style.display = "none";
-           }
-           else
-           { 
-    				console.log("dispay block");
-    				buyThreshold.style.display = "block";
-    				sellThreshold.style.display = "block";
-           }
-
-          if (data.strategy== "EMAMACD"){
-              MACDbuyThreshold.style.display = "none";
-              sellThreshold.style.display = "none";
-          }
-
-          if (data.strategy== "KDJ" || data.strategy== "KDJ-EX"){
-            signalPeriod.style.display = "none";
-            MACDbuyThreshold.style.display = "none";
-            MACDsellThreshold.style.display = "none";
-          }
+          $('#strategy').val(strategy);
+         
+          _showhide(strategy)
         }
 
         console.log(data.disable_trading)
