@@ -50,7 +50,7 @@ func (oo *OOStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	const btcslap = 0.2
 	const ltcslap = 0.01
 	const timeout = 10
-	const ordercount = 1
+	const ordercount = 3
 
 	numTradeAmount, err := strconv.ParseFloat(Option["tradeAmount"], 64)
 	if err != nil {
@@ -104,9 +104,7 @@ func (oo *OOStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 		}
 
 		logger.Infoln(warning)
-	}
 
-	for i := 1; i <= ordercount; i++ {
 		warning := "oo, 卖出Sell Out---->限价单"
 		tradePrice := fmt.Sprintf("%f", orderbook.Asks[len(orderbook.Asks)-1].Price-flag)
 		sellID := tradeAPI.Sell(tradePrice, splitTradeAmount)
