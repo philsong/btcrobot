@@ -7,7 +7,7 @@
   USE AT YOUR OWN RISK!
 
   The author of this project is NOT responsible for any damage or loss caused
-  by this software. There can be bugs and the bot may not perform as expected
+  by this software. There can be bugs and the bot may not Tick as expected
   or specified. Please consider testing it first with paper trading /
   backtesting on historical data. Also look at the code to see what how
   it's working.
@@ -109,7 +109,7 @@ func (emamacdStrategy *EMAMACDStrategy) is_downcross(prevema, ema float64) bool 
 }
 
 //EMA strategy
-func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
+func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 	//read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
@@ -205,10 +205,10 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Rec
 					emamacdStrategy.PrevEMATrade = "buy"
 					emamacdStrategy.PrevMACDTrade = "init"
 					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
-					warning := "EMA up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
-						",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1]) + ",diff" + diff
+					warning := "EMA up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
+						",委托价" + getTradePrice("buy", Price[length-1]) + ",diff" + diff
 					logger.Infoln(warning)
-					if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
+					if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
 						emamacdStrategy.PrevBuyPirce = Price[length-1]
 						warning += "[委托成功]"
 					} else {
@@ -237,10 +237,10 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Rec
 				emamacdStrategy.PrevEMATrade = "sell"
 
 				histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
-				warning := "MACD down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
-					",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1]) + ",histogram" + histogram
+				warning := "MACD down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
+					",委托价" + getTradePrice("sell", Price[length-1]) + ",histogram" + histogram
 				logger.Infoln(warning)
-				if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
+				if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 					warning += "[委托成功]"
 				} else {
 					warning += "[委托失败]"
@@ -255,10 +255,10 @@ func (emamacdStrategy *EMAMACDStrategy) Perform(tradeAPI TradeAPI, records []Rec
 	if Price[length-1] < emamacdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["disable_trading"] != "1" && emamacdStrategy.PrevEMATrade != "sell" {
 
-			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) + ",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
+			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
 
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
+			if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"

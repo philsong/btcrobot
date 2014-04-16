@@ -7,7 +7,7 @@
   USE AT YOUR OWN RISK!
 
   The author of this project is NOT responsible for any damage or loss caused
-  by this software. There can be bugs and the bot may not perform as expected
+  by this software. There can be bugs and the bot may not Tick as expected
   or specified. Please consider testing it first with paper trading /
   backtesting on historical data. Also look at the code to see what how
   it's working.
@@ -130,7 +130,7 @@ func (emaStrategy *EMAStrategy) is_downcross(prevema, ema float64) bool {
 }
 
 //EMA strategy
-func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
+func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	//read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
@@ -217,11 +217,11 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, records []Record) boo
 					emaStrategy.PrevEMATrade = "buy"
 
 					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
-					warning := "EMA up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
-						",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1]) + ",diff" + diff
+					warning := "EMA up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
+						",委托价" + getTradePrice("buy", Price[length-1]) + ",diff" + diff
 					logger.Infoln(warning)
 
-					if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
+					if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
 						emaStrategy.PrevBuyPirce = Price[length-1]
 						warning += "[委托成功]"
 					} else {
@@ -243,11 +243,11 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, records []Record) boo
 					emaStrategy.PrevEMATrade = "sell"
 
 					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
-					warning := "EMA down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
-						",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1]) + ",diff" + diff
+					warning := "EMA down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
+						",委托价" + getTradePrice("sell", Price[length-1]) + ",diff" + diff
 
 					logger.Infoln(warning)
-					if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
+					if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 						warning += "[委托成功]"
 					} else {
 						warning += "[委托失败]"
@@ -269,9 +269,9 @@ func (emaStrategy *EMAStrategy) Perform(tradeAPI TradeAPI, records []Record) boo
 		if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrade != "sell" {
 			emaStrategy.PrevEMATrade = "sell"
 			emaStrategy.PrevBuyPirce = 0
-			warning := "stop loss, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) + ",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
+			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
+			if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"

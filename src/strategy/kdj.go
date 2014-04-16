@@ -7,7 +7,7 @@
   USE AT YOUR OWN RISK!
 
   The author of this project is NOT responsible for any damage or loss caused
-  by this software. There can be bugs and the bot may not perform as expected
+  by this software. There can be bugs and the bot may not Tick as expected
   or specified. Please consider testing it first with paper trading /
   backtesting on historical data. Also look at the code to see what how
   it's working.
@@ -37,7 +37,7 @@ func init() {
 }
 
 //xxx strategy
-func (kdjStrategy *KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
+func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 	//实现自己的策略
 
 	tradeAmount := Option["tradeAmount"]
@@ -78,10 +78,10 @@ func (kdjStrategy *KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) boo
 		logger.Infoln("KDJ up cross")
 		if (kdjStrategy.PrevKDJTrade == "init" && d[length-2] <= 30) || kdjStrategy.PrevKDJTrade == "sell" {
 			//do buy
-			warning := "KDJ up cross, 买入buy In<----市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
-				",委托价" + tradeAPI.GetTradePrice("buy", Price[length-1])
+			warning := "KDJ up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
+				",委托价" + getTradePrice("buy", Price[length-1])
 			logger.Infoln(warning)
-			if tradeAPI.Buy(tradeAPI.GetTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
+			if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
@@ -100,10 +100,10 @@ func (kdjStrategy *KDJStrategy) Perform(tradeAPI TradeAPI, records []Record) boo
 		logger.Infoln("KDJ down cross")
 		if (kdjStrategy.PrevKDJTrade == "init" && d[length-2] >= 70) || kdjStrategy.PrevKDJTrade == "buy" {
 			//do sell
-			warning := "KDJ down cross, 卖出Sell Out---->市价" + tradeAPI.GetTradePrice("", Price[length-1]) +
-				",委托价" + tradeAPI.GetTradePrice("sell", Price[length-1])
+			warning := "KDJ down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
+				",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
-			if tradeAPI.Sell(tradeAPI.GetTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
+			if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"

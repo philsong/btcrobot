@@ -177,9 +177,9 @@ type Account_info struct {
 	Loan_btc_display      string
 }
 
-func (w *HuobiTrade) Get_account_info() (account_info Account_info, ret bool) {
+func (w *HuobiTrade) GetAccountInfo() (account_info Account_info, ret bool) {
 	pParams := make(map[string]string)
-	pParams["method"] = "get_account_info"
+	pParams["method"] = "GetAccountInfo"
 	pParams["access_key"] = w.access_key
 	now := time.Now().Unix()
 	pParams["created"] = strconv.FormatInt(now, 10)

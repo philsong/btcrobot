@@ -2,59 +2,59 @@ package strategy
 
 import (
 	. "common"
+	. "config"
+	"fmt"
 	"logger"
+	"strconv"
 )
 
 // Strategy is the interface that must be implemented by a strategy driver.
 type Strategy interface {
-	Perform(tradeAPI TradeAPI, records []Record) bool
+	Tick(records []Record) bool
 }
 
 var strategys = make(map[string]Strategy)
+var gTradeAPI TradeAPI
 
 // Register makes a strategy available by the provided name.
 // If Register is called twice with the same name or if driver is nil,
 // it panics.
-func Register(strageteyName string, strategy Strategy) {
+func Register(strategyName string, strategy Strategy) {
 	if strategy == nil {
 		panic("sql: Register strategy is nil")
 	}
-	if _, dup := strategys[strageteyName]; dup {
-		panic("sql: Register called twice for strategy " + strageteyName)
+	if _, dup := strategys[strategyName]; dup {
+		panic("sql: Register called twice for strategy " + strategyName)
 	}
-	strategys[strageteyName] = strategy
+	strategys[strategyName] = strategy
 }
 
 //entry call
-func Perform(strageteyName string, tradeAPI TradeAPI, records []Record) bool {
-	strategy, ok := strategys[strageteyName]
+func Tick(tradeAPI TradeAPI, records []Record) bool {
+
+	strategyName := Option["strategy"]
+	strategy, ok := strategys[strategyName]
 	if !ok {
-		logger.Errorf("sql: unknown strategy %q (forgotten import?)", strageteyName)
+		logger.Errorf("sql: unknown strategy %q (forgotten import? private strategy?)", strategyName)
 		return false
 	}
 
+	length := len(records)
 	//
-	if len(records) == 0 {
+	if length == 0 {
 		logger.Errorln("warning:detect exception data", len(records))
 		return false
 	}
 
-	var Price []float64
-	var Volumn []float64
-	for _, v := range records {
-		Price = append(Price, v.Close)
-		Volumn = append(Volumn, v.Volumn)
-	}
-
-	length := len(Price)
-
 	//check exception data in trade center
 	if checkException(records[length-2], records[length-1]) == false {
-		logger.Errorln("detect exception data of trade center", Price[length-2], Price[length-1], Volumn[length-1])
+		logger.Errorln("detect exception data of trade center",
+			records[length-2].Close, records[length-1].Close, records[length-1].Volumn)
 		return false
 	}
 
-	return strategy.Perform(tradeAPI, records)
+	gTradeAPI = tradeAPI
+	return strategy.Tick(records)
 }
 
 //check exception data in trade center
@@ -68,4 +68,39 @@ func checkException(recordPrev, recordNow Record) bool {
 	}
 
 	return true
+}
+
+func getTradePrice(tradeDirection string, price float64) string {
+	slippage, err := strconv.ParseFloat(Option["slippage"], 64)
+	if err != nil {
+		logger.Debugln("config item slippage is not float")
+		slippage = 0
+	}
+
+	var finalTradePrice float64
+	if tradeDirection == "buy" {
+		finalTradePrice = price * (1 + slippage*0.001)
+	} else if tradeDirection == "sell" {
+		finalTradePrice = price * (1 - slippage*0.001)
+	} else {
+		finalTradePrice = price
+	}
+
+	return fmt.Sprintf("%0.02f", finalTradePrice)
+}
+
+func Buy(price, amount string) string {
+	return gTradeAPI.Buy(price, amount)
+}
+func Sell(price, amount string) string {
+	return gTradeAPI.Sell(price, amount)
+}
+func CancelOrder(order_id string) bool {
+	return gTradeAPI.CancelOrder(order_id)
+}
+func GetAccountInfo() (AccountInfo, bool) {
+	return gTradeAPI.GetAccountInfo()
+}
+func GetOrderBook() (ret bool, orderBook OrderBook) {
+	return gTradeAPI.GetOrderBook()
 }

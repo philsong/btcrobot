@@ -235,7 +235,7 @@ type UserInfo struct {
 	Info   Info
 }
 
-func (w *OkcoinTrade) Get_account_info() (userInfo UserInfo, ret bool) {
+func (w *OkcoinTrade) GetAccountInfo() (userInfo UserInfo, ret bool) {
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
 

@@ -69,6 +69,11 @@
   time 2014-04-13 support Open order strategy,
                   support KDJ_EX(internal) strategy,
                   optimize code
+  Version 0.32
+  time 2014-04-16 split K-line data and trade center,
+                  eg. trade okcoin BTC according  huobi BTC kline!
+                  trade huobi LTC according  okcoin LTC kline!
 
+                  optimze the code structure, to wirte strategy more simple now, just realize the "tick" function
 
 */

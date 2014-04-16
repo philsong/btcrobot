@@ -7,7 +7,7 @@
   USE AT YOUR OWN RISK!
 
   The author of this project is NOT responsible for any damage or loss caused
-  by this software. There can be bugs and the bot may not perform as expected
+  by this software. There can be bugs and the bot may not Tick as expected
   or specified. Please consider testing it first with paper trading /
   backtesting on historical data. Also look at the code to see what how
   it's working.
@@ -45,12 +45,12 @@ func init() {
 }
 
 //KDJ-EX strategy
-func (oo *OOStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
+func (oo *OOStrategy) Tick(records []Record) bool {
 
 	const btcslap = 0.2
 	const ltcslap = 0.01
 	const timeout = 10
-	const ordercount = 3
+	const ordercount = 1
 
 	numTradeAmount, err := strconv.ParseFloat(Option["tradeAmount"], 64)
 	if err != nil {
@@ -72,10 +72,39 @@ func (oo *OOStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 		//Price = append(Price, v.Low)
 	}
 
-	ret, orderbook := tradeAPI.GetOrderBook()
+	//K线为白，D线为黄，J线为红,K in middle
+	k, d, j := getKDJ(records)
+	length := len(records)
+	if oo.PrevTime != records[length-1].TimeStr ||
+		oo.PrevPrice != records[length-1].Close {
+		oo.PrevTime = records[length-1].TimeStr
+		oo.PrevPrice = records[length-1].Close
+
+		logger.Infoln(records[length-1].TimeStr, records[length-1].Close)
+		logger.Infof("d(黄线）%0.0f\tk(白线）%0.0f\tj(红线）%0.0f\n", d[length-2], k[length-2], j[length-2])
+		logger.Infof("d(黄线）%0.0f\tk(白线）%0.0f\tj(红线）%0.0f\n", d[length-1], k[length-1], j[length-1])
+	}
+
+	if ((j[length-2] < k[length-2] && k[length-2] < d[length-2]) || oo.PrevKDJTrade == "sell") &&
+		(j[length-1] > k[length-1] && k[length-1] > d[length-1]) {
+		logger.Infoln("KDJ up cross")
+		oo.PrevKDJTrade = "buy"
+	}
+
+	if ((j[length-2] > k[length-2] && k[length-2] > d[length-2]) || oo.PrevKDJTrade == "buy") &&
+		(j[length-1] < k[length-1] && k[length-1] < d[length-1]) {
+		logger.Infoln("KDJ down cross")
+		oo.PrevKDJTrade = "sell"
+	}
+
+	if oo.PrevKDJTrade == "sell" {
+		return false
+	}
+
+	ret, orderbook := GetOrderBook()
 	if !ret {
 		logger.Infoln("get orderbook failed 1")
-		ret, orderbook = tradeAPI.GetOrderBook() //try again
+		ret, orderbook = GetOrderBook() //try again
 		if !ret {
 			logger.Infoln("get orderbook failed 2")
 			return false
@@ -95,7 +124,7 @@ func (oo *OOStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 	for i := 1; i <= ordercount; i++ {
 		warning := "oo, 买入buy In<----限价单"
 		tradePrice := fmt.Sprintf("%f", orderbook.Bids[0].Price+flag)
-		buyID := tradeAPI.Buy(tradePrice, splitTradeAmount)
+		buyID := Buy(tradePrice, splitTradeAmount)
 		if buyID != "0" {
 			warning += "[委托成功]"
 			oo.BuyId = append(oo.BuyId, buyID)
@@ -107,7 +136,7 @@ func (oo *OOStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 
 		warning = "oo, 卖出Sell Out---->限价单"
 		tradePrice = fmt.Sprintf("%f", orderbook.Asks[len(orderbook.Asks)-1].Price-flag)
-		sellID := tradeAPI.Sell(tradePrice, splitTradeAmount)
+		sellID := Sell(tradePrice, splitTradeAmount)
 		if sellID != "0" {
 			warning += "[委托成功]"
 			oo.SellId = append(oo.SellId, sellID)
@@ -131,7 +160,7 @@ func (oo *OOStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 		//todo-
 		for _, BuyId := range oo.BuyId {
 			warning := "<--------------buy order timeout, cancel-------------->" + BuyId
-			if tradeAPI.CancelOrder(BuyId) {
+			if CancelOrder(BuyId) {
 				warning += "[Cancel委托成功]"
 			} else {
 				warning += "[Cancel委托失败]"
@@ -147,7 +176,7 @@ func (oo *OOStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 		//todo
 		for _, SellId := range oo.SellId {
 			warning := "<--------------sell order timeout, cancel------------->" + SellId
-			if tradeAPI.CancelOrder(SellId) {
+			if CancelOrder(SellId) {
 				warning += "[Cancel委托成功]"
 			} else {
 				warning += "[Cancel委托失败]"

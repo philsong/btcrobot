@@ -18,12 +18,13 @@
 package monitor
 
 import (
-	"common"
+	. "common"
 	. "config"
 	"fmt"
 	"huobi"
 	"logger"
 	"okcoin"
+	"strategy"
 	"strconv"
 	"time"
 )
@@ -48,39 +49,47 @@ func backtesting() {
 }
 */
 
-func RobotWorker() {
-	fmt.Println("env", Config["env"])
-	if DebugEnv || Config["env"] == "dev" {
-		fmt.Println("test working...")
+func marketAPI() (marketAPI MarketAPI) {
+	if Option["datacenter"] == "huobi" {
+		marketAPI = huobi.NewHuobi()
+	} else if Option["datacenter"] == "okcoin" {
+		marketAPI = okcoin.NewOkcoin()
+	} else {
+		logger.Fatalln("Please config the datacenter firstly...")
 
-		var tradeAPI common.TradeAPI
-		tradeAPI = okcoin.NewOkcoin()
-		tradeAPI.Get_account_info()
-		tradeAPI.GetOrderBook()
-
-		tradeAPI = huobi.NewHuobi()
-		tradeAPI.Get_account_info()
-		ret, orderbook := tradeAPI.GetOrderBook()
-		fmt.Println(ret, orderbook)
-
-		//testHuobiAPI()
-		//testOkcoinLTCAPI()
-		return
 	}
+	return
+}
 
-	var tradeAPI common.TradeAPI
-	tradeAPI = huobi.NewHuobi()
-	tradeAPI.Get_account_info()
-
-	tradeAPI = okcoin.NewOkcoin()
-	tradeAPI.Get_account_info()
-
+func tradeAPI() (tradeAPI TradeAPI) {
 	if Option["tradecenter"] == "huobi" {
 		tradeAPI = huobi.NewHuobi()
 	} else if Option["tradecenter"] == "okcoin" {
 		tradeAPI = okcoin.NewOkcoin()
 	} else {
 		logger.Fatalln("Please config the tradecenter firstly...")
+
+	}
+	return
+}
+
+func RobotWorker() {
+	fmt.Println("env", Config["env"])
+	if DebugEnv || Config["env"] == "dev" {
+		fmt.Println("test working...")
+
+		var tradeAPI TradeAPI
+		tradeAPI = okcoin.NewOkcoin()
+		tradeAPI.GetAccountInfo()
+		tradeAPI.GetOrderBook()
+
+		tradeAPI = huobi.NewHuobi()
+		tradeAPI.GetAccountInfo()
+		ret, orderbook := tradeAPI.GetOrderBook()
+		fmt.Println(ret, orderbook)
+
+		//testHuobiAPI()
+		//testOkcoinLTCAPI()
 		return
 	}
 
@@ -97,7 +106,10 @@ func RobotWorker() {
 
 	go func() {
 		for _ = range ticker.C {
-			tradeAPI.AnalyzeKLine(peroid)
+			ret, records := marketAPI().GetKLine(peroid)
+			if ret != false {
+				strategy.Tick(tradeAPI(), records)
+			}
 		}
 	}()
 
@@ -167,10 +179,10 @@ func RunRobot() {
 
 func testHuobiAPI() {
 	tradeAPI := huobi.NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
-	accout_info, _ := tradeAPI.Get_account_info()
+	accout_info, _ := tradeAPI.GetAccountInfo()
 	fmt.Println(accout_info)
 
-	//	fmt.Println(tradeAPI.Get_account_info())
+	//	fmt.Println(tradeAPI.GetAccountInfo())
 	if false {
 		buyId := tradeAPI.BuyBTC("1000", "0.001")
 		sellId := tradeAPI.SellBTC("10000", "0.001")
@@ -194,7 +206,7 @@ func testHuobiAPI() {
 
 func testOkcoinBTCAPI() {
 	tradeAPI := okcoin.NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
-	accout_info, _ := tradeAPI.Get_account_info()
+	accout_info, _ := tradeAPI.GetAccountInfo()
 	fmt.Println(accout_info)
 
 	buyret := tradeAPI.BuyBTC("1000", "0.01")

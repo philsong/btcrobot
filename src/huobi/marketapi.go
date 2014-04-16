@@ -29,9 +29,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"strategy"
 	"strconv"
-	"strings"
 	"util"
 )
 
@@ -49,20 +47,21 @@ import (
 	logger.Traceln(txcode[m.Code])
 */
 
-func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
+func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, records []Record) {
+	ret = false
 	var huobisymbol string
 	if symbol == "btc_cny" {
 		huobisymbol = "huobibtccny"
 	} else {
 		huobisymbol = "huobiltccny"
 		logger.Fatal("huobi does not support LTC by now, wait for huobi provide it.", huobisymbol)
-		return false
+		return
 	}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf(Config["hb_kline_url"], peroid, rand.Float64()), nil)
 	if err != nil {
 		logger.Fatal(err)
-		return false
+		return
 	}
 
 	req.Header.Set("Referer", Config["hb_base_url"])
@@ -78,115 +77,39 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 	logger.Tracef("HTTP req end AnalyzeKLinePeroid")
 	if err != nil {
 		logger.Traceln(err)
-		return false
+		return
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode == 200 {
-		var body string
+	if resp.StatusCode != 200 {
 
-		contentEncoding := resp.Header.Get("Content-Encoding")
-		logger.Tracef("HTTP returned Content-Encoding %s", contentEncoding)
-		switch contentEncoding {
-		case "gzip":
-			body = util.DumpGZIP(resp.Body)
-
-		default:
-			bodyByte, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				logger.Errorln("read the http stream failed")
-				return false
-			} else {
-				body = string(bodyByte)
-
-				ioutil.WriteFile(fmt.Sprintf("cache/hbKLine_%03d.data", peroid), bodyByte, 0644)
-			}
-		}
-
-		logger.Traceln(resp.Header.Get("Content-Type"))
-
-		ret := strings.Contains(body, "您需要登录才能继续")
-		if ret {
-			logger.Traceln("您需要登录才能继续")
-			return false
-		} else {
-			return w.analyzePeroidLine(fmt.Sprintf("cache/hbKLine_%03d.data", peroid), body)
-		}
-
-	} else {
 		logger.Tracef("HTTP returned status %v", resp)
+		return
 	}
+	var body string
 
-	return false
-}
+	contentEncoding := resp.Header.Get("Content-Encoding")
+	logger.Tracef("HTTP returned Content-Encoding %s", contentEncoding)
+	logger.Traceln(resp.Header.Get("Content-Type"))
+	switch contentEncoding {
+	case "gzip":
+		body = util.DumpGZIP(resp.Body)
 
-func (w *Huobi) analyzePeroidLine(filename string, content string) bool {
-	//logger.Infoln(content)
-	//logger.Infoln(filename)
-	ret, records := parsePeroidCSV(filename)
-	if ret == false {
-		logger.Errorln("Huobi parsePeroidCSV failed....")
-		return false
-	}
-
-	strategyName := Option["strategy"]
-	strategy.Perform(strategyName, *w, records)
-
-	return true
-}
-
-// reads a whole file into memory and returns a slice of its lines.
-func readLines(path string) ([]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	var lines []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
-}
-
-// writes the lines to the given file.
-func writeLines(lines []string, path string, skipline int) error {
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	w := bufio.NewWriter(file)
-	for i, line := range lines {
-		if i < skipline {
-			continue
+	default:
+		bodyByte, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			logger.Errorln("read the http stream failed")
+			return
+		} else {
+			body = string(bodyByte)
 		}
-
-		fmt.Fprintln(w, line)
 	}
-	return w.Flush()
+
+	ioutil.WriteFile(fmt.Sprintf("cache/hbKLine_%03d.data", peroid), []byte(body), 0644)
+
+	return analyzePeroidLine(fmt.Sprintf("cache/hbKLine_%03d.data", peroid))
 }
 
-// convert to standard csv file
-func data2csv(filename string, skipline int) {
-	lines, err := readLines(filename)
-	if err != nil {
-		logger.Fatalf("readLines: %s", err)
-	}
-	/*
-		for i, line := range lines {
-			fmt.Println(i, line)
-		}
-	*/
-
-	if err := writeLines(lines, filename+".csv", skipline); err != nil {
-		logger.Fatalf("writeLines: %s", err)
-	}
-}
-
-func parsePeroidCSV(filename string) (ret bool, records []Record) {
+func analyzePeroidLine(filename string) (ret bool, records []Record) {
 	// convert to standard csv file
 	data2csv(filename, 2)
 
@@ -251,4 +174,56 @@ func parsePeroidCSV(filename string) (ret bool, records []Record) {
 
 	ret = true
 	return
+}
+
+// convert to standard csv file
+func data2csv(filename string, skipline int) {
+	lines, err := readLines(filename)
+	if err != nil {
+		logger.Fatalf("readLines: %s", err)
+	}
+	/*
+		for i, line := range lines {
+			fmt.Println(i, line)
+		}
+	*/
+
+	if err := writeLines(lines, filename+".csv", skipline); err != nil {
+		logger.Fatalf("writeLines: %s", err)
+	}
+}
+
+// reads a whole file into memory and returns a slice of its lines.
+func readLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
+}
+
+// writes the lines to the given file.
+func writeLines(lines []string, path string, skipline int) error {
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	w := bufio.NewWriter(file)
+	for i, line := range lines {
+		if i < skipline {
+			continue
+		}
+
+		fmt.Fprintln(w, line)
+	}
+	return w.Flush()
 }

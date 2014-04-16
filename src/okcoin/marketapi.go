@@ -25,7 +25,6 @@ import (
 	"io/ioutil"
 	"logger"
 	"net/http"
-	"strategy"
 	"strconv"
 	"strings"
 	"time"
@@ -59,7 +58,7 @@ import (
 	/for ltc
 	https://www.okcoin.com/klineData.do?type=3&marketFrom=3
 */
-func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
+func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, records []Record) {
 	var oksymbol string
 	if symbol == "btc_cny" {
 		oksymbol = "okcoinbtccny"
@@ -67,12 +66,13 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 		oksymbol = "okcoinltccny"
 	}
 
+	ret = false
 	now := time.Now().UnixNano() / 1000000
 
 	req, err := http.NewRequest("GET", fmt.Sprintf(Config["ok_kline_url"], 60*peroid, oksymbol, now), nil)
 	if err != nil {
 		logger.Fatal(err)
-		return false
+		return
 	}
 
 	req.Header.Set("Referer", Config["ok_base_url"])
@@ -82,48 +82,48 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool) {
 	logger.Traceln(req)
 
 	c := util.NewTimeoutClient()
-	logger.Tracef("HTTP req begin AnalyzeKLinePeroid")
+	logger.Tracef("okHTTP req begin")
 	resp, err := c.Do(req)
-	logger.Tracef("HTTP req end AnalyzeKLinePeroid")
+	logger.Tracef("okHTTP req end")
 	if err != nil {
 		logger.Traceln(err)
-		return false
+		return
 	}
 
 	defer resp.Body.Close()
-	if resp.StatusCode == 200 {
-		var body string
-
-		contentEncoding := resp.Header.Get("Content-Encoding")
-		logger.Tracef("HTTP returned Content-Encoding %s", contentEncoding)
-		switch contentEncoding {
-		case "gzip":
-			body = util.DumpGZIP(resp.Body)
-
-		default:
-			bodyByte, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				logger.Errorln("read the http stream failed")
-				return false
-			} else {
-				body = string(bodyByte)
-
-				ioutil.WriteFile(fmt.Sprintf("cache/okTradeKLine_%03d.data", peroid), bodyByte, 0644)
-			}
-		}
-
-		logger.Traceln(resp.Header.Get("Content-Type"))
-
-		return w.analyzePeroidLine(fmt.Sprintf("cache/okTradeKLine_%03d.data", peroid), body)
-	} else {
+	if resp.StatusCode != 200 {
 		logger.Tracef("HTTP returned status %v", resp)
+		return
 	}
 
-	return false
+	var body string
+	contentEncoding := resp.Header.Get("Content-Encoding")
+
+	logger.Tracef("HTTP returned Content-Encoding %s", contentEncoding)
+	logger.Traceln(resp.Header.Get("Content-Type"))
+
+	switch contentEncoding {
+	case "gzip":
+		body = util.DumpGZIP(resp.Body)
+
+	default:
+		bodyByte, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			logger.Errorln("read the http stream failed")
+			return
+		} else {
+			body = string(bodyByte)
+
+			ioutil.WriteFile(fmt.Sprintf("cache/okTradeKLine_%03d.data", peroid), bodyByte, 0644)
+		}
+	}
+
+	return
+	return analyzePeroidLine(body)
 }
 
-func parsePeroidArray(content string) (ret bool, records []Record) {
-	logger.Traceln("Okcoin parsePeroidArray begin....")
+func analyzePeroidLine(content string) (ret bool, records []Record) {
+	logger.Traceln("Okcoin analyzePeroidLine begin....")
 	content = strings.TrimPrefix(content, "[[")
 	content = strings.TrimSuffix(content, "]]")
 
@@ -202,19 +202,4 @@ func parsePeroidArray(content string) (ret bool, records []Record) {
 	logger.Traceln("Okcoin parsePeroidArray end....")
 	ret = true
 	return
-}
-
-func (w *Okcoin) analyzePeroidLine(filename, content string) bool {
-	//logger.Infoln(content)
-	//logger.Infoln(filename)
-	ret, records := parsePeroidArray(content)
-	if ret == false {
-		logger.Errorln("Okcoin parsePeroidArray failed....")
-		return false
-	}
-
-	strategyName := Option["strategy"]
-	strategy.Perform(strategyName, *w, records)
-
-	return true
 }
