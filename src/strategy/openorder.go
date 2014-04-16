@@ -105,8 +105,8 @@ func (oo *OOStrategy) Perform(tradeAPI TradeAPI, records []Record) bool {
 
 		logger.Infoln(warning)
 
-		warning := "oo, 卖出Sell Out---->限价单"
-		tradePrice := fmt.Sprintf("%f", orderbook.Asks[len(orderbook.Asks)-1].Price-flag)
+		warning = "oo, 卖出Sell Out---->限价单"
+		tradePrice = fmt.Sprintf("%f", orderbook.Asks[len(orderbook.Asks)-1].Price-flag)
 		sellID := tradeAPI.Sell(tradePrice, splitTradeAmount)
 		if sellID != "0" {
 			warning += "[委托成功]"
