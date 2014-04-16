@@ -26,12 +26,22 @@
           </div>
 
           <div class="control-group string optional">
-            <label class="string optional control-label" for="tradecenter"><abbr title="required">*</abbr>交易中心</label>
+            <label class="string optional control-label" for="datacenter"><abbr title="required">*</abbr>市场数据源</label>
+            <div class="controls">
+                <select name="datacenter" id="datacenter" class="select-1" >
+                    <option value="huobi">huobi</option>
+                    <option value="okcoin">okcoin</option>
+                </select>(改这个要重启控制台)
+            </div>
+          </div>
+
+          <div class="control-group string optional">
+            <label class="string optional control-label" for="tradecenter"><abbr title="required">*</abbr>交易所</label>
             <div class="controls">
                 <select name="tradecenter" id="tradecenter" class="select-1" >
                     <option value="huobi">huobi</option>
                     <option value="okcoin">okcoin</option>
-                </select>(改这个要重启控制台)
+                </select>
             </div>
           </div>
 
@@ -191,6 +201,8 @@ $(function(){
     $.getJSON('/engineajax.json', function(data){
         if (data.tick_interval) {
           $('#tick_interval').val(data.tick_interval);
+
+          $('#datacenter').val(data.datacenter);
 
           $('#tradecenter').val(data.tradecenter);
 

@@ -208,6 +208,7 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		config.Option["tick_interval"] = req.FormValue("tick_interval")
+		config.Option["datacenter"] = req.FormValue("datacenter")
 		config.Option["tradecenter"] = req.FormValue("tradecenter")
 		config.Option["symbol"] = req.FormValue("symbol")
 		config.Option["strategy"] = req.FormValue("strategy")
