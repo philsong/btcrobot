@@ -118,7 +118,6 @@ func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, record
 		}
 	}
 
-	return
 	return analyzePeroidLine(body)
 }
 

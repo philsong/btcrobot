@@ -31,7 +31,7 @@
                 <select name="datacenter" id="datacenter" class="select-1" >
                     <option value="huobi">huobi</option>
                     <option value="okcoin">okcoin</option>
-                </select>(改这个要重启控制台)
+                </select>
             </div>
           </div>
 
@@ -84,7 +84,7 @@
                     <option value="15">15 分钟</option>
                     <option value="5">5 分钟</option>
                     <option value="1">1 分钟</option>
-                </select>(改这个要重启控制台)
+                </select>
             </div>
             
           </div>
@@ -123,7 +123,7 @@
             <div class="control-group string optional" style="display: none" id="MACDsellThreshold"><label class="string optional control-label" for="MACDsellThreshold"><abbr title="required">*</abbr>卖出Histogram阀值</label><div class="controls"><input class="string optional span1" id="MACDsellThreshold" name="MACDsellThreshold" size="50" type="text" value="{{.config.MACDsellThreshold}}">(即使MACD死叉，直到MACD Histogram小于卖出Histogram阀值才进行卖出)</div></div>
           </div>
 
-          <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>运行时长</label><div class="controls"><input class="string optional span1" id="totalHour" name="totalHour" size="50" type="text" value="{{.config.totalHour}}">小时</div></div>
+          <div class="control-group string optional"><label class="string optional control-label" for="tradeAmount"><abbr title="required">*</abbr>运行时长</label><div class="controls"><input class="string optional span1" id="totalHour" name="totalHour" size="50" type="text" value="{{.config.totalHour}}">小时  (修改此项要重启控制台)</div></div>
 
           <div class="form-actions">
               <input class="btn btn-primary" data-disable-with="正在保存" name="commit" type="submit" value="提交"/>

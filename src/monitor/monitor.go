@@ -96,7 +96,6 @@ func RobotWorker() {
 	ticker := time.NewTicker(1 * time.Second) //2s
 	defer ticker.Stop()
 
-	peroid, _ := strconv.Atoi(Option["tick_interval"])
 	totalHour, _ := strconv.ParseInt(Option["totalHour"], 0, 64)
 	if totalHour < 1 {
 		totalHour = 1
@@ -106,6 +105,7 @@ func RobotWorker() {
 
 	go func() {
 		for _ = range ticker.C {
+			peroid, _ := strconv.Atoi(Option["tick_interval"])
 			ret, records := marketAPI().GetKLine(peroid)
 			if ret != false {
 				strategy.Tick(tradeAPI(), records)
