@@ -43,9 +43,22 @@ func (w Okcoin) GetOrderBook() (ret bool, orderBook OrderBook) {
 	return w.getOrderBook(symbol)
 }
 
-func (w Okcoin) GetOpenOrder() (ret bool, orderBook OrderBook) {
+func (w Okcoin) GetOrder(order_id string) (ret bool, order Order) {
 	symbol := Option["symbol"]
-	return w.getOrderBook(symbol)
+	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+
+	ret, ok_orderTable := tradeAPI.Get_order(symbol, order_id)
+	if ret == false {
+		return
+	}
+
+	order.Id = ok_orderTable.Orders[0].Orders_id
+
+	order.Amount = ok_orderTable.Orders[0].Amount
+
+	order.Deal_amount = ok_orderTable.Orders[0].Deal_amount
+
+	return
 }
 
 func (w Okcoin) GetKLine(peroid int) (ret bool, records []Record) {
@@ -53,33 +66,33 @@ func (w Okcoin) GetKLine(peroid int) (ret bool, records []Record) {
 	return w.AnalyzeKLinePeroid(symbol, peroid)
 }
 
-func (w Okcoin) GetAccountInfo() (AccountInfo AccountInfo, ret bool) {
+func (w Okcoin) GetAccount() (account Account, ret bool) {
 	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 
-	userInfo, ret := tradeAPI.GetAccountInfo()
+	userInfo, ret := tradeAPI.GetAccount()
 
 	if !ret {
-		logger.Traceln("okcoin GetAccountInfo failed")
+		logger.Traceln("okcoin GetAccount failed")
 		return
 	} else {
 		logger.Traceln(userInfo)
 
-		AccountInfo.Available_cny = userInfo.Info.Funds.Free.CNY
-		AccountInfo.Available_btc = userInfo.Info.Funds.Free.BTC
-		AccountInfo.Available_ltc = userInfo.Info.Funds.Free.LTC
+		account.Available_cny = userInfo.Info.Funds.Free.CNY
+		account.Available_btc = userInfo.Info.Funds.Free.BTC
+		account.Available_ltc = userInfo.Info.Funds.Free.LTC
 
-		AccountInfo.Frozen_cny = userInfo.Info.Funds.Freezed.CNY
-		AccountInfo.Frozen_btc = userInfo.Info.Funds.Freezed.BTC
-		AccountInfo.Frozen_ltc = userInfo.Info.Funds.Freezed.LTC
+		account.Frozen_cny = userInfo.Info.Funds.Freezed.CNY
+		account.Frozen_btc = userInfo.Info.Funds.Freezed.BTC
+		account.Frozen_ltc = userInfo.Info.Funds.Freezed.LTC
 
 		logger.Infof("okcoin资产: \n 可用cny:%-10s \tbtc:%-10s \tltc:%-10s \n 冻结cny:%-10s \tbtc:%-10s \tltc:%-10s\n",
-			AccountInfo.Available_cny,
-			AccountInfo.Available_btc,
-			AccountInfo.Available_ltc,
-			AccountInfo.Frozen_cny,
-			AccountInfo.Frozen_btc,
-			AccountInfo.Frozen_ltc)
-		//logger.Infoln(AccountInfo)
+			account.Available_cny,
+			account.Available_btc,
+			account.Available_ltc,
+			account.Frozen_cny,
+			account.Frozen_btc,
+			account.Frozen_ltc)
+		//logger.Infoln(Account)
 		return
 	}
 }
@@ -121,10 +134,10 @@ func (w Okcoin) Sell(tradePrice, tradeAmount string) (sellId string) {
 	}
 
 	time.Sleep(3 * time.Second)
-	_, ret := w.GetAccountInfo()
+	_, ret := w.GetAccount()
 
 	if !ret {
-		logger.Infoln("GetAccountInfo failed")
+		logger.Infoln("GetAccount failed")
 	}
 
 	return sellId

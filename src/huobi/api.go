@@ -49,36 +49,66 @@ func (w Huobi) GetOrderBook() (ret bool, orderBook OrderBook) {
 	return w.getOrderBook(symbol)
 }
 
+func (w Huobi) GetOrder(order_id string) (ret bool, order Order) {
+	return
+	/*
+		symbol := Option["symbol"]
+		tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
+
+		ret, hbOrder := tradeAPI.Get_order(order_id)
+		if ret == false {
+			return
+		}
+
+		m.Orders_id = hbOrder.Id
+
+		m.Orders.Amount, err = strconv.ParseFloat(hbOrder.order_amount, 64)
+		if err != nil {
+			logger.Errorln("config item stoploss is not float")
+			return false
+		}
+
+		m.Orders.Deal_amount, err = strconv.ParseFloat(hbOrder.processed_amount, 64)
+		if err != nil {
+			logger.Errorln("config item stoploss is not float")
+			return false
+		}
+
+
+	*/
+	//return tradeAPI.Get_order(symbol, order_id)
+}
+
 func (w Huobi) GetKLine(peroid int) (ret bool, records []Record) {
 	symbol := Option["symbol"]
 	return w.AnalyzeKLinePeroid(symbol, peroid)
 }
 
-func (w Huobi) GetAccountInfo() (AccountInfo AccountInfo, ret bool) {
+func (w Huobi) GetAccount() (account Account, ret bool) {
 	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
 
-	userInfo, ret := tradeAPI.GetAccountInfo()
+	userInfo, ret := tradeAPI.GetAccount()
 
 	if !ret {
-		logger.Traceln("Huobi GetAccountInfo failed")
+		logger.Traceln("Huobi GetAccount failed")
 
 		return
 	} else {
-		AccountInfo.Available_cny = userInfo.Available_cny_display
-		AccountInfo.Available_btc = userInfo.Available_btc_display
-		AccountInfo.Available_ltc = "N/A"
+		account.Available_cny = userInfo.Available_cny_display
+		account.Available_btc = userInfo.Available_btc_display
+		account.Available_ltc = "N/A"
 
-		AccountInfo.Frozen_cny = userInfo.Frozen_cny_display
-		AccountInfo.Frozen_btc = userInfo.Frozen_btc_display
-		AccountInfo.Frozen_ltc = "N/A"
+		account.Frozen_cny = userInfo.Frozen_cny_display
+		account.Frozen_btc = userInfo.Frozen_btc_display
+		account.Frozen_ltc = "N/A"
 
 		logger.Infof("Huobi资产: \n 可用cny:%-10s \tbtc:%-10s \tltc:%-10s \n 冻结cny:%-10s \tbtc:%-10s \tltc:%-10s\n",
-			AccountInfo.Available_cny,
-			AccountInfo.Available_btc,
-			AccountInfo.Available_ltc,
-			AccountInfo.Frozen_cny,
-			AccountInfo.Frozen_btc,
-			AccountInfo.Frozen_ltc)
+			account.Available_cny,
+			account.Available_btc,
+			account.Available_ltc,
+			account.Frozen_cny,
+			account.Frozen_btc,
+			account.Frozen_ltc)
 		return
 	}
 }
@@ -99,9 +129,9 @@ func (w Huobi) Buy(tradePrice, tradeAmount string) (buyId string) {
 	}
 
 	time.Sleep(3 * time.Second)
-	_, ret := w.GetAccountInfo()
+	_, ret := w.GetAccount()
 	if !ret {
-		logger.Infoln("GetAccountInfo failed")
+		logger.Infoln("GetAccount failed")
 	}
 
 	return buyId
@@ -123,9 +153,9 @@ func (w Huobi) Sell(tradePrice, tradeAmount string) (sellId string) {
 	}
 
 	time.Sleep(3 * time.Second)
-	_, ret := w.GetAccountInfo()
+	_, ret := w.GetAccount()
 	if !ret {
-		logger.Infoln("GetAccountInfo failed")
+		logger.Infoln("GetAccount failed")
 	}
 
 	return sellId

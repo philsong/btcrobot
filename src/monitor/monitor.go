@@ -80,11 +80,11 @@ func RobotWorker() {
 
 		var tradeAPI TradeAPI
 		tradeAPI = okcoin.NewOkcoin()
-		tradeAPI.GetAccountInfo()
+		tradeAPI.GetAccount()
 		tradeAPI.GetOrderBook()
 
 		tradeAPI = huobi.NewHuobi()
-		tradeAPI.GetAccountInfo()
+		tradeAPI.GetAccount()
 		ret, orderbook := tradeAPI.GetOrderBook()
 		fmt.Println(ret, orderbook)
 
@@ -179,10 +179,10 @@ func RunRobot() {
 
 func testHuobiAPI() {
 	tradeAPI := huobi.NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
-	accout_info, _ := tradeAPI.GetAccountInfo()
+	accout_info, _ := tradeAPI.GetAccount()
 	fmt.Println(accout_info)
 
-	//	fmt.Println(tradeAPI.GetAccountInfo())
+	//	fmt.Println(tradeAPI.GetAccount())
 	if false {
 		buyId := tradeAPI.BuyBTC("1000", "0.001")
 		sellId := tradeAPI.SellBTC("10000", "0.001")
@@ -206,7 +206,7 @@ func testHuobiAPI() {
 
 func testOkcoinBTCAPI() {
 	tradeAPI := okcoin.NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
-	accout_info, _ := tradeAPI.GetAccountInfo()
+	accout_info, _ := tradeAPI.GetAccount()
 	fmt.Println(accout_info)
 
 	buyret := tradeAPI.BuyBTC("1000", "0.01")
@@ -214,13 +214,13 @@ func testOkcoinBTCAPI() {
 	sellret := tradeAPI.SellBTC("10000", "0.01")
 	fmt.Println(sellret)
 
-	var orderTable okcoin.OrderTable
-	orderTable, ret := tradeAPI.Get_BTCorder("-1")
+	var orderTable okcoin.OKOrderTable
+	ret, orderTable := tradeAPI.Get_BTCorder("-1")
 	fmt.Println(ret, orderTable)
 
 	time.Sleep(2000 * time.Millisecond)
 
-	orderTable, ret = tradeAPI.Get_LTCorder("-1")
+	ret, orderTable = tradeAPI.Get_LTCorder("-1")
 	fmt.Println(ret, orderTable)
 
 	ret = tradeAPI.Cancel_BTCorder("-1")

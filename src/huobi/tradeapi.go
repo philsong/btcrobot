@@ -133,7 +133,7 @@ type ErrorMsg struct {
 	Time int
 }
 
-type Order struct {
+type HBOrder struct {
 	Id               int
 	Type             int
 	order_price      string
@@ -177,9 +177,9 @@ type Account_info struct {
 	Loan_btc_display      string
 }
 
-func (w *HuobiTrade) GetAccountInfo() (account_info Account_info, ret bool) {
+func (w *HuobiTrade) GetAccount() (account_info Account_info, ret bool) {
 	pParams := make(map[string]string)
-	pParams["method"] = "GetAccountInfo"
+	pParams["method"] = "GetAccount"
 	pParams["access_key"] = w.access_key
 	now := time.Now().Unix()
 	pParams["created"] = strconv.FormatInt(now, 10)
@@ -211,7 +211,7 @@ func (w *HuobiTrade) GetAccountInfo() (account_info Account_info, ret bool) {
 	return
 }
 
-func (w *HuobiTrade) Get_orders() (m []Order, ret bool) {
+func (w *HuobiTrade) Get_orders() (ret bool, m []HBOrder) {
 	pParams := make(map[string]string)
 	pParams["method"] = "get_orders"
 	pParams["access_key"] = w.access_key
@@ -245,7 +245,7 @@ func (w *HuobiTrade) Get_orders() (m []Order, ret bool) {
 	return
 }
 
-func (w *HuobiTrade) Get_order_info(id string) (string, error) {
+func (w *HuobiTrade) Get_order(id string) (string, error) {
 	pParams := make(map[string]string)
 	pParams["method"] = "order_info"
 	pParams["access_key"] = w.access_key

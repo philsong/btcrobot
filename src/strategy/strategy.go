@@ -98,9 +98,13 @@ func Sell(price, amount string) string {
 func CancelOrder(order_id string) bool {
 	return gTradeAPI.CancelOrder(order_id)
 }
-func GetAccountInfo() (AccountInfo, bool) {
-	return gTradeAPI.GetAccountInfo()
+func GetAccount() (Account, bool) {
+	return gTradeAPI.GetAccount()
 }
 func GetOrderBook() (ret bool, orderBook OrderBook) {
 	return gTradeAPI.GetOrderBook()
+}
+
+func GetOrder(order_id string) (ret bool, order Order) {
+	return gTradeAPI.GetOrder(order_id)
 }

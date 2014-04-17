@@ -2,7 +2,7 @@ package common
 
 //trade interface type and method
 
-type AccountInfo struct {
+type Account struct {
 	Available_cny string
 	Available_btc string
 	Available_ltc string
@@ -32,6 +32,12 @@ type OrderBook struct {
 	Bids [10]_MarketOrder //buy
 }
 
+type Order struct {
+	Id          int
+	Amount      float64
+	Deal_amount float64
+}
+
 type MarketAPI interface {
 	GetKLine(peroid int) (ret bool, records []Record)
 }
@@ -39,7 +45,8 @@ type MarketAPI interface {
 type TradeAPI interface {
 	Buy(price, amount string) string
 	Sell(price, amount string) string
+	GetOrder(order_id string) (ret bool, order Order)
 	CancelOrder(order_id string) bool
-	GetAccountInfo() (AccountInfo, bool)
+	GetAccount() (Account, bool)
 	GetOrderBook() (ret bool, orderBook OrderBook)
 }

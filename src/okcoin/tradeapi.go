@@ -155,22 +155,6 @@ type ErrorMsg struct {
 	ErrorCode int
 }
 
-type Order struct {
-	Orders_id   int
-	Status      int
-	Symbol      string
-	Type        string
-	Rate        int
-	Amount      float64
-	Deal_amount float64
-	Avg_rate    int
-}
-
-type OrderTable struct {
-	Result bool
-	Orders []Order
-}
-
 func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool) {
 	if strings.Contains(body, "result") != true {
 		ret = false
@@ -235,7 +219,7 @@ type UserInfo struct {
 	Info   Info
 }
 
-func (w *OkcoinTrade) GetAccountInfo() (userInfo UserInfo, ret bool) {
+func (w *OkcoinTrade) GetAccount() (userInfo UserInfo, ret bool) {
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
 
@@ -268,7 +252,23 @@ func (w *OkcoinTrade) GetAccountInfo() (userInfo UserInfo, ret bool) {
 	return
 }
 
-func (w *OkcoinTrade) Get_order(symbol, order_id string) (m OrderTable, ret bool) {
+type OKOrder struct {
+	Orders_id   int
+	Status      int
+	Symbol      string
+	Type        string
+	Rate        int
+	Amount      float64
+	Deal_amount float64
+	Avg_rate    int
+}
+
+type OKOrderTable struct {
+	Result bool
+	Orders []OKOrder
+}
+
+func (w *OkcoinTrade) Get_order(symbol, order_id string) (ret bool, m OKOrderTable) {
 	pParams := make(map[string]string)
 	pParams["partner"] = w.partner
 	pParams["symbol"] = symbol
@@ -300,11 +300,11 @@ func (w *OkcoinTrade) Get_order(symbol, order_id string) (m OrderTable, ret bool
 	return
 }
 
-func (w *OkcoinTrade) Get_BTCorder(order_id string) (m OrderTable, ret bool) {
+func (w *OkcoinTrade) Get_BTCorder(order_id string) (ret bool, m OKOrderTable) {
 	return w.Get_order("btc_cny", order_id)
 }
 
-func (w *OkcoinTrade) Get_LTCorder(order_id string) (m OrderTable, ret bool) {
+func (w *OkcoinTrade) Get_LTCorder(order_id string) (ret bool, m OKOrderTable) {
 	return w.Get_order("ltc_cny", order_id)
 }
 
