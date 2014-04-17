@@ -49,7 +49,7 @@ func main() {
 }
 
 func printBanner() {
-	version := "0.30"
+	version := "0.32"
 	fmt.Println("[ ---------------------------------------------------------->>> ")
 	fmt.Println(" BTC/LTC自动化算法交易引擎 Version:", version)
 	fmt.Println(" btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang")
@@ -57,7 +57,6 @@ func printBanner() {
 	fmt.Println(" ")
 	fmt.Println(" Disclaimer: USE AT YOUR OWN RISK!")
 	fmt.Println(" ")
-	fmt.Println(" *@feedback [btcrobot]http://weibo.com/bocaicfa")
 	fmt.Println(" *@请在浏览器中打开 http://127.0.0.1:9090 配置相关参数")
 	fmt.Println(" *@警告：API key和密码存放在conf/secret.json文件内，共享给他人前请务必删除，注意账号安全！！")
 	fmt.Println(" <<<----------------------------------------------------------] ")

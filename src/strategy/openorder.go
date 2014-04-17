@@ -49,7 +49,7 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 
 	const btcslap = 0.2
 	const ltcslap = 0.01
-	const timeout = 10
+	const timeout = 20
 	const ordercount = 1
 
 	numTradeAmount, err := strconv.ParseFloat(Option["tradeAmount"], 64)
