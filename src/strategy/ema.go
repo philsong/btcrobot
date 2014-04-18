@@ -265,7 +265,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	}
 
 	//do sell when price is below stoploss point
-	if Price[length-1] < emaStrategy.PrevBuyPirce*(1-stoploss*0.01) {
+	if Price[length-1] <= emaStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrade != "sell" {
 			emaStrategy.PrevEMATrade = "sell"
 			emaStrategy.PrevBuyPirce = 0
