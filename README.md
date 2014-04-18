@@ -10,6 +10,10 @@ BTC/LTC自动化算法交易引擎
   Disclaimer:
 
   USE AT YOUR OWN RISK!
+  
+  声明：
+  
+  本软件风险巨大！！！使用前务必小量测试N天！！！目前还在快速完善发展中，欢迎各路程序员贡献代码！
 
   The author of this project is NOT responsible for any damage or loss caused
   by this software. There can be bugs and the bot may not perform as expected
