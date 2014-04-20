@@ -260,7 +260,7 @@ type OKOrder struct {
 	Rate        int
 	Amount      float64
 	Deal_amount float64
-	Avg_rate    int
+	Avg_rate    float64
 }
 
 type OKOrderTable struct {
@@ -292,10 +292,10 @@ func (w *OkcoinTrade) Get_order(symbol, order_id string) (ret bool, m OKOrderTab
 	if err := doc.Decode(&m); err == io.EOF {
 		logger.Traceln(err)
 	} else if err != nil {
-		logger.Fatal(err)
+		logger.Errorln(err)
+		logger.Errorln(body)
+		logger.Errorln(m)
 	}
-
-	logger.Traceln(m)
 
 	return
 }
