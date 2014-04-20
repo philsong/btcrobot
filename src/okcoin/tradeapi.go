@@ -257,7 +257,7 @@ type OKOrder struct {
 	Status      int
 	Symbol      string
 	Type        string
-	Rate        int
+	Rate        float64
 	Amount      float64
 	Deal_amount float64
 	Avg_rate    float64
