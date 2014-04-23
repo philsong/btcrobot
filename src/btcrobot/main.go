@@ -49,7 +49,7 @@ func main() {
 }
 
 func printBanner() {
-	version := "0.32"
+	version := "0.33"
 	fmt.Println("[ ---------------------------------------------------------->>> ")
 	fmt.Println(" BTC/LTC自动化算法交易引擎 Version:", version)
 	fmt.Println(" btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang")

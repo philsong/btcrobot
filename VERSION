@@ -76,4 +76,7 @@
 
                   optimze the code structure, to wirte strategy more simple now, just realize the "tick" function
 
+  Version 0.33
+  time 2014-04-23 refactor the web UI using flat design
+
 */
