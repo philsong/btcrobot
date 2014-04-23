@@ -10,12 +10,13 @@ $(function() {
   $('input[name="dobuy"]').click(function(e) {
     $.ajax({
       type: "POST",
-      url: "http://127.0.0.1:9091/tradedobuy.json",
+      url: "/trade",
       success: function(data) {
-        alert(data.msg);
+        alert(data);
         location.reload();
       },
       data: {
+        msgtype: "dobuy",
         buyprice: $('#buyprice').val(),
         buyamount: $('#buyamount').val(),
       }
@@ -27,12 +28,13 @@ $(function() {
   $('input[name="dosell"]').click(function(e) {
     $.ajax({
       type: "POST",
-      url: "http://127.0.0.1:9091/tradedosell.json",
+      url: "/trade",
       success: function(data) {
-        alert(data.msg);
+        alert(data);
         location.reload();
       },
       data: {
+        msgtype: "dosell",
         sellprice: $('#sellprice').val(),
         sellamount: $('#sellamount').val(),
       }

@@ -16,7 +16,8 @@ $(function() {
   $('#update_conf').submit(function() {
     var self = $(this);
     $.post(self.attr('action'), self.serialize(), function(data) {
-      alert(data.msg);
+      console.log(data)
+      alert(data);
       location.reload();
     });
     return false;
