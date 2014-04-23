@@ -27,12 +27,16 @@ import (
 	"net/http"
 )
 
-func RunServer() {
+func RunServer2() {
 	// 服务静态文件
-	http.Handle("/static/", http.FileServer(http.Dir(ROOT)))
+	//http.Handle("/", http.FileServer(http.Dir(ROOT)))
+	h := http.StripPrefix("/static/", http.FileServer(http.Dir("./static/")))
+	http.Handle("/static/", h)
 
-	router := initRouter()
-	http.Handle("/", router)
+	//http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir("./user"))))
+
+	//router := initRouter()
+	//http.Handle("/", router)
 	if Config["env"] == "test" {
 		logger.Infoln(http.ListenAndServe("0.0.0.0:9090", nil))
 	} else {
@@ -54,11 +58,9 @@ func initRouter() *mux.Router {
 	formValidateFilter := new(filter.FormValidateFilter)
 	router.FilterChain(mux.NewFilterChain([]mux.Filter{formValidateFilter, frontViewFilter}...))
 
-	router.HandleFunc("/", GuideHandler)
-	router.HandleFunc("/guide", GuideHandler)
 	router.HandleFunc("/huobi", HuobiIndictorHandler)
 	router.HandleFunc("/okcoin", OkcoinIndictorHandler)
-	router.HandleFunc("/secret{json:(|.json)}", SecretHandler)
+	router.HandleFunc("/secret{msgtype:(|ajax|get|post)}{json:(|.json)}", SecretHandler)
 	router.HandleFunc("/engine{msgtype:(|ajax|get|post)}{json:(|.json)}", EngineHandler)
 	router.HandleFunc("/trade{msgtype:(|ajax|dobuy|dosell)}{json:(|.json)}", TradeHandler)
 

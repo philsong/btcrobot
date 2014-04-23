@@ -49,7 +49,7 @@ function myTimer() {
 		});
 
 		// Create the chart
-		$('#container').highcharts('StockChart', {
+		$('#indictorcontainer').highcharts('StockChart', {
 
 
 			title: {

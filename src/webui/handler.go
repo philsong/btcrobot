@@ -96,7 +96,7 @@ func TradeHandler(rw http.ResponseWriter, req *http.Request) {
 
 	msgtype := vars["msgtype"]
 
-	if req.Method != "POST" || msgtype == "" {
+	if req.Method != "POST" && msgtype == "" {
 		// 获取用户信息
 		err := config.LoadTrade()
 		if err != nil {
@@ -107,6 +107,17 @@ func TradeHandler(rw http.ResponseWriter, req *http.Request) {
 		// 设置模板数据
 		filter.SetData(req, map[string]interface{}{"trade": config.TradeOption})
 		req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/trade.html")
+		return
+	} else if req.Method != "POST" && msgtype == "ajax" {
+		rw.Header().Set("Access-Control-Allow-Origin", "*") //允许访问所有域
+
+		Option_json, err := json.Marshal(config.TradeOption)
+		if err != nil {
+			logger.Errorln(err)
+			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "读取引擎配置数据失败", `"}`)
+		} else {
+			fmt.Fprint(rw, string(Option_json))
+		}
 		return
 	} else if req.Method == "POST" {
 		if msgtype == "dobuy" {
@@ -175,6 +186,8 @@ func EngineHandler(rw http.ResponseWriter, req *http.Request) {
 		req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/engine.html")
 		return
 	} else if req.Method != "POST" && msgtype == "ajax" {
+		rw.Header().Set("Access-Control-Allow-Origin", "*") //允许访问所有域
+
 		Option_json, err := json.Marshal(config.Option)
 		if err != nil {
 			logger.Errorln(err)
@@ -254,6 +267,17 @@ func SecretHandler(rw http.ResponseWriter, req *http.Request) {
 		// 设置模板数据
 		filter.SetData(req, map[string]interface{}{"config": config.SecretOption})
 		req.Form.Set(filter.CONTENT_TPL_KEY, "/template/trade/secret.html")
+		return
+	} else if req.Method != "POST" && msgtype == "ajax" {
+		rw.Header().Set("Access-Control-Allow-Origin", "*") //允许访问所有域
+
+		Option_json, err := json.Marshal(config.SecretOption)
+		if err != nil {
+			logger.Errorln(err)
+			fmt.Fprint(rw, `{"errno": 1, "msg":"`, "读取引擎配置数据失败", `"}`)
+		} else {
+			fmt.Fprint(rw, string(Option_json))
+		}
 		return
 	} else {
 		config.SecretOption["username"] = req.FormValue("username")

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>btcrobot 算法交易系统</title>
+    <meta name="description" content="btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
+  it features multiple trading methods using technical analysis."/>
+
+    <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
+
+    <!-- Loading Bootstrap -->
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="css/flat-ui.css" rel="stylesheet">
+    <link href="css/demo.css" rel="stylesheet">
+
+    <link rel="shortcut icon" href="images/favicon.ico">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container">
+      <div class="demo-headline">
+        <h1 class="demo-logo">
+          <div class="logo"></div>
+          btcrobot
+          <small>算法交易系统</small>
+        </h1>
+      </div> <!-- /demo-headline -->
+
+
+      <div class="row demo-row">
+        <div class="col-xs-12">
+          <nav class="navbar navbar-inverse navbar-embossed" role="navigation">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
+                <span class="sr-only">Toggle navigation</span>
+              </button>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-collapse-01">
+              <ul class="nav navbar-nav navbar-left">           
+                <li><a href="/">主页<span class="navbar-unread">1</span></a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">趋势图<b class="caret"></b></a>
+                  <span class="dropdown-arrow"></span>
+                  <ul class="dropdown-menu">
+                    <li><a href="/indictor_huobi.html" rel="nofollow">火币指标</a></li> 
+                    <li class="divider"></li>
+                    <li><a href="/indictor_okcoin.html" rel="nofollow">OKcoin指标</a></li> 
+                  </ul>
+                </li>
+                    <li><a href="/engine.html" rel="nofollow">机器人</a></li> 
+                    <li><a href="/trade.html" rel="nofollow">操盘手</a></li> 
+                    <li><a href="/secret.html" rel="nofollow">安全设置</a></li> 
+                <li><a href="https://github.com/philsong/btcrobot/wiki" target="_blank">帮助</a></li>
+               </ul>
+            </div><!-- /.navbar-collapse -->
+          </nav><!-- /navbar -->
+        </div>
+      </div> <!-- /row -->
+
+
+      <div class="row">
+        <div class="col-xs-12">
+            <div id="indictorcontainer" width=500></div>    
+            <button  style="display: none" onclick="myStopFunction()">暂停</button>
+            <button  style="display: none" onclick="myStartFunction()">重启</button> 
+        </div>
+        </div>
+      </div> <!-- /row -->
+
+    </div> <!-- /container -->
+
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-6">
+            <h3 class="footer-title">BTC/LTC自动化算法交易引擎.</h3>
+            <p>
+              <a href="https://github.com/philsong/btcrobot" target="_blank"> 代码库https://github.com/philsong/btcrobot</a>
+            </p>
+
+            <p>
+              <a href="http://weibo.com/bocaicfa" target="_blank">微博http://weibo.com/bocaicfa</a>
+            </p>
+            
+            <P>交易策略模型群：375145175</p>
+            <p>机器人使用互助群：124603104</P>
+          </div> <!-- /col-xs-7 -->
+
+          <div class="col-xs-6">
+            <div class="footer-banner">
+              <h3 class="footer-title">捐助开发</h3>
+              <ul>
+                <li>感谢您对开源的支持</li>
+                <li>您的支持让该开源软件不断优化完善</li>
+                <li>亦是各种开源项目支撑下去的核心动力之一</li>
+
+                <li>BTC：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8</li>
+                <li>LTC：LXwX5XeZeVfXM2b4GRs6HM1mNn4K9En3F4</li>
+
+                <li><a href="https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E5%BC%80%E5%8F%91%E7%9A%84%E4%BA%BA" target="_blank">捐助人员列表</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    
+    <!-- Load JS here for greater good =============================-->
+  
+
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="js/jquery.ui.touch-punch.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-select.js"></script>
+    <script src="js/bootstrap-switch.js"></script>
+    <script src="js/flatui-checkbox.js"></script>
+    <script src="js/flatui-radio.js"></script>
+    <script src="js/jquery.tagsinput.js"></script>
+    <script src="js/jquery.placeholder.js"></script>
+    <script src="js/jquery.stacktable.js"></script>
+    <script src="js/application.js"></script>
+    <script src="js/highstock.js"></script>
+    <script src="js/modules/exporting.js"></script>
+    <script src="js/technical-indicators.src.js"></script>
+    <script src="js/huobi.js"></script>
+  </body>
+</html>

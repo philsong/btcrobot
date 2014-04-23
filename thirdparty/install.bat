@@ -14,6 +14,7 @@ set GOPATH=%~dp0
 go install github.com/studygolang/mux
 go install github.com/gorilla/sessions
 go install github.com/go-martini/martini
+go install github.com/codegangsta/martini-contrib/auth
 
 set GOPATH=%OLDGOPATH%
 
