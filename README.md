@@ -2,7 +2,8 @@ BTC/LTC Robot
 ===========
 BTC/LTC自动化算法交易引擎
 
-![btcrobot logo](https://raw.githubusercontent.com/philsong/btcrobot/tree/master/static/images/demo/hacking-bitcoin-with-go.png)
+![btcrobot logo](
+https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/hacking-bitcoin-with-go.png)
 
   btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
   it features multiple trading methods using technical analysis.
@@ -46,7 +47,13 @@ BTC/LTC自动化算法交易引擎
 若你有自己的方法，大把时间， 不一定非要用机器人
 有时候你自己操盘利润可能更多，不然操盘手都失业了。。
 
-Update: 本软件完全开源, 您可选择2种方式支持开发：1. 捐助 2. 若要定制策略，请发策略内容到微博私信联系，1BTC 起。
+Update: 
+
+2013/4/23日：EMA、MACD太多人用了，最近开始失效。。。哥发现一旦公开策略，使用人数变多，该策略就废了。即日起哥不再公开发布新的策略，
+
+专注于改开源框架的完善，然后提供策略接口，让用户自己实现自己的策略，这样就不会失效了，未来必将是机器人大战啊。。。
+
+本软件完全开源, 您可选择2种方式支持开发：1. 捐助 2. 若要定制策略，请发策略内容到微博私信联系，1BTC 起。
 
 使用指南如下:
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
