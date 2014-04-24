@@ -208,7 +208,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 
 		//do buy when cross up
 		if emaStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessBuyThreshold {
-			if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrade != "buy" {
+			if Option["enable_trading"] == "1" && emaStrategy.PrevEMATrade != "buy" {
 
 				emaStrategy.PrevEMACross = "up"
 
@@ -236,7 +236,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 		//do sell when cross down
 		if emaStrategy.is_downcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessSellThreshold {
 			emaStrategy.PrevEMACross = "down"
-			if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrade != "sell" {
+			if Option["enable_trading"] == "1" && emaStrategy.PrevEMATrade != "sell" {
 
 				if emaStrategy.checkThreshold("sell", EMAdif[length-1]) {
 
@@ -266,7 +266,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 
 	//do sell when price is below stoploss point
 	if Price[length-1] <= emaStrategy.PrevBuyPirce*(1-stoploss*0.01) {
-		if Option["disable_trading"] != "1" && emaStrategy.PrevEMATrade != "sell" {
+		if Option["enable_trading"] == "1" && emaStrategy.PrevEMATrade != "sell" {
 			emaStrategy.PrevEMATrade = "sell"
 			emaStrategy.PrevBuyPirce = 0
 			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + getTradePrice("sell", Price[length-1])

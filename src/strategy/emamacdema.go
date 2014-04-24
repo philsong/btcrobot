@@ -211,7 +211,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 
 		//do buy when cross up
 		if emamacdemaStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emamacdemaStrategy.LessBuyThreshold {
-			if Option["disable_trading"] != "1" && emamacdemaStrategy.PrevEMATrade != "buy" {
+			if Option["enable_trading"] == "1" && emamacdemaStrategy.PrevEMATrade != "buy" {
 
 				emamacdemaStrategy.PrevEMACross = "up"
 
@@ -236,7 +236,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 		//do sell when cross down
 		if emamacdemaStrategy.is_downcross(EMAdif[length-2], EMAdif[length-1]) || emamacdemaStrategy.LessSellThreshold {
 			emamacdemaStrategy.PrevEMACross = "down"
-			if Option["disable_trading"] != "1" && emamacdemaStrategy.PrevEMATrade != "sell" {
+			if Option["enable_trading"] == "1" && emamacdemaStrategy.PrevEMATrade != "sell" {
 				if emamacdemaStrategy.checkThreshold("sell", EMAdif[length-1]) {
 					emamacdemaStrategy.PrevEMATrade = "sell"
 					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
@@ -273,7 +273,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 	if MACDdif[length-1] > 0 {
 		if (MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) ||
 			(emamacdemaStrategy.PrevMACDTrade == "sell" && MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) {
-			if Option["disable_trading"] != "1" && emamacdemaStrategy.PrevMACDTrade == "sell" {
+			if Option["enable_trading"] == "1" && emamacdemaStrategy.PrevMACDTrade == "sell" {
 				emamacdemaStrategy.PrevMACDTrade = "buy"
 				histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
 				warning := "MACD up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
@@ -291,7 +291,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 		} else if (Price[length-1] < emaLong[length-1]) &&
 			((MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) ||
 				(emamacdemaStrategy.PrevMACDTrade == "buy" && MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] < MACDsellThreshold)) {
-			if Option["disable_trading"] != "1" && emamacdemaStrategy.PrevMACDTrade != "sell" {
+			if Option["enable_trading"] == "1" && emamacdemaStrategy.PrevMACDTrade != "sell" {
 				emamacdemaStrategy.PrevMACDTrade = "sell"
 				histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
 				warning := "MACD down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
@@ -310,7 +310,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 
 	//do sell when price is below stoploss point
 	if Price[length-1] < emamacdemaStrategy.PrevBuyPirce*(1-stoploss*0.01) {
-		if Option["disable_trading"] != "1" && emamacdemaStrategy.PrevEMATrade != "sell" {
+		if Option["enable_trading"] == "1" && emamacdemaStrategy.PrevEMATrade != "sell" {
 
 			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)

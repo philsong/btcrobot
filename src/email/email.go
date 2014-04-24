@@ -144,7 +144,7 @@ func NoticeEmailV2() {
 
 func TriggerTrender(alert string) error {
 
-	if Option["disable_email"] != "1" {
+	if Option["enable_email"] == "1" {
 		if alert != "" {
 			SendAlertEmail(Option["to_email"], alert)
 		}
@@ -166,7 +166,7 @@ func TriggerPrice(price float64) error {
 	}
 
 	var alert string
-	if Option["disable_email"] != "1" {
+	if Option["enable_email"] == "1" {
 		if price < lowest_price {
 			alert = fmt.Sprintf("价格 %f 低于设定的阀值 %f", price, Option["lowest_price"])
 		} else if price > highest_price {

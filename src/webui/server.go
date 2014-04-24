@@ -78,17 +78,17 @@ func webui() {
 	})
 
 	m.Post("/engine", func(res http.ResponseWriter, req *http.Request) {
-		if req.FormValue("disable_trading") == "on" {
-			config.Option["disable_trading"] = "1"
+		if req.FormValue("enable_trading") == "on" {
+			config.Option["enable_trading"] = "1"
 		} else {
-			config.Option["disable_trading"] = "0"
+			config.Option["enable_trading"] = "0"
 		}
 
 		// open传递过来的是“on”或没传递
-		if req.FormValue("disable_email") == "on" {
-			config.Option["disable_email"] = "1"
+		if req.FormValue("enable_email") == "on" {
+			config.Option["enable_email"] = "1"
 		} else {
-			config.Option["disable_email"] = "0"
+			config.Option["enable_email"] = "0"
 		}
 
 		config.Option["to_email"] = req.FormValue("to_email")

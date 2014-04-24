@@ -197,7 +197,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 
 		//do buy when cross up
 		if emamacdStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emamacdStrategy.LessBuyThreshold {
-			if Option["disable_trading"] != "1" && emamacdStrategy.PrevEMATrade != "buy" {
+			if Option["enable_trading"] == "1" && emamacdStrategy.PrevEMATrade != "buy" {
 
 				emamacdStrategy.PrevEMACross = "up"
 
@@ -228,10 +228,9 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 
 	//macd cross
 	if EMAdif[length-1] > 0 || emamacdStrategy.PrevEMATrade == "buy" {
-		logger.Debugln(Option["disable_trading"], emamacdStrategy.PrevMACDTrade)
 		if (MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) &&
 			emamacdStrategy.PrevMACDTrade != "sell" {
-			if Option["disable_trading"] != "1" && emamacdStrategy.PrevMACDTrade != "sell" {
+			if Option["enable_trading"] == "1" && emamacdStrategy.PrevMACDTrade != "sell" {
 				emamacdStrategy.PrevMACDTrade = "sell"
 				emamacdStrategy.PrevBuyPirce = 0
 				emamacdStrategy.PrevEMATrade = "sell"
@@ -253,7 +252,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 
 	//do sell when price is below stoploss point
 	if Price[length-1] < emamacdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
-		if Option["disable_trading"] != "1" && emamacdStrategy.PrevEMATrade != "sell" {
+		if Option["enable_trading"] == "1" && emamacdStrategy.PrevEMATrade != "sell" {
 
 			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)

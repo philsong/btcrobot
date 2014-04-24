@@ -113,7 +113,7 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 	//macd cross
 	if (MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) ||
 		(macdStrategy.PrevMACDTrade == "sell" && MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) {
-		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "buy" {
+		if Option["enable_trading"] == "1" && macdStrategy.PrevMACDTrade != "buy" {
 			macdStrategy.PrevMACDTrade = "buy"
 
 			histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
@@ -131,7 +131,7 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 		}
 	} else if (MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) ||
 		(macdStrategy.PrevMACDTrade == "buy" && MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] < MACDsellThreshold) {
-		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
+		if Option["enable_trading"] == "1" && macdStrategy.PrevMACDTrade != "sell" {
 			macdStrategy.PrevMACDTrade = "sell"
 
 			histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
@@ -150,7 +150,7 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 
 	//do sell when price is below stoploss point
 	if Price[length-1] < macdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
-		if Option["disable_trading"] != "1" && macdStrategy.PrevMACDTrade != "sell" {
+		if Option["enable_trading"] == "1" && macdStrategy.PrevMACDTrade != "sell" {
 
 			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)

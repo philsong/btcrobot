@@ -56,18 +56,18 @@ $(function() {
   $.getJSON('/engine', function(data) {
     console.log(data)
 
-    if (data.disable_trading == "0") {
-      console.log("0")
-      $('#disable_trading').prop('checked', false);
+    if (data.enable_trading == "1") {
+      console.log("1")
+      $('#enable_trading').prop('checked', true);
     } else {
-       console.log("1")
-      $('#disable_trading').prop('checked', true);
+       console.log("0")
+      $('#enable_trading').prop('checked', false);
     }
 
-    if (data.disable_email == "0") {
-      $('#disable_email').prop('checked', false);
+    if (data.enable_email == "1") {
+      $('#enable_email').prop('checked', true);
     } else {
-      $('#disable_email').prop('checked', true);
+      $('#enable_email').prop('checked', false);
     }
 
     $('#to_email').val(data.to_email);
