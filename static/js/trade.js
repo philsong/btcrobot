@@ -2,8 +2,14 @@ $(function() {
   $.getJSON('/trade', function(data) {
     $('#buyprice').val(data.buyprice);
     $('#sellprice').val(data.sellprice);
-    $('#buyamount').val(data.buyamount);
-    $('#sellamount').val(data.sellamount);
+    $('#buytotalamount').val(data.buytotalamount);
+    $('#selltotalamount').val(data.selltotalamount);
+    $('#buyinterval').val(data.buyinterval);
+    $('#sellinterval').val(data.sellinterval);
+    $('#buytimes').val(data.buytimes);
+    $('#selltimes').val(data.selltimes);
+    $('#maxbuyamountratio').val(data.maxbuyamountratio);
+    $('#maxsellamountratio').val(data.maxsellamountratio);
   });
 
   // 表单提交
@@ -18,7 +24,10 @@ $(function() {
       data: {
         msgtype: "dobuy",
         buyprice: $('#buyprice').val(),
-        buyamount: $('#buyamount').val(),
+        buyamount: $('#buytotalamount').val(),
+        buyinterval: $('#buyinterval').val(),
+        buytimes: $('#buytimes').val(),
+        maxbuyamountratio: $('#maxbuyamountratio').val(),
       }
     })
 
@@ -36,7 +45,10 @@ $(function() {
       data: {
         msgtype: "dosell",
         sellprice: $('#sellprice').val(),
-        sellamount: $('#sellamount').val(),
+        sellamount: $('#selltotalamount').val(),
+        sellinterval: $('#sellinterval').val(),
+        selltimes: $('#selltimes').val(),
+        maxsellamountratio: $('#maxsellamountratio').val(),
       }
     })
 
