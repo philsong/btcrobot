@@ -117,6 +117,14 @@ func webui() {
 			Option["enable_trading"] = "0"
 		}
 
+		if req.FormValue("discipleMode") == "on" {
+			Option["discipleMode"] = "1"
+		} else {
+			Option["discipleMode"] = "0"
+		}
+
+		Option["discipleValue"] = req.FormValue("discipleValue")
+
 		// open传递过来的是“on”或没传递
 		if req.FormValue("enable_email") == "on" {
 			Option["enable_email"] = "1"

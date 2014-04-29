@@ -242,12 +242,25 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 
 					emaStrategy.PrevEMATrade = "sell"
 
+					var tradePrice string
+					if Option["discipleMode"] == "1" {
+						discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
+						if err != nil {
+							logger.Errorln("config item discipleValue is not float")
+							return false
+						}
+
+						tradePrice = fmt.Sprintf("%f", emaStrategy.PrevBuyPirce+discipleValue)
+					} else {
+						tradePrice = getTradePrice("sell", Price[length-1])
+					}
+
 					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
 					warning := "EMA down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
-						",委托价" + getTradePrice("sell", Price[length-1]) + ",diff" + diff
+						",委托价" + tradePrice + ",diff" + diff
 
 					logger.Infoln(warning)
-					if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
+					if Sell(tradePrice, tradeAmount) != "0" {
 						warning += "[委托成功]"
 					} else {
 						warning += "[委托失败]"
@@ -268,15 +281,28 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	if Price[length-1] <= emaStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["enable_trading"] == "1" && emaStrategy.PrevEMATrade != "sell" {
 			emaStrategy.PrevEMATrade = "sell"
-			emaStrategy.PrevBuyPirce = 0
-			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + getTradePrice("sell", Price[length-1])
+			var tradePrice string
+			if Option["discipleMode"] == "1" {
+				discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
+				if err != nil {
+					logger.Errorln("config item discipleValue is not float")
+					return false
+				}
+
+				tradePrice = fmt.Sprintf("%f", emaStrategy.PrevBuyPirce+discipleValue)
+			} else {
+				tradePrice = getTradePrice("sell", Price[length-1])
+			}
+
+			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + tradePrice
 			logger.Infoln(warning)
-			if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
+			if Sell(tradePrice, tradeAmount) != "0" {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
 			}
 
+			emaStrategy.PrevBuyPirce = 0
 			go email.TriggerTrender(warning)
 		}
 	}

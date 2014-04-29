@@ -53,9 +53,8 @@ func (w Okcoin) GetOrder(order_id string) (ret bool, order Order) {
 	}
 
 	order.Id = ok_orderTable.Orders[0].Orders_id
-
+	order.Price = ok_orderTable.Orders[0].Avg_rate
 	order.Amount = ok_orderTable.Orders[0].Amount
-
 	order.Deal_amount = ok_orderTable.Orders[0].Deal_amount
 
 	return

@@ -34,6 +34,7 @@ type OrderBook struct {
 
 type Order struct {
 	Id          int
+	Price       float64
 	Amount      float64
 	Deal_amount float64
 }

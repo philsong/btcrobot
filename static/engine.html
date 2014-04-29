@@ -70,13 +70,38 @@
           <label class="share-label" >自动交易</label>
           <input type="checkbox" data-toggle="switch" id="enable_trading" name="enable_trading" />
         </div>
+      </div> <!-- /row -->
 
-        <div class="col-xs-3">
+      <hr>
+
+      <div class="row">
+        <div class="col-xs-4">
+          <label class="share-label" >死多模式</label>
+          <input type="checkbox" data-toggle="switch" id="discipleMode"  name="discipleMode"/>
+        </div>
+        
+        <div class="col-xs-4">
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon">死多偏移量</span>
+                <input type="text" class="form-control" placeholder="死多偏移量" id="discipleValue" name="discipleValue"/>
+              </div>  
+            </div>
+        </div>
+
+      </div> <!-- /row -->
+
+      <hr>
+
+      <div class="row">
+
+
+        <div class="col-xs-4">
           <label class="share-label" >邮件通知</label>
           <input type="checkbox" data-toggle="switch" id="enable_email"  name="enable_email"/>
         </div>
 
-        <div class="col-xs-5">
+        <div class="col-xs-4">
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon">接收email@</span>

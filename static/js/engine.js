@@ -57,12 +57,18 @@ $(function() {
     console.log(data)
 
     if (data.enable_trading == "1") {
-      console.log("1")
       $('#enable_trading').prop('checked', true);
     } else {
-       console.log("0")
       $('#enable_trading').prop('checked', false);
     }
+
+    if (data.discipleMode == "1") {
+      $('#discipleMode').prop('checked', true);
+    } else {
+      $('#discipleMode').prop('checked', false);
+    }
+
+    $('#discipleValue').val(data.discipleValue);
 
     if (data.enable_email == "1") {
       $('#enable_email').prop('checked', true);
