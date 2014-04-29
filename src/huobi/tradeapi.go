@@ -179,7 +179,7 @@ type Account_info struct {
 
 func (w *HuobiTrade) GetAccount() (account_info Account_info, ret bool) {
 	pParams := make(map[string]string)
-	pParams["method"] = "GetAccount"
+	pParams["method"] = "get_account_info"
 	pParams["access_key"] = w.access_key
 	now := time.Now().Unix()
 	pParams["created"] = strconv.FormatInt(now, 10)
