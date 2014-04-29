@@ -244,13 +244,17 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 
 					var tradePrice string
 					if Option["discipleMode"] == "1" {
-						discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
-						if err != nil {
-							logger.Errorln("config item discipleValue is not float")
-							return false
-						}
+						if Price[length-1] < emaStrategy.PrevBuyPirce {
+							tradePrice = fmt.Sprintf("%f", Price[length-1])
+						} else {
+							discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
+							if err != nil {
+								logger.Errorln("config item discipleValue is not float")
+								return false
+							}
 
-						tradePrice = fmt.Sprintf("%f", emaStrategy.PrevBuyPirce+discipleValue)
+							tradePrice = fmt.Sprintf("%f", emaStrategy.PrevBuyPirce+discipleValue)
+						}
 					} else {
 						tradePrice = getTradePrice("sell", Price[length-1])
 					}
@@ -283,13 +287,17 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 			emaStrategy.PrevEMATrade = "sell"
 			var tradePrice string
 			if Option["discipleMode"] == "1" {
-				discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
-				if err != nil {
-					logger.Errorln("config item discipleValue is not float")
-					return false
-				}
+				if Price[length-1] < emaStrategy.PrevBuyPirce {
+					tradePrice = fmt.Sprintf("%f", Price[length-1])
+				} else {
+					discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
+					if err != nil {
+						logger.Errorln("config item discipleValue is not float")
+						return false
+					}
 
-				tradePrice = fmt.Sprintf("%f", emaStrategy.PrevBuyPirce+discipleValue)
+					tradePrice = fmt.Sprintf("%f", emaStrategy.PrevBuyPirce+discipleValue)
+				}
 			} else {
 				tradePrice = getTradePrice("sell", Price[length-1])
 			}
