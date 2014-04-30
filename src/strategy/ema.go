@@ -244,7 +244,8 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 
 					var tradePrice string
 					if Option["discipleMode"] == "1" {
-						if Price[length-1] < emaStrategy.PrevBuyPirce {
+						stoplossPrice := emaStrategy.PrevBuyPirce * (1 - stoploss*0.01)
+						if Price[length-1] > stoplossPrice {
 							tradePrice = fmt.Sprintf("%f", Price[length-1])
 						} else {
 							discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
@@ -282,12 +283,13 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	}
 
 	//do sell when price is below stoploss point
-	if Price[length-1] <= emaStrategy.PrevBuyPirce*(1-stoploss*0.01) {
+	stoplossPrice := emaStrategy.PrevBuyPirce * (1 - stoploss*0.01)
+	if Price[length-1] <= stoplossPrice {
 		if Option["enable_trading"] == "1" && emaStrategy.PrevEMATrade != "sell" {
 			emaStrategy.PrevEMATrade = "sell"
 			var tradePrice string
 			if Option["discipleMode"] == "1" {
-				if Price[length-1] < emaStrategy.PrevBuyPirce {
+				if Price[length-1] > stoplossPrice {
 					tradePrice = fmt.Sprintf("%f", Price[length-1])
 				} else {
 					discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
