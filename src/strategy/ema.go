@@ -246,7 +246,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 					if Option["discipleMode"] == "1" {
 						stoplossPrice := emaStrategy.PrevBuyPirce * (1 - stoploss*0.01)
 						if Price[length-1] > stoplossPrice {
-							tradePrice = fmt.Sprintf("%f", Price[length-1])
+							tradePrice = getTradePrice("sell", Price[length-1])
 						} else {
 							discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
 							if err != nil {
@@ -290,7 +290,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 			var tradePrice string
 			if Option["discipleMode"] == "1" {
 				if Price[length-1] > stoplossPrice {
-					tradePrice = fmt.Sprintf("%f", Price[length-1])
+					tradePrice = getTradePrice("sell", Price[length-1])
 				} else {
 					discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
 					if err != nil {
@@ -326,105 +326,4 @@ func backup(Time string) {
 	oldFile := "cache/TradeKLine_minute.data"
 	newFile := fmt.Sprintf("%s_%s", oldFile, Time)
 	os.Rename(oldFile, newFile)
-}
-
-func getEMAdifAt(emaShort, emaLong []float64, idx int) float64 {
-	var cel = emaLong[idx]
-	var ces = emaShort[idx]
-	if cel == 0 {
-		return 0
-	} else {
-		return 100 * (ces - cel) / ((ces + cel) / 2)
-	}
-}
-
-func getEMAdif(emaShort, emaLong []float64) []float64 {
-	// loop through data
-	var EMAdifs []float64
-	length := len(emaShort)
-	for i := 0; i < length; i++ {
-		EMAdifAt := getEMAdifAt(emaShort, emaLong, i)
-		EMAdifs = append(EMAdifs, EMAdifAt)
-	}
-
-	return EMAdifs
-}
-
-/* Function based on the idea of an exponential moving average.
- *
- * Formula: EMA = Price(t) * k + EMA(y) * (1 - k)
- * t = today y = yesterday N = number of days in EMA k = 2/(2N+1)
- *
- * @param Price : array of y variables.
- * @param periods : The amount of "days" to average from.
- * @return an array containing the EMA.
-**/
-func EMA(Price []float64, periods int) []float64 {
-
-	var t float64
-	y := 0.0
-	n := float64(periods)
-	var k float64
-	k = 2 / (n + 1)
-	var ema float64 // exponential moving average.
-
-	var periodArr []float64
-	var startpos int
-	length := len(Price)
-	var emaLine []float64 = make([]float64, length)
-
-	// loop through data
-	for i := 0; i < length; i++ {
-		if Price[i] != 0 {
-			startpos = i + 1
-			break
-		} else {
-			emaLine[i] = 0
-		}
-	}
-
-	for i := startpos; i < length; i++ {
-		periodArr = append(periodArr, Price[i])
-
-		// 0: runs if the periodArr has enough points.
-		// 1: set currentvalue (today).
-		// 2: set last value. either by past avg or yesterdays ema.
-		// 3: calculate todays ema.
-		if periods == len(periodArr) {
-
-			t = Price[i]
-
-			if y == 0 {
-				y = arrayAvg(periodArr)
-			} else {
-				ema = (t * k) + (y * (1 - k))
-				y = ema
-			}
-
-			emaLine[i] = y
-
-			// remove first value in array.
-			periodArr = periodArr[1:]
-
-		} else {
-
-			emaLine[i] = 0
-		}
-
-	}
-
-	return emaLine
-}
-
-/* Function that returns average of an array's values.
- *
-**/
-func arrayAvg(arr []float64) float64 {
-	sum := 0.0
-
-	for i := 0; i < len(arr); i++ {
-		sum = sum + arr[i]
-	}
-
-	return (sum / (float64)(len(arr)))
 }
