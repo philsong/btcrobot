@@ -157,7 +157,12 @@ func kd(records []Record, period int) ([]float64, []float64) {
 			lowest := arrayLowest(periodLowArr)
 			highest := arrayHighest(periodHighArr)
 			//logger.Infoln(i, records[i].Close, lowest, highest)
-			rsv[i] = 100 * (records[i].Close - lowest) / (highest - lowest)
+			if highest-lowest < 0.000001 {
+				rsv[i] = 100
+			} else {
+				rsv[i] = 100 * (records[i].Close - lowest) / (highest - lowest)
+			}
+
 			k[i] = (2.0/3)*k[i-1] + 1.0/3*rsv[i]
 			d[i] = (2.0/3)*d[i-1] + 1.0/3*k[i]
 			// remove first value in array.
