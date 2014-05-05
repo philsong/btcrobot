@@ -106,7 +106,13 @@ func RobotWorker() {
 	go func() {
 		for _ = range ticker.C {
 			peroid, _ := strconv.Atoi(Option["tick_interval"])
-			ret, records := marketAPI().GetKLine(peroid)
+			strategyName := Option["strategy"]
+			ret := true
+			var records []Record
+			if strategyName != "OPENORDER" {
+				ret, records = marketAPI().GetKLine(peroid)
+			}
+
 			if ret != false {
 				strategy.Tick(tradeAPI(), records)
 			}

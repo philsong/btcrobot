@@ -49,7 +49,7 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 
 	const btcslap = 0.2
 	const ltcslap = 0.01
-	const timeout = 20
+	const timeout = 180
 	const ordercount = 1
 
 	numTradeAmount, err := strconv.ParseFloat(Option["tradeAmount"], 64)
@@ -60,17 +60,6 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 
 	nSplitTradeAmount := numTradeAmount / float64(ordercount)
 	splitTradeAmount := fmt.Sprintf("%f", nSplitTradeAmount)
-
-	var Time []string
-	var Price []float64
-	var Volumn []float64
-	for _, v := range records {
-		Time = append(Time, v.TimeStr)
-		Price = append(Price, v.Close)
-		Volumn = append(Volumn, v.Volumn)
-		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
-		//Price = append(Price, v.Low)
-	}
 
 	ret, orderbook := GetOrderBook()
 	if !ret {
@@ -87,38 +76,43 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 
 	diff := 0.05
 
-	if orderbook.Bids[0].Price+diff > orderbook.Asks[len(orderbook.Asks)-1].Price {
+	if orderbook.Bids[0].Price+diff <= orderbook.Asks[len(orderbook.Asks)-1].Price {
 		for i := 1; i <= ordercount; i++ {
+			ret := true
 			warning := "oo, 买入buy In<----限价单"
 			tradePrice := fmt.Sprintf("%f", orderbook.Bids[0].Price+0.01)
 			buyID := Buy(tradePrice, splitTradeAmount)
 			if buyID != "0" {
 				warning += "[委托成功]"
 				oo.BuyId = append(oo.BuyId, buyID)
+				ret = true
 			} else {
 				warning += "[委托失败]"
+				ret = false
 			}
 
 			logger.Infoln(warning)
 
-			warning = "oo, 卖出Sell Out---->限价单"
-			tradePrice = fmt.Sprintf("%f", orderbook.Asks[len(orderbook.Asks)-1].Price-0.01)
-			sellID := Sell(tradePrice, splitTradeAmount)
-			if sellID != "0" {
-				warning += "[委托成功]"
-				oo.SellId = append(oo.SellId, sellID)
-			} else {
-				warning += "[委托失败]"
-			}
+			if ret {
+				warning = "oo, 卖出Sell Out---->限价单"
+				tradePrice = fmt.Sprintf("%f", orderbook.Asks[len(orderbook.Asks)-1].Price-0.01)
+				sellID := Sell(tradePrice, splitTradeAmount)
+				if sellID != "0" {
+					warning += "[委托成功]"
+					oo.SellId = append(oo.SellId, sellID)
+				} else {
+					warning += "[委托失败]"
+				}
 
-			logger.Infoln(warning)
+				logger.Infoln(warning)
+			}
 		}
 	}
 
 	//check timeout trade
 	now := time.Now()
 
-	time.Sleep(30 * time.Second)
+	time.Sleep(2 * time.Second)
 	logger.Infoln("time go ", int64(now.Sub(oo.BuyBegin)/time.Second))
 	logger.Infoln("BuyId len", len(oo.BuyId), cap(oo.BuyId))
 	logger.Infoln("SellId len", len(oo.SellId), cap(oo.SellId))

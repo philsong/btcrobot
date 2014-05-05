@@ -39,18 +39,20 @@ func Tick(tradeAPI TradeAPI, records []Record) bool {
 		return false
 	}
 
-	length := len(records)
-	//
-	if length == 0 {
-		logger.Errorln("warning:detect exception data", len(records))
-		return false
-	}
+	if strategyName != "OPENORDER" {
+		length := len(records)
+		//
+		if length == 0 {
+			logger.Errorln("warning:detect exception data", len(records))
+			return false
+		}
 
-	//check exception data in trade center
-	if checkException(records[length-2], records[length-1]) == false {
-		logger.Errorln("detect exception data of trade center",
-			records[length-2].Close, records[length-1].Close, records[length-1].Volumn)
-		return false
+		//check exception data in trade center
+		if checkException(records[length-2], records[length-1]) == false {
+			logger.Errorln("detect exception data of trade center",
+				records[length-2].Close, records[length-1].Close, records[length-1].Volumn)
+			return false
+		}
 	}
 
 	gTradeAPI = tradeAPI

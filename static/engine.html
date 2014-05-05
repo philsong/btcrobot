@@ -150,14 +150,14 @@
         </div>
         
         <div class="col-xs-3">
-          交易策略
+          *交易策略
           <select class="select-block" id="strategy"  name="strategy" data-width="auto" onChange="onStrategyUI();">
             <option value="EMA">EMA</option>
             <option value="MACD">MACD</option>
             <option value="EMAMACDEMA">EMA+多次MACD+EMA</option>
             <option value="EMAMACD">EMA+单次MACD</option>
             <option value="KDJ">KDJ</option>
-            <option value="OPENORDER">OPENORDER(削头皮,高风险)</option>                  
+            <option value="OPENORDER">盘口对冲(俗称削头皮)</option>                  
             <option value="HLCross">k线高低突破</option>
             <option value="KDJ-EX">KDJ-EX(私密)</option>     
             <option value="KDJ-XC">KDJ-XC(私密)</option>    
@@ -167,7 +167,7 @@
         
         <div class="col-xs-2">
           <div class="form-group">
-            K线周期
+            *K线周期
             <select value="" class="select-block" id="tick_interval" name="tick_interval">
               <option value="100">1 天</option>
               <option value="60">1 小时</option>
@@ -180,7 +180,7 @@
         </div>
 
         <div class="col-xs-1">
-          运行
+          *运行
           <input type="text" class="form-control" placeholder="运行时长" id="totalHour" name="totalHour" />小时
         </div>
       </div> <!-- /row -->

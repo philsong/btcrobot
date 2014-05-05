@@ -78,7 +78,9 @@ https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%E
 
 0.1安装git环境
 
-  http://code.google.com/p/msysgit/downloads/list
+  http://msysgit.github.io/
+
+  注意:windows下安装时一定要选择，把git路径加入到系统PATH中,否则后续安装无法找到git命令。
 
 1、下载 btcrobot 代码
 	
