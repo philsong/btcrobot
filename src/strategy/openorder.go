@@ -72,35 +72,6 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 		//Price = append(Price, v.Low)
 	}
 
-	//K线为白，D线为黄，J线为红,K in middle
-	k, d, j := getKDJ(records)
-	length := len(records)
-	if oo.PrevTime != records[length-1].TimeStr ||
-		oo.PrevPrice != records[length-1].Close {
-		oo.PrevTime = records[length-1].TimeStr
-		oo.PrevPrice = records[length-1].Close
-
-		logger.Infoln(records[length-1].TimeStr, records[length-1].Close)
-		logger.Infof("d(黄线）%0.0f\tk(白线）%0.0f\tj(红线）%0.0f\n", d[length-2], k[length-2], j[length-2])
-		logger.Infof("d(黄线）%0.0f\tk(白线）%0.0f\tj(红线）%0.0f\n", d[length-1], k[length-1], j[length-1])
-	}
-
-	if ((j[length-2] < k[length-2] && k[length-2] < d[length-2]) || oo.PrevKDJTrade == "sell") &&
-		(j[length-1] > k[length-1] && k[length-1] > d[length-1]) {
-		logger.Infoln("KDJ up cross")
-		oo.PrevKDJTrade = "buy"
-	}
-
-	if ((j[length-2] > k[length-2] && k[length-2] > d[length-2]) || oo.PrevKDJTrade == "buy") &&
-		(j[length-1] < k[length-1] && k[length-1] < d[length-1]) {
-		logger.Infoln("KDJ down cross")
-		oo.PrevKDJTrade = "sell"
-	}
-
-	if oo.PrevKDJTrade == "sell" {
-		return false
-	}
-
 	ret, orderbook := GetOrderBook()
 	if !ret {
 		logger.Infoln("get orderbook failed 1")
@@ -112,45 +83,42 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 	}
 
 	logger.Infoln("卖一", orderbook.Asks[len(orderbook.Asks)-1])
-
 	logger.Infoln("买一", orderbook.Bids[0])
 
-	var flag float64
-	if orderbook.Bids[0].Price+0.02 > orderbook.Asks[len(orderbook.Asks)-1].Price {
-		flag = 0
-	} else {
-		flag = 0.01
-	}
-	for i := 1; i <= ordercount; i++ {
-		warning := "oo, 买入buy In<----限价单"
-		tradePrice := fmt.Sprintf("%f", orderbook.Bids[0].Price+flag)
-		buyID := Buy(tradePrice, splitTradeAmount)
-		if buyID != "0" {
-			warning += "[委托成功]"
-			oo.BuyId = append(oo.BuyId, buyID)
-		} else {
-			warning += "[委托失败]"
+	diff := 0.05
+
+	if orderbook.Bids[0].Price+diff > orderbook.Asks[len(orderbook.Asks)-1].Price {
+		for i := 1; i <= ordercount; i++ {
+			warning := "oo, 买入buy In<----限价单"
+			tradePrice := fmt.Sprintf("%f", orderbook.Bids[0].Price+0.01)
+			buyID := Buy(tradePrice, splitTradeAmount)
+			if buyID != "0" {
+				warning += "[委托成功]"
+				oo.BuyId = append(oo.BuyId, buyID)
+			} else {
+				warning += "[委托失败]"
+			}
+
+			logger.Infoln(warning)
+
+			warning = "oo, 卖出Sell Out---->限价单"
+			tradePrice = fmt.Sprintf("%f", orderbook.Asks[len(orderbook.Asks)-1].Price-0.01)
+			sellID := Sell(tradePrice, splitTradeAmount)
+			if sellID != "0" {
+				warning += "[委托成功]"
+				oo.SellId = append(oo.SellId, sellID)
+			} else {
+				warning += "[委托失败]"
+			}
+
+			logger.Infoln(warning)
 		}
-
-		logger.Infoln(warning)
-
-		warning = "oo, 卖出Sell Out---->限价单"
-		tradePrice = fmt.Sprintf("%f", orderbook.Asks[len(orderbook.Asks)-1].Price-flag)
-		sellID := Sell(tradePrice, splitTradeAmount)
-		if sellID != "0" {
-			warning += "[委托成功]"
-			oo.SellId = append(oo.SellId, sellID)
-		} else {
-			warning += "[委托失败]"
-		}
-
-		logger.Infoln(warning)
 	}
 
 	//check timeout trade
 	now := time.Now()
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(30 * time.Second)
 	logger.Infoln("time go ", int64(now.Sub(oo.BuyBegin)/time.Second))
 	logger.Infoln("BuyId len", len(oo.BuyId), cap(oo.BuyId))
 	logger.Infoln("SellId len", len(oo.SellId), cap(oo.SellId))
