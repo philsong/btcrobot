@@ -56,8 +56,6 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 		Time = append(Time, v.TimeStr)
 		Price = append(Price, v.Close)
 		Volumn = append(Volumn, v.Volumn)
-		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
-		//Price = append(Price, v.Low)
 	}
 
 	length := len(Price)
@@ -75,14 +73,13 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 	//HLCross cross
 	if records[length-1].Close > records[length-2].High {
 		if Option["enable_trading"] == "1" && HLCross.PrevHLCrossTrade != "buy" {
-			HLCross.PrevHLCrossTrade = "buy"
-
 			warning := "HLCross up, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
 				",委托价" + getTradePrice("buy", Price[length-1])
 			logger.Infoln(warning)
 			if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
 				HLCross.PrevBuyPirce = Price[length-1]
 				warning += "[委托成功]"
+				HLCross.PrevHLCrossTrade = "buy"
 			} else {
 				warning += "[委托失败]"
 			}
@@ -91,13 +88,13 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 		}
 	} else if records[length-1].Close < records[length-2].Low {
 		if Option["enable_trading"] == "1" && HLCross.PrevHLCrossTrade != "sell" {
-			HLCross.PrevHLCrossTrade = "sell"
-
 			warning := "HLCross down, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
 				",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
 			if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
+				HLCross.PrevHLCrossTrade = "sell"
+				HLCross.PrevBuyPirce = 0
 			} else {
 				warning += "[委托失败]"
 			}
@@ -109,19 +106,17 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 	//do sell when price is below stoploss point
 	if Price[length-1] < HLCross.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["enable_trading"] == "1" && HLCross.PrevHLCrossTrade != "sell" {
-
 			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
 			if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
+				HLCross.PrevHLCrossTrade = "sell"
+				HLCross.PrevBuyPirce = 0
 			} else {
 				warning += "[委托失败]"
 			}
 
 			go email.TriggerTrender(warning)
-
-			HLCross.PrevHLCrossTrade = "sell"
-			HLCross.PrevBuyPirce = 0
 		}
 	}
 
