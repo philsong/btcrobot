@@ -88,4 +88,6 @@
                   add the disciple mode for EMA
                   fix KDJ bugs div by 0
 
+  Version 0.36
+  time 2014-05-07 auto rename secret.sample to secret.json
 */

@@ -107,13 +107,7 @@ https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%E
 	
 这样便编译好了 btcrobot
 
-4、配置秘钥API文件
-
-修改btcrobot/conf目录下的secret.sample文件名为secret.json
-
-向火币或者OKcoin申请交易API，并填入secret.json中
-
-5、运行 btcrobot。
+4、运行 btcrobot。
 
 	// windows 下执行
 	start.bat
@@ -122,11 +116,16 @@ https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%E
 
 一切顺利的话，btcrobot应该就启动了。
 
-6、浏览器中查看
+5、浏览器中查看
 
-在浏览器中输入：http://127.0.0.1:9090
+在浏览器中打开：http://127.0.0.1:9090
 
-用默认用户名admin, 密码是123456 登录
+用默认用户名admin, 密码123456 登录
+
+6、配置秘钥API文件
+
+向火币或者OKcoin申请交易API，并填入”安全配置“菜单中。
+
 
 应该就能开始自动化交易之旅了。
 
