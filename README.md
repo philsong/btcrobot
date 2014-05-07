@@ -116,7 +116,7 @@ https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%E
 
 一切顺利的话，btcrobot应该就启动了。
 
-5、浏览器中查看
+5、浏览器中登陆
 
 在浏览器中打开：http://127.0.0.1:9090
 
