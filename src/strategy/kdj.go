@@ -25,14 +25,13 @@ import (
 )
 
 type KDJStrategy struct {
-	PrevKDJTrade string
-	PrevTime     string
-	PrevPrice    float64
+	PrevTime  string
+	PrevPrice float64
 }
 
 func init() {
 	kdjStrategy := new(KDJStrategy)
-	kdjStrategy.PrevKDJTrade = "init"
+	PrevTrade = "init"
 	Register("KDJ", kdjStrategy)
 }
 
@@ -73,48 +72,51 @@ func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 		logger.Infof("d(黄线）%0.0f\tk(白线）%0.0f\tj(红线）%0.0f\n", d[length-1], k[length-1], j[length-1])
 	}
 
-	if ((j[length-2] < k[length-2] && k[length-2] < d[length-2]) || kdjStrategy.PrevKDJTrade == "sell") &&
+	if ((j[length-2] < k[length-2] && k[length-2] < d[length-2]) || PrevTrade == "sell") &&
 		(j[length-1] > k[length-1] && k[length-1] > d[length-1]) {
 		logger.Infoln("KDJ up cross")
-		if (kdjStrategy.PrevKDJTrade == "init" && d[length-2] <= 30) || kdjStrategy.PrevKDJTrade == "sell" {
+		if (PrevTrade == "init" && d[length-2] <= 30) || PrevTrade == "sell" {
 			//do buy
 			warning := "KDJ up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
 				",委托价" + getTradePrice("buy", Price[length-1])
 			logger.Infoln(warning)
 			if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
+				PrevBuyPirce = Price[length-1]
+				PrevTrade = "buy"
 			} else {
 				warning += "[委托失败]"
 			}
-
-			kdjStrategy.PrevKDJTrade = "buy"
 
 			go email.TriggerTrender(warning)
 		}
 
 	}
 
-	if ((j[length-2] > k[length-2] && k[length-2] > d[length-2]) || kdjStrategy.PrevKDJTrade == "buy") &&
+	if ((j[length-2] > k[length-2] && k[length-2] > d[length-2]) || PrevTrade == "buy") &&
 		(j[length-1] < k[length-1] && k[length-1] < d[length-1]) {
 
 		logger.Infoln("KDJ down cross")
-		if (kdjStrategy.PrevKDJTrade == "init" && d[length-2] >= 70) || kdjStrategy.PrevKDJTrade == "buy" {
+		if (PrevTrade == "init" && d[length-2] >= 70) || PrevTrade == "buy" {
 			//do sell
 			warning := "KDJ down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
 				",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
 			if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 				warning += "[委托成功]"
+				PrevTrade = "sell"
+				PrevBuyPirce = 0
 			} else {
 				warning += "[委托失败]"
 			}
-
-			kdjStrategy.PrevKDJTrade = "sell"
 
 			go email.TriggerTrender(warning)
 		}
 
 	}
+
+	//do sell when price is below stoploss point
+	stop_loss_detect(Price)
 
 	return true
 }

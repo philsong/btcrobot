@@ -3,6 +3,7 @@ package strategy
 import (
 	. "common"
 	. "config"
+	"email"
 	"fmt"
 	"logger"
 	"strconv"
@@ -14,6 +15,10 @@ type Strategy interface {
 }
 
 var strategys = make(map[string]Strategy)
+var PrevTrade string
+var PrevBuyPirce float64
+var warning string
+
 var gTradeAPI TradeAPI
 
 // Register makes a strategy available by the provided name.
@@ -109,4 +114,114 @@ func GetOrderBook() (ret bool, orderBook OrderBook) {
 
 func GetOrder(order_id string) (ret bool, order Order) {
 	return gTradeAPI.GetOrder(order_id)
+}
+
+func GetAvailable_cny() float64 {
+	account, ret := GetAccount()
+	if !ret {
+		logger.Errorln("GetAccount failed")
+		return 0
+	}
+
+	numAvailable_cny, err := strconv.ParseFloat(account.Available_cny, 64)
+	if err != nil {
+		logger.Errorln("tradeAmount is not float")
+		return 0
+	}
+	//balance > 0
+	return numAvailable_cny
+}
+
+func GetAvailable_btc() float64 {
+	account, ret := GetAccount()
+	if !ret {
+		logger.Errorln("GetAccount failed")
+		return 0
+	}
+
+	numAvailable_btc, err := strconv.ParseFloat(account.Available_btc, 64)
+	if err != nil {
+		logger.Errorln("Available_btc is not float")
+		return 0
+	}
+	//nCoins > 0
+	return numAvailable_btc
+}
+
+func GetAvailable_ltc() float64 {
+	account, ret := GetAccount()
+	if !ret {
+		logger.Errorln("GetAccount failed")
+		return 0
+	}
+
+	numAvailable_ltc, err := strconv.ParseFloat(account.Available_ltc, 64)
+	if err != nil {
+		logger.Errorln("Available_ltc is not float")
+		return 0
+	}
+	//nCoins > 0
+	return numAvailable_ltc
+}
+
+func GetAvailable_coin() float64 {
+	symbol := Option["symbol"]
+	if symbol == "btc_cny" {
+		return GetAvailable_btc()
+	} else {
+		return GetAvailable_ltc()
+	}
+}
+
+//////////////////////////////////
+//common stop loss function
+//////////////////////////////////
+
+func stop_loss_detect(Price []float64) bool {
+	length := len(Price)
+
+	stoploss, err := strconv.ParseFloat(Option["stoploss"], 64)
+	if err != nil {
+		logger.Errorln("config item stoploss is not float")
+		return false
+	}
+
+	//do sell when price is below stoploss point
+	stoplossPrice := PrevBuyPirce * (1 - stoploss*0.01)
+	if Price[length-1] <= stoplossPrice {
+		if Option["enable_trading"] == "1" && PrevTrade != "sell" {
+			var tradePrice string
+			if Option["discipleMode"] == "1" {
+				if Price[length-1] > stoplossPrice {
+					tradePrice = getTradePrice("sell", Price[length-1])
+				} else {
+					discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
+					if err != nil {
+						logger.Errorln("config item discipleValue is not float")
+						return false
+					}
+
+					tradePrice = fmt.Sprintf("%f", PrevBuyPirce+discipleValue)
+				}
+			} else {
+				tradePrice = getTradePrice("sell", Price[length-1])
+			}
+
+			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + tradePrice
+			logger.Infoln(warning)
+
+			tradeAmount := Option["tradeAmount"]
+			if Sell(tradePrice, tradeAmount) != "0" {
+				warning += "[委托成功]"
+				PrevTrade = "sell"
+				PrevBuyPirce = 0
+			} else {
+				warning += "[委托失败]"
+			}
+
+			go email.TriggerTrender(warning)
+		}
+	}
+
+	return true
 }

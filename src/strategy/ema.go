@@ -28,10 +28,8 @@ import (
 )
 
 type EMAStrategy struct {
-	PrevEMATrade      string
 	PrevEMACross      string
 	PrevEMAdif        float64
-	PrevBuyPirce      float64
 	LessBuyThreshold  bool
 	LessSellThreshold bool
 }
@@ -208,13 +206,13 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 
 		//do buy when cross up
 		if emaStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessBuyThreshold {
-			if Option["enable_trading"] == "1" && emaStrategy.PrevEMATrade != "buy" {
+			if Option["enable_trading"] == "1" && PrevTrade != "buy" {
 
 				emaStrategy.PrevEMACross = "up"
 
 				if emaStrategy.checkThreshold("buy", EMAdif[length-1]) {
 
-					emaStrategy.PrevEMATrade = "buy"
+					PrevTrade = "buy"
 
 					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
 					warning := "EMA up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
@@ -222,7 +220,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 					logger.Infoln(warning)
 
 					if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
-						emaStrategy.PrevBuyPirce = Price[length-1]
+						PrevBuyPirce = Price[length-1]
 						warning += "[委托成功]"
 					} else {
 						warning += "[委托失败]"
@@ -236,15 +234,15 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 		//do sell when cross down
 		if emaStrategy.is_downcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessSellThreshold {
 			emaStrategy.PrevEMACross = "down"
-			if Option["enable_trading"] == "1" && emaStrategy.PrevEMATrade != "sell" {
+			if Option["enable_trading"] == "1" && PrevTrade != "sell" {
 
 				if emaStrategy.checkThreshold("sell", EMAdif[length-1]) {
 
-					emaStrategy.PrevEMATrade = "sell"
+					PrevTrade = "sell"
 
 					var tradePrice string
 					if Option["discipleMode"] == "1" {
-						stoplossPrice := emaStrategy.PrevBuyPirce * (1 - stoploss*0.01)
+						stoplossPrice := PrevBuyPirce * (1 - stoploss*0.01)
 						if Price[length-1] > stoplossPrice {
 							tradePrice = getTradePrice("sell", Price[length-1])
 						} else {
@@ -254,7 +252,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 								return false
 							}
 
-							tradePrice = fmt.Sprintf("%f", emaStrategy.PrevBuyPirce+discipleValue)
+							tradePrice = fmt.Sprintf("%f", PrevBuyPirce+discipleValue)
 						}
 					} else {
 						tradePrice = getTradePrice("sell", Price[length-1])
@@ -283,39 +281,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	}
 
 	//do sell when price is below stoploss point
-	stoplossPrice := emaStrategy.PrevBuyPirce * (1 - stoploss*0.01)
-	if Price[length-1] <= stoplossPrice {
-		if Option["enable_trading"] == "1" && emaStrategy.PrevEMATrade != "sell" {
-			emaStrategy.PrevEMATrade = "sell"
-			var tradePrice string
-			if Option["discipleMode"] == "1" {
-				if Price[length-1] > stoplossPrice {
-					tradePrice = getTradePrice("sell", Price[length-1])
-				} else {
-					discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
-					if err != nil {
-						logger.Errorln("config item discipleValue is not float")
-						return false
-					}
-
-					tradePrice = fmt.Sprintf("%f", emaStrategy.PrevBuyPirce+discipleValue)
-				}
-			} else {
-				tradePrice = getTradePrice("sell", Price[length-1])
-			}
-
-			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + tradePrice
-			logger.Infoln(warning)
-			if Sell(tradePrice, tradeAmount) != "0" {
-				warning += "[委托成功]"
-			} else {
-				warning += "[委托失败]"
-			}
-
-			emaStrategy.PrevBuyPirce = 0
-			go email.TriggerTrender(warning)
-		}
-	}
+	stop_loss_detect(Price)
 
 	return true
 }
