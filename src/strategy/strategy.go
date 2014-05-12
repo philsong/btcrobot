@@ -119,11 +119,32 @@ func getTradePrice(tradeDirection string, price float64) string {
 }
 
 func Buy(price, amount string) string {
-	return gTradeAPI.Buy(price, amount)
+	nTradePrice, err := strconv.ParseFloat(price, 64)
+	if err != nil {
+		logger.Errorln("price is not float")
+		return "0"
+	}
+
+	buyID := gTradeAPI.Buy(price, amount)
+	if buyID != "0" {
+		buyOrders[time.Now()] = buyID
+		PrevTrade = "buy"
+		PrevBuyPirce = nTradePrice
+	}
+
+	return buyID
 }
+
 func Sell(price, amount string) string {
-	return gTradeAPI.Sell(price, amount)
+	sellID := gTradeAPI.Sell(price, amount)
+	if sellID != "0" {
+		sellOrders[time.Now()] = sellID
+		PrevTrade = "sell"
+		PrevBuyPirce = 0
+	}
+	return sellID
 }
+
 func CancelOrder(order_id string) bool {
 	return gTradeAPI.CancelOrder(order_id)
 }

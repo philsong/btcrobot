@@ -82,12 +82,12 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 				if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
 					PrevBuyPirce = Price[length-1]
 					warning += "[委托成功]"
-					PrevTrade = "buy"
 				} else {
 					warning += "[委托失败]"
 				}
 			}
 
+			logger.Infoln(warning)
 			go email.TriggerTrender(warning)
 		}
 	} else if records[length-1].Close < records[length-2].Low {
@@ -101,21 +101,20 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 					",委托价" + getTradePrice("sell", Price[length-1])
 				if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
 					warning += "[委托成功]"
-					PrevTrade = "sell"
-					PrevBuyPirce = 0
 				} else {
 					warning += "[委托失败]"
 				}
 			}
 
 			logger.Infoln(warning)
-
 			go email.TriggerTrender(warning)
 		}
 	}
 
 	//do sell when price is below stoploss point
-	stop_loss_detect(Price)
+	processStoploss(Price)
+
+	processTimeout()
 
 	return true
 }
