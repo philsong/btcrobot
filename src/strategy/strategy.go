@@ -393,49 +393,53 @@ func processTimeout() bool {
 			if order.Amount == order.Deal_amount {
 				delete(sellOrders, tm)
 				buy_amount -= order.Deal_amount
-			} else if order.Deal_amount < order.Amount {
-
-				ret, orderBook := GetOrderBook()
-				if !ret {
-					logger.Infoln("get orderBook failed 1")
-					ret, orderBook = GetOrderBook() //try again
-					if !ret {
-						logger.Infoln("get orderBook failed 2")
-						return false
-					}
+			} else {
+				if int64(now.Sub(tm)/time.Minute) <= timeout {
+					continue
 				}
+				if order.Deal_amount < order.Amount {
+					ret, orderBook := GetOrderBook()
+					if !ret {
+						logger.Infoln("get orderBook failed 1")
+						ret, orderBook = GetOrderBook() //try again
+						if !ret {
+							logger.Infoln("get orderBook failed 2")
+							return false
+						}
+					}
 
-				warning := "<--------------sell Delegation timeout, cancel-------------->" + id
-				if CancelOrder(id) {
-					warning += "[Cancel委托成功]"
+					warning := "<--------------sell Delegation timeout, cancel-------------->" + id
+					if CancelOrder(id) {
+						warning += "[Cancel委托成功]"
 
-					delete(sellOrders, tm)
-					//update to delete, start a new order for sell in below
+						delete(sellOrders, tm)
+						//update to delete, start a new order for sell in below
 
-					buy_amount -= order.Deal_amount
-					sell_amount := order.Amount - order.Deal_amount
+						buy_amount -= order.Deal_amount
+						sell_amount := order.Amount - order.Deal_amount
 
-					logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
-					logger.Infoln("买一", orderBook.Bids[0])
+						logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
+						logger.Infoln("买一", orderBook.Bids[0])
 
-					warning := "timeout, resell 卖出Sell Out---->限价单"
-					tradePrice := fmt.Sprintf("%f", orderBook.Asks[len(orderBook.Asks)-1].Price-0.01)
-					tradeAmount := fmt.Sprintf("%f", sell_amount)
-					sellID := Sell(tradePrice, tradeAmount)
-					if sellID != "0" {
-						warning += "[委托成功]"
-						sellOrders[time.Now()] = sellID //append or just update "set"
+						warning := "timeout, resell 卖出Sell Out---->限价单"
+						tradePrice := fmt.Sprintf("%f", orderBook.Asks[len(orderBook.Asks)-1].Price-0.01)
+						tradeAmount := fmt.Sprintf("%f", sell_amount)
+						sellID := Sell(tradePrice, tradeAmount)
+						if sellID != "0" {
+							warning += "[委托成功]"
+							sellOrders[time.Now()] = sellID //append or just update "set"
+						} else {
+							warning += "[委托失败]"
+							resellOrders[time.Now()] = tradeAmount
+						}
+						logger.Infoln(warning)
 					} else {
-						warning += "[委托失败]"
-						resellOrders[time.Now()] = tradeAmount
+						warning += "[Cancel委托失败]"
 					}
 					logger.Infoln(warning)
-				} else {
-					warning += "[Cancel委托失败]"
+					time.Sleep(1 * time.Second)
+					time.Sleep(500 * time.Microsecond)
 				}
-				logger.Infoln(warning)
-				time.Sleep(1 * time.Second)
-				time.Sleep(500 * time.Microsecond)
 			}
 		}
 	}
