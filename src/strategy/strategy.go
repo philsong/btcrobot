@@ -218,7 +218,7 @@ func Buy() string {
 			return "0"
 		}
 
-		amount = fmt.Sprintf("%s", nAmount)
+		amount = fmt.Sprintf("%02f", nAmount)
 	}
 
 	warning += "---->数量" + amount
@@ -292,7 +292,7 @@ func Sell() string {
 
 	if nAmount > Available_coin {
 		nAmount = Available_coin
-		amount = fmt.Sprintf("%s", nAmount)
+		amount = fmt.Sprintf("%02f", nAmount)
 	}
 
 	sellID := sell(price, amount)
