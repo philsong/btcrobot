@@ -28,8 +28,6 @@ import (
 
 type the3crowStrategy struct {
 	PrevClosePrice float64
-	PrevHighPrice  float64
-	PrevLowPrice   float64
 }
 
 func init() {
@@ -59,16 +57,34 @@ func (the3crow *the3crowStrategy) Tick(records []Record) bool {
 	}
 
 	length := len(Price)
-
-	if the3crow.PrevClosePrice != records[length-1].Close ||
-		the3crow.PrevHighPrice != records[length-2].High ||
-		the3crow.PrevLowPrice != records[length-2].Low {
-		the3crow.PrevClosePrice = records[length-1].Close
-		the3crow.PrevHighPrice = records[length-2].High
-		the3crow.PrevLowPrice = records[length-2].Low
-
-		logger.Infof("nowClose %0.02f prevHigh %0.02f prevLow %0.02f\n", records[length-1].Close, records[length-2].High, records[length-2].Low)
+	if the3crow.PrevClosePrice == records[length-1].Close {
+		return false
 	}
+
+	the3crow.PrevClosePrice = records[length-1].Close
+
+	logger.Infof("nowClose %0.02f\n", records[length-1].Close)
+	logger.Infof("3 open %0.02f close %0.02f\n", records[length-2].Open, records[length-2].Close)
+	logger.Infof("2 open %0.02f close %0.02f\n", records[length-3].Open, records[length-3].Close)
+	logger.Infof("1 open %0.02f close %0.02f\n", records[length-4].Open, records[length-4].Close)
+
+	if records[length-2].Close > records[length-2].Open {
+		logger.Infof("3阳")
+	} else {
+		logger.Infof("3阴")
+	}
+
+	if records[length-3].Close > records[length-3].Open {
+		logger.Infof("2阳")
+	} else {
+		logger.Infof("2阴")
+	}
+	if records[length-4].Close > records[length-4].Open {
+		logger.Infof("1阳")
+	} else {
+		logger.Infof("1阴")
+	}
+	logger.Infoln("---------")
 
 	//the3crow cross
 	if records[length-2].Close > records[length-2].Open &&

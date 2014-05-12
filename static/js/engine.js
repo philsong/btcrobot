@@ -40,7 +40,7 @@ function _onStrategyUI(strategy) {
     kdjid.style.display = "none";
   }
 
-  if (strategy == "OPENORDER" || strategy == "HLCross") {
+  if (strategy == "OPENORDER" || strategy == "HLCross" || strategy == "the3crow") {
     emaid.style.display = "none";
     kdjid.style.display = "none";
   }
