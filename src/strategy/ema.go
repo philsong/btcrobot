@@ -20,7 +20,6 @@ package strategy
 import (
 	. "common"
 	. "config"
-	"email"
 	"fmt"
 	"logger"
 	"os"
@@ -133,19 +132,6 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
 
-	_, err := strconv.ParseFloat(Option["tradeAmount"], 64)
-	if err != nil {
-		logger.Errorln("config item tradeAmount is not float")
-		return false
-	}
-	tradeAmount := Option["tradeAmount"]
-
-	stoploss, err := strconv.ParseFloat(Option["stoploss"], 64)
-	if err != nil {
-		logger.Errorln("config item stoploss is not float")
-		return false
-	}
-
 	var Time []string
 	var Price []float64
 	var Volumn []float64
@@ -207,26 +193,9 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 		//do buy when cross up
 		if emaStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessBuyThreshold {
 			if Option["enable_trading"] == "1" && PrevTrade != "buy" {
-
 				emaStrategy.PrevEMACross = "up"
-
 				if emaStrategy.checkThreshold("buy", EMAdif[length-1]) {
-
-					PrevTrade = "buy"
-
-					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
-					warning := "EMA up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
-						",委托价" + getTradePrice("buy", Price[length-1]) + ",diff" + diff
-					logger.Infoln(warning)
-
-					if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
-						PrevBuyPirce = Price[length-1]
-						warning += "[委托成功]"
-					} else {
-						warning += "[委托失败]"
-					}
-
-					go email.TriggerTrender(warning)
+					Buy()
 				}
 			}
 		}
@@ -235,41 +204,8 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 		if emaStrategy.is_downcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessSellThreshold {
 			emaStrategy.PrevEMACross = "down"
 			if Option["enable_trading"] == "1" && PrevTrade != "sell" {
-
 				if emaStrategy.checkThreshold("sell", EMAdif[length-1]) {
-
-					PrevTrade = "sell"
-
-					var tradePrice string
-					if Option["discipleMode"] == "1" {
-						stoplossPrice := PrevBuyPirce * (1 - stoploss*0.01)
-						if Price[length-1] > stoplossPrice {
-							tradePrice = getTradePrice("sell", Price[length-1])
-						} else {
-							discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
-							if err != nil {
-								logger.Errorln("config item discipleValue is not float")
-								return false
-							}
-
-							tradePrice = fmt.Sprintf("%f", PrevBuyPirce+discipleValue)
-						}
-					} else {
-						tradePrice = getTradePrice("sell", Price[length-1])
-					}
-
-					diff := fmt.Sprintf("%0.03f", EMAdif[length-1])
-					warning := "EMA down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
-						",委托价" + tradePrice + ",diff" + diff
-
-					logger.Infoln(warning)
-					if Sell(tradePrice, tradeAmount) != "0" {
-						warning += "[委托成功]"
-					} else {
-						warning += "[委托失败]"
-					}
-
-					go email.TriggerTrender(warning)
+					Sell()
 				}
 			}
 		}

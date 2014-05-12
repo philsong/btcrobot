@@ -19,10 +19,7 @@ package strategy
 
 import (
 	. "common"
-	. "config"
-	"email"
 	"logger"
-	"strconv"
 )
 
 type HLCrossStrategy struct {
@@ -38,16 +35,6 @@ func init() {
 
 //HLCross strategy
 func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
-	//read config
-
-	tradeAmount := Option["tradeAmount"]
-
-	numTradeAmount, err := strconv.ParseFloat(Option["tradeAmount"], 64)
-	if err != nil {
-		logger.Errorln("config item tradeAmount is not float")
-		return false
-	}
-
 	var Time []string
 	var Price []float64
 	var Volumn []float64
@@ -71,41 +58,10 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 
 	//HLCross cross
 	if records[length-1].Close > records[length-2].High {
-		if Option["enable_trading"] == "1" && PrevTrade != "buy" {
-			if GetAvailable_coin() < numTradeAmount {
-				warning = "HLCross up, but 没有足够的法币可买"
-				PrevTrade = "buy"
-			} else {
-				warning = "HLCross up, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
-					",委托价" + getTradePrice("buy", Price[length-1])
-				logger.Infoln(warning)
-				if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
-					warning += "[委托成功]"
-				} else {
-					warning += "[委托失败]"
-				}
-			}
-
-			logger.Infoln(warning)
-			go email.TriggerTrender(warning)
-		}
+		logger.Infoln("HLCross up")
+		Buy()
 	} else if records[length-1].Close < records[length-2].Low {
-		if Option["enable_trading"] == "1" && PrevTrade != "sell" {
-			if GetAvailable_coin() < numTradeAmount {
-				warning = "HLCross down, but 没有足够的币可卖"
-			} else {
-				warning = "HLCross down, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
-					",委托价" + getTradePrice("sell", Price[length-1])
-				if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
-					warning += "[委托成功]"
-				} else {
-					warning += "[委托失败]"
-				}
-			}
-
-			logger.Infoln(warning)
-			go email.TriggerTrender(warning)
-		}
+		Sell()
 	}
 
 	//do sell when price is below stoploss point

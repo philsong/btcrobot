@@ -20,8 +20,6 @@ package strategy
 import (
 	. "common"
 	. "config"
-	"email"
-	"fmt"
 	"logger"
 	"strconv"
 )
@@ -64,8 +62,6 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 		}
 	*/
 
-	tradeAmount := Option["tradeAmount"]
-
 	MACDbuyThreshold, err := strconv.ParseFloat(Option["MACDbuyThreshold"], 64)
 	if err != nil {
 		logger.Errorln("config item MACDbuyThreshold is not float")
@@ -106,40 +102,10 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 	//macd cross
 	if (MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) ||
 		(PrevTrade == "sell" && MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) {
-		if Option["enable_trading"] == "1" && PrevTrade != "buy" {
-			PrevTrade = "buy"
-
-			histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
-			warning := "MACD up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
-				",委托价" + getTradePrice("buy", Price[length-1]) + ",histogram" + histogram
-			logger.Infoln(warning)
-			if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
-				PrevBuyPirce = Price[length-1]
-				warning += "[委托成功]"
-			} else {
-				warning += "[委托失败]"
-			}
-
-			go email.TriggerTrender(warning)
-		}
+		Buy()
 	} else if (MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) ||
 		(PrevTrade == "buy" && MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] < MACDsellThreshold) {
-		if Option["enable_trading"] == "1" && PrevTrade != "sell" {
-			PrevTrade = "sell"
-
-			histogram := fmt.Sprintf("%0.03f", MACDHistogram[length-1])
-			warning := "MACD down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
-				",委托价" + getTradePrice("sell", Price[length-1]) + ",histogram" + histogram
-			logger.Infoln(warning)
-			if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
-				warning += "[委托成功]"
-				PrevBuyPirce = 0
-			} else {
-				warning += "[委托失败]"
-			}
-
-			go email.TriggerTrender(warning)
-		}
+		Sell()
 	}
 
 	//do sell when price is below stoploss point

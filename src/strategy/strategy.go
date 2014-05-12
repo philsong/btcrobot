@@ -120,30 +120,193 @@ func getTradePrice(tradeDirection string, price float64) string {
 	return fmt.Sprintf("%0.02f", finalTradePrice)
 }
 
-func Buy(price, amount string) string {
-	nTradePrice, err := strconv.ParseFloat(price, 64)
+func getBuyPrice() (price string, nPrice float64, warning string) {
+	//compute the price
+	slippage, err := strconv.ParseFloat(Option["slippage"], 64)
 	if err != nil {
-		logger.Errorln("price is not float")
+		logger.Debugln("config item slippage is not float")
+		slippage = 0.01
+	}
+
+	ret, orderBook := GetOrderBook()
+	if !ret {
+		logger.Infoln("get orderBook failed 1")
+		ret, orderBook = GetOrderBook() //try again
+		if !ret {
+			logger.Infoln("get orderBook failed 2")
+			return
+		}
+	}
+
+	logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
+	logger.Infoln("买一", orderBook.Bids[0])
+	nPrice = orderBook.Bids[0].Price + slippage
+	price = fmt.Sprintf("%f", nPrice)
+	warning += "---->限价单" + price
+
+	return
+}
+
+func buy(price, amount string) string {
+	nPrice, err := strconv.ParseFloat(price, 64)
+	if err != nil {
+		logger.Debugln("price is not float")
 		return "0"
 	}
 
-	buyID := gTradeAPI.Buy(price, amount)
+	var buyID string
+	if Option["enable_trading"] == "1" {
+		buyID = gTradeAPI.Buy(price, amount)
+	} else {
+		buyID = "-1"
+	}
+
 	if buyID != "0" {
 		buyOrders[time.Now()] = buyID
 		PrevTrade = "buy"
-		PrevBuyPirce = nTradePrice
+		PrevBuyPirce = nPrice
 	}
 
 	return buyID
 }
 
-func Sell(price, amount string) string {
-	sellID := gTradeAPI.Sell(price, amount)
+func sell(price, amount string) string {
+	var sellID string
+	if Option["enable_trading"] == "1" {
+		sellID = gTradeAPI.Sell(price, amount)
+	} else {
+		sellID = "-1"
+	}
+
 	if sellID != "0" {
 		sellOrders[time.Now()] = sellID
 		PrevTrade = "sell"
 		PrevBuyPirce = 0
 	}
+
+	return sellID
+}
+
+func Buy() string {
+	if PrevTrade == "buy" {
+		return "0"
+	}
+
+	//compute the price
+	price, nPrice, warning := getBuyPrice()
+
+	//compute the amount
+	amount := Option["tradeAmount"]
+	nAmount, err := strconv.ParseFloat(amount, 64)
+	if err != nil {
+		logger.Infoln("amount is not float")
+	}
+
+	Available_cny := GetAvailable_cny()
+	if Available_cny < nPrice*nAmount {
+		var nMinTradeAmount float64
+		nAmount = Available_cny / nPrice
+		symbol := Option["symbol"]
+		if symbol == "btc_cny" {
+			nMinTradeAmount = 0.1
+		} else {
+			nMinTradeAmount = 0.01
+		}
+		if nAmount < nMinTradeAmount {
+			warning += "没有足够的法币可用"
+			logger.Infoln(warning)
+			return "0"
+		}
+
+		amount = fmt.Sprintf("%s", nAmount)
+	}
+
+	warning += "---->数量" + amount
+
+	buyID := buy(price, amount)
+	if buyID == "-1" {
+		warning += " [模拟]"
+	} else if buyID == "0" {
+		warning += "[委托失败]"
+	} else {
+		warning += "[委托成功]" + buyID
+	}
+
+	logger.Infoln(warning)
+	go email.TriggerTrender(warning)
+
+	return buyID
+}
+
+func getSellPrice() (price string, nPrice float64, warning string) {
+	//compute the price
+	slippage, err := strconv.ParseFloat(Option["slippage"], 64)
+	if err != nil {
+		logger.Debugln("config item slippage is not float")
+		slippage = 0.01
+	}
+
+	ret, orderBook := GetOrderBook()
+	if !ret {
+		logger.Infoln("get orderBook failed 1")
+		ret, orderBook = GetOrderBook() //try again
+		if !ret {
+			logger.Infoln("get orderBook failed 2")
+			return
+		}
+	}
+
+	logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
+	logger.Infoln("买一", orderBook.Bids[0])
+	nPrice = orderBook.Asks[len(orderBook.Asks)-1].Price - slippage
+	price = fmt.Sprintf("%f", nPrice)
+	warning += "---->限价单" + price
+
+	return
+}
+
+func Sell() string {
+	if PrevTrade == "sell" {
+		return "0"
+	}
+
+	//compute the price
+	price, _, warning := getSellPrice()
+
+	//compute the amount
+	Available_coin := GetAvailable_coin()
+	if Available_coin < 0.01 {
+		warning = "the3crow down, but 没有足够的币可卖"
+		logger.Infoln(warning)
+		PrevTrade = "sell"
+		PrevBuyPirce = 0
+		return "0"
+	}
+
+	amount := Option["tradeAmount"]
+	nAmount, err := strconv.ParseFloat(amount, 64)
+	if err != nil {
+		logger.Infoln("amount is not float")
+		return "0"
+	}
+
+	if nAmount > Available_coin {
+		nAmount = Available_coin
+		amount = fmt.Sprintf("%s", nAmount)
+	}
+
+	sellID := sell(price, amount)
+	if sellID == "-1" {
+		warning += " [模拟]"
+	} else if sellID == "0" {
+		warning += "[委托失败]"
+	} else {
+		warning += "[委托成功]" + sellID
+	}
+
+	logger.Infoln(warning)
+	go email.TriggerTrender(warning)
+
 	return sellID
 }
 
@@ -165,13 +328,13 @@ func GetAvailable_cny() float64 {
 	account, ret := GetAccount()
 	if !ret {
 		logger.Errorln("GetAccount failed")
-		return 0
+		return -1
 	}
 
 	numAvailable_cny, err := strconv.ParseFloat(account.Available_cny, 64)
 	if err != nil {
 		logger.Errorln("tradeAmount is not float")
-		return 0
+		return -1
 	}
 	//balance > 0
 	return numAvailable_cny
@@ -181,13 +344,13 @@ func GetAvailable_btc() float64 {
 	account, ret := GetAccount()
 	if !ret {
 		logger.Errorln("GetAccount failed")
-		return 0
+		return -1
 	}
 
 	numAvailable_btc, err := strconv.ParseFloat(account.Available_btc, 64)
 	if err != nil {
 		logger.Errorln("Available_btc is not float")
-		return 0
+		return -1
 	}
 	//nCoins > 0
 	return numAvailable_btc
@@ -197,13 +360,13 @@ func GetAvailable_ltc() float64 {
 	account, ret := GetAccount()
 	if !ret {
 		logger.Errorln("GetAccount failed")
-		return 0
+		return -1
 	}
 
 	numAvailable_ltc, err := strconv.ParseFloat(account.Available_ltc, 64)
 	if err != nil {
 		logger.Errorln("Available_ltc is not float")
-		return 0
+		return -1
 	}
 	//nCoins > 0
 	return numAvailable_ltc
@@ -234,50 +397,10 @@ func processStoploss(Price []float64) bool {
 	//do sell when price is below stoploss point
 	stoplossPrice := PrevBuyPirce * (1 - stoploss*0.01)
 	if Price[length-1] <= stoplossPrice {
-		if Option["enable_trading"] == "1" && PrevTrade != "sell" {
-			var tradePrice string
-			if Option["discipleMode"] == "1" {
-				if Price[length-1] > stoplossPrice {
-					tradePrice = getTradePrice("sell", Price[length-1])
-				} else {
-					discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
-					if err != nil {
-						logger.Errorln("config item discipleValue is not float")
-						return false
-					}
+		warning := "stop loss, 卖出Sell Out---->"
+		logger.Infoln(warning)
 
-					tradePrice = fmt.Sprintf("%f", PrevBuyPirce+discipleValue)
-				}
-			} else {
-				tradePrice = getTradePrice("sell", Price[length-1])
-			}
-
-			warning := "stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + tradePrice
-			logger.Infoln(warning)
-
-			tradeAmount := Option["tradeAmount"]
-
-			numTradeAmount, err := strconv.ParseFloat(Option["tradeAmount"], 64)
-			if err != nil {
-				logger.Errorln("config item tradeAmount is not float")
-				return false
-			}
-
-			Available_coin := GetAvailable_coin()
-			if Available_coin < numTradeAmount {
-				tradeAmount = fmt.Sprintf("%s", Available_coin)
-			}
-
-			if Sell(tradePrice, tradeAmount) != "0" {
-				warning += "[委托成功]"
-				PrevTrade = "sell"
-				PrevBuyPirce = 0
-			} else {
-				warning += "[委托失败]"
-			}
-
-			go email.TriggerTrender(warning)
-		}
+		Sell()
 	}
 
 	return true
@@ -304,22 +427,7 @@ func processTimeout() bool {
 	for tm, tradeAmount := range resellOrders {
 		warning := fmt.Sprintf("<-----re-sell %f-------------->", tradeAmount)
 		logger.Infoln(warning)
-		ret, orderBook := GetOrderBook()
-		if !ret {
-			logger.Infoln("get orderBook failed 1")
-			ret, orderBook = GetOrderBook() //try again
-			if !ret {
-				logger.Infoln("get orderBook failed 2")
-				return false
-			}
-		}
-
-		logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
-		logger.Infoln("买一", orderBook.Bids[0])
-
-		warning = "resell 卖出Sell Out---->限价单"
-		tradePrice := fmt.Sprintf("%f", orderBook.Asks[len(orderBook.Asks)-1].Price-0.01)
-		sellID := Sell(tradePrice, tradeAmount)
+		sellID := Sell()
 		if sellID != "0" {
 			warning += "[委托成功]"
 			delete(resellOrders, tm)
@@ -424,7 +532,7 @@ func processTimeout() bool {
 						warning := "timeout, resell 卖出Sell Out---->限价单"
 						tradePrice := fmt.Sprintf("%f", orderBook.Asks[len(orderBook.Asks)-1].Price-0.01)
 						tradeAmount := fmt.Sprintf("%f", sell_amount)
-						sellID := Sell(tradePrice, tradeAmount)
+						sellID := sell(tradePrice, tradeAmount)
 						if sellID != "0" {
 							warning += "[委托成功]"
 							sellOrders[time.Now()] = sellID //append or just update "set"

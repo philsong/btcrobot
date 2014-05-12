@@ -19,8 +19,6 @@ package strategy
 
 import (
 	. "common"
-	. "config"
-	"email"
 	"logger"
 )
 
@@ -38,8 +36,6 @@ func init() {
 //xxx strategy
 func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 	//实现自己的策略
-
-	tradeAmount := Option["tradeAmount"]
 
 	var Time []string
 	var Price []float64
@@ -77,18 +73,7 @@ func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 		logger.Infoln("KDJ up cross")
 		if (PrevTrade == "init" && d[length-2] <= 30) || PrevTrade == "sell" {
 			//do buy
-			warning := "KDJ up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
-				",委托价" + getTradePrice("buy", Price[length-1])
-			logger.Infoln(warning)
-			if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
-				warning += "[委托成功]"
-				PrevBuyPirce = Price[length-1]
-				PrevTrade = "buy"
-			} else {
-				warning += "[委托失败]"
-			}
-
-			go email.TriggerTrender(warning)
+			Buy()
 		}
 
 	}
@@ -99,18 +84,7 @@ func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 		logger.Infoln("KDJ down cross")
 		if (PrevTrade == "init" && d[length-2] >= 70) || PrevTrade == "buy" {
 			//do sell
-			warning := "KDJ down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
-				",委托价" + getTradePrice("sell", Price[length-1])
-			logger.Infoln(warning)
-			if Sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
-				warning += "[委托成功]"
-				PrevTrade = "sell"
-				PrevBuyPirce = 0
-			} else {
-				warning += "[委托失败]"
-			}
-
-			go email.TriggerTrender(warning)
+			Sell()
 		}
 
 	}

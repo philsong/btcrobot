@@ -221,7 +221,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 					warning := "EMA up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
 						",委托价" + getTradePrice("buy", Price[length-1]) + ",diff" + diff
 					logger.Infoln(warning)
-					if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
+					if buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
 						emamacdemaStrategy.PrevBuyPirce = Price[length-1]
 						warning += "[委托成功]"
 					} else {
@@ -252,7 +252,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 						ematradeAmount = tradeAmount
 					}
 
-					if Sell(getTradePrice("sell", Price[length-1]), ematradeAmount) != "0" {
+					if sell(getTradePrice("sell", Price[length-1]), ematradeAmount) != "0" {
 						warning += "[委托成功]"
 					} else {
 						warning += "[委托失败]"
@@ -279,7 +279,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 				warning := "MACD up cross, 买入buy In<----市价" + getTradePrice("", Price[length-1]) +
 					",委托价" + getTradePrice("buy", Price[length-1]) + ",histogram" + histogram
 				logger.Infoln(warning)
-				if Buy(getTradePrice("buy", Price[length-1]), MacdTradeAmount) != "0" {
+				if buy(getTradePrice("buy", Price[length-1]), MacdTradeAmount) != "0" {
 					emamacdemaStrategy.PrevBuyPirce = Price[length-1]
 					warning += "[委托成功]"
 				} else {
@@ -297,7 +297,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 				warning := "MACD down cross, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
 					",委托价" + getTradePrice("sell", Price[length-1]) + ",histogram" + histogram
 				logger.Infoln(warning)
-				if Sell(getTradePrice("sell", Price[length-1]), MacdTradeAmount) != "0" {
+				if sell(getTradePrice("sell", Price[length-1]), MacdTradeAmount) != "0" {
 					warning += "[委托成功]"
 				} else {
 					warning += "[委托失败]"
@@ -322,7 +322,7 @@ func (emamacdemaStrategy *EMAMACDEMAStrategy) Tick(records []Record) bool {
 				ematradeAmount = tradeAmount
 			}
 
-			if Sell(getTradePrice("sell", Price[length-1]), ematradeAmount) != "0" {
+			if sell(getTradePrice("sell", Price[length-1]), ematradeAmount) != "0" {
 				warning += "[委托成功]"
 			} else {
 				warning += "[委托失败]"
