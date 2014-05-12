@@ -283,6 +283,8 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	//do sell when price is below stoploss point
 	processStoploss(Price)
 
+	processTimeout()
+
 	return true
 }
 

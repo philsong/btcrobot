@@ -27,7 +27,6 @@ import (
 )
 
 type OOStrategy struct {
-	PrevKDJTrade string
 	PrevTime     string
 	PrevPrice    float64
 	PrevBuyPirce float64
@@ -39,8 +38,6 @@ type OOStrategy struct {
 
 func init() {
 	oo := new(OOStrategy)
-	oo.PrevKDJTrade = "init"
-
 	Register("OPENORDER", oo)
 }
 
@@ -48,8 +45,7 @@ func init() {
 func (oo *OOStrategy) Tick(records []Record) bool {
 
 	const btcslap = 0.2
-	const ltcslap = 0.01
-	const timeout = 180
+	const ltcslap = 0.05
 	const ordercount = 1
 
 	numTradeAmount, err := strconv.ParseFloat(Option["tradeAmount"], 64)
@@ -84,7 +80,6 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 			buyID := Buy(tradePrice, splitTradeAmount)
 			if buyID != "0" {
 				warning += "[委托成功]"
-				oo.BuyId = append(oo.BuyId, buyID)
 				ret = true
 			} else {
 				warning += "[委托失败]"
@@ -99,7 +94,6 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 				sellID := Sell(tradePrice, splitTradeAmount)
 				if sellID != "0" {
 					warning += "[委托成功]"
-					oo.SellId = append(oo.SellId, sellID)
 				} else {
 					warning += "[委托失败]"
 				}
@@ -109,45 +103,7 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 		}
 	}
 
-	//check timeout trade
-	now := time.Now()
-
-	time.Sleep(2 * time.Second)
-	logger.Infoln("time go ", int64(now.Sub(oo.BuyBegin)/time.Second))
-	logger.Infoln("BuyId len", len(oo.BuyId), cap(oo.BuyId))
-	logger.Infoln("SellId len", len(oo.SellId), cap(oo.SellId))
-
-	if len(oo.BuyId) != 0 &&
-		int64(now.Sub(oo.BuyBegin)/time.Second) > timeout {
-		//todo-
-		for _, BuyId := range oo.BuyId {
-			warning := "<--------------buy order timeout, cancel-------------->" + BuyId
-			if CancelOrder(BuyId) {
-				warning += "[Cancel委托成功]"
-			} else {
-				warning += "[Cancel委托失败]"
-			}
-			logger.Infoln(warning)
-			time.Sleep(1 * time.Second)
-		}
-		oo.BuyId = oo.BuyId[:0]
-	}
-
-	if len(oo.SellId) != 0 &&
-		int64(now.Sub(oo.SellBegin)/time.Second) > timeout {
-		//todo
-		for _, SellId := range oo.SellId {
-			warning := "<--------------sell order timeout, cancel------------->" + SellId
-			if CancelOrder(SellId) {
-				warning += "[Cancel委托成功]"
-			} else {
-				warning += "[Cancel委托失败]"
-			}
-			logger.Infoln(warning)
-			time.Sleep(1 * time.Second)
-		}
-		oo.SellId = oo.SellId[:0]
-	}
+	processTimeout()
 
 	return true
 }

@@ -15,6 +15,8 @@ type Strategy interface {
 	Tick(records []Record) bool
 }
 
+const timeout = 5 //minute
+
 var strategys = make(map[string]Strategy)
 var PrevTrade string
 var PrevBuyPirce float64
@@ -254,6 +256,18 @@ func processStoploss(Price []float64) bool {
 			logger.Infoln(warning)
 
 			tradeAmount := Option["tradeAmount"]
+
+			numTradeAmount, err := strconv.ParseFloat(Option["tradeAmount"], 64)
+			if err != nil {
+				logger.Errorln("config item tradeAmount is not float")
+				return false
+			}
+
+			Available_coin := GetAvailable_coin()
+			if Available_coin < numTradeAmount {
+				tradeAmount = fmt.Sprintf("%s", Available_coin)
+			}
+
 			if Sell(tradePrice, tradeAmount) != "0" {
 				warning += "[委托成功]"
 				PrevTrade = "sell"
@@ -335,15 +349,15 @@ func processTimeout() bool {
 				buy_amount += order.Deal_amount
 				delete(buyOrders, tm)
 			} else {
+				if int64(now.Sub(tm)/time.Minute) <= timeout {
+					continue
+				}
+
 				if order.Deal_amount > 0.0001 { //部分成交的买卖单
 					buy_average = (buy_amount*buy_average + order.Deal_amount*order.Price) / (buy_amount + order.Deal_amount)
 					logger.Infof("part of buy_average=%0.02f\n", buy_average)
 					dealOrders[tm] = order
 					buy_amount += order.Deal_amount
-				} else {
-					if int64(now.Sub(tm)/time.Minute) <= timeout {
-						continue
-					}
 				}
 
 				warning := fmt.Sprintf("<-----buy Delegation timeout, cancel %s[deal:%f]-------------->", id, order.Deal_amount)

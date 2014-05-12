@@ -80,7 +80,6 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 					",委托价" + getTradePrice("buy", Price[length-1])
 				logger.Infoln(warning)
 				if Buy(getTradePrice("buy", Price[length-1]), tradeAmount) != "0" {
-					PrevBuyPirce = Price[length-1]
 					warning += "[委托成功]"
 				} else {
 					warning += "[委托失败]"
@@ -94,8 +93,6 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 		if Option["enable_trading"] == "1" && PrevTrade != "sell" {
 			if GetAvailable_coin() < numTradeAmount {
 				warning = "HLCross down, but 没有足够的币可卖"
-				PrevTrade = "sell"
-				PrevBuyPirce = 0
 			} else {
 				warning = "HLCross down, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) +
 					",委托价" + getTradePrice("sell", Price[length-1])
