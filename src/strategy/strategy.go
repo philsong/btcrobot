@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"logger"
 	"strconv"
+	"time"
 )
 
 // Strategy is the interface that must be implemented by a strategy driver.
@@ -19,7 +20,28 @@ var PrevTrade string
 var PrevBuyPirce float64
 var warning string
 
+var buyOrders map[time.Time]string
+var dealOrders map[time.Time]Order
+var sellOrders map[time.Time]string
+var recancelbuyOrders map[time.Time]string
+var resellOrders map[time.Time]string
+
+var buy_average float64
+var buy_amount float64
+
 var gTradeAPI TradeAPI
+
+func init() {
+	buyOrders = make(map[time.Time]string)
+	dealOrders = make(map[time.Time]Order)
+	sellOrders = make(map[time.Time]string)
+	recancelbuyOrders = make(map[time.Time]string)
+	resellOrders = make(map[time.Time]string)
+
+	buy_average = 0
+
+	PrevTrade = "init"
+}
 
 // Register makes a strategy available by the provided name.
 // If Register is called twice with the same name or if driver is nil,
@@ -177,7 +199,7 @@ func GetAvailable_coin() float64 {
 //common stop loss function
 //////////////////////////////////
 
-func stop_loss_detect(Price []float64) bool {
+func processStoploss(Price []float64) bool {
 	length := len(Price)
 
 	stoploss, err := strconv.ParseFloat(Option["stoploss"], 64)
@@ -224,4 +246,196 @@ func stop_loss_detect(Price []float64) bool {
 	}
 
 	return true
+}
+
+func processTimeout() bool {
+	//check timeout trade
+
+	//last cancel failed, recancel
+	for tm, id := range recancelbuyOrders {
+		warning := fmt.Sprintf("<-----re-cancel %s-------------->", id)
+		if CancelOrder(id) {
+			warning += "[Cancel委托成功]"
+			delete(recancelbuyOrders, tm)
+		} else {
+			warning += "[Cancel委托失败]"
+		}
+
+		logger.Infoln(warning)
+		time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Microsecond)
+	}
+
+	for tm, tradeAmount := range resellOrders {
+		warning := fmt.Sprintf("<-----re-sell %f-------------->", tradeAmount)
+		logger.Infoln(warning)
+		ret, orderBook := GetOrderBook()
+		if !ret {
+			logger.Infoln("get orderBook failed 1")
+			ret, orderBook = GetOrderBook() //try again
+			if !ret {
+				logger.Infoln("get orderBook failed 2")
+				return false
+			}
+		}
+
+		logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
+		logger.Infoln("买一", orderBook.Bids[0])
+
+		warning = "resell 卖出Sell Out---->限价单"
+		tradePrice := fmt.Sprintf("%f", orderBook.Asks[len(orderBook.Asks)-1].Price-0.01)
+		sellID := Sell(tradePrice, tradeAmount)
+		if sellID != "0" {
+			warning += "[委托成功]"
+			delete(resellOrders, tm)
+			sellOrders[time.Now()] = sellID //append or just update "set"
+		} else {
+			warning += "[委托失败]"
+		}
+
+		logger.Infoln(warning)
+		time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Microsecond)
+	}
+
+	now := time.Now()
+	if len(buyOrders) != 0 {
+		//todo-
+		logger.Infoln("BuyId len", len(buyOrders))
+		for tm, id := range buyOrders {
+			ret, order := GetOrder(id)
+			if ret == false {
+				continue
+			}
+			if order.Amount == order.Deal_amount {
+				buy_average = (buy_amount*buy_average + order.Deal_amount*order.Price) / (buy_amount + order.Deal_amount)
+				logger.Infof("buy_average=%0.02f\n", buy_average)
+				dealOrders[tm] = order
+				buy_amount += order.Deal_amount
+				delete(buyOrders, tm)
+			} else {
+				if order.Deal_amount > 0.0001 { //部分成交的买卖单
+					buy_average = (buy_amount*buy_average + order.Deal_amount*order.Price) / (buy_amount + order.Deal_amount)
+					logger.Infof("part of buy_average=%0.02f\n", buy_average)
+					dealOrders[tm] = order
+					buy_amount += order.Deal_amount
+				} else {
+					if int64(now.Sub(tm)/time.Minute) <= timeout {
+						continue
+					}
+				}
+
+				warning := fmt.Sprintf("<-----buy Delegation timeout, cancel %s[deal:%f]-------------->", id, order.Deal_amount)
+				logger.Infoln(order)
+				if CancelOrder(id) {
+					warning += "[Cancel委托成功]"
+				} else {
+					warning += "[Cancel委托失败]"
+					recancelbuyOrders[time.Now()] = id
+				}
+
+				delete(buyOrders, tm)
+				logger.Infoln(warning)
+				time.Sleep(1 * time.Second)
+				time.Sleep(500 * time.Microsecond)
+			}
+		}
+	}
+
+	if len(sellOrders) != 0 {
+		//todo-
+		logger.Infoln("SellId len", len(sellOrders))
+		for tm, id := range sellOrders {
+			if int64(now.Sub(tm)/time.Second) <= timeout {
+				continue
+			}
+
+			ret, order := GetOrder(id)
+			if ret == false {
+				continue
+			}
+
+			if order.Amount == order.Deal_amount {
+				delete(sellOrders, tm)
+				buy_amount -= order.Deal_amount
+			} else if order.Deal_amount < order.Amount {
+
+				ret, orderBook := GetOrderBook()
+				if !ret {
+					logger.Infoln("get orderBook failed 1")
+					ret, orderBook = GetOrderBook() //try again
+					if !ret {
+						logger.Infoln("get orderBook failed 2")
+						return false
+					}
+				}
+
+				warning := "<--------------sell Delegation timeout, cancel-------------->" + id
+				if CancelOrder(id) {
+					warning += "[Cancel委托成功]"
+
+					delete(sellOrders, tm)
+					//update to delete, start a new order for sell in below
+
+					buy_amount -= order.Deal_amount
+					sell_amount := order.Amount - order.Deal_amount
+
+					logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
+					logger.Infoln("买一", orderBook.Bids[0])
+
+					warning := "timeout, resell 卖出Sell Out---->限价单"
+					tradePrice := fmt.Sprintf("%f", orderBook.Asks[len(orderBook.Asks)-1].Price-0.01)
+					tradeAmount := fmt.Sprintf("%f", sell_amount)
+					sellID := Sell(tradePrice, tradeAmount)
+					if sellID != "0" {
+						warning += "[委托成功]"
+						sellOrders[time.Now()] = sellID //append or just update "set"
+					} else {
+						warning += "[委托失败]"
+						resellOrders[time.Now()] = tradeAmount
+					}
+					logger.Infoln(warning)
+				} else {
+					warning += "[Cancel委托失败]"
+				}
+				logger.Infoln(warning)
+				time.Sleep(1 * time.Second)
+				time.Sleep(500 * time.Microsecond)
+			}
+		}
+	}
+
+	return true
+}
+
+//todo:need to think about edge issue carefully
+//compute any period k-line base on 1 minte kline
+func getKLine(records []Record, periods int) (recordsN []Record) {
+	length := len(records)
+	lengthN := length / periods
+
+	// Loop through the entire array.
+	for i := 0; i < periods*lengthN; i = i + periods {
+		var recordN Record
+		recordN.TimeStr = records[i].TimeStr
+		recordN.Time = records[i].Time
+
+		recordN.Open = records[i].Open
+		recordN.Close = records[i+periods-1].Close
+
+		var LowPrice []float64
+		var HignPrice []float64
+		for j := 0; j < periods; j++ {
+			LowPrice = append(LowPrice, records[i+j].Low)
+			HignPrice = append(HignPrice, records[i+j].High)
+			recordN.Volumn += records[i+j].Volumn
+		}
+		recordN.Low = arrayLowest(LowPrice)
+		recordN.High = arrayHighest(HignPrice)
+
+		// add points to the array.
+		recordsN = append(recordsN, recordN)
+	}
+
+	return recordsN
 }
