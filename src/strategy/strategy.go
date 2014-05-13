@@ -283,7 +283,7 @@ func Sell() string {
 	//compute the amount
 	Available_coin := GetAvailable_coin()
 	if Available_coin < 0.01 {
-		warning = "the3crow down, but 没有足够的币可卖"
+		warning = "没有足够的币可卖"
 		logger.Infoln(warning)
 		PrevTrade = "sell"
 		PrevBuyPirce = 0
