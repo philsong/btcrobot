@@ -124,6 +124,23 @@ func getTradePrice(tradeDirection string, price float64) string {
 	return fmt.Sprintf("%0.02f", finalTradePrice)
 }
 
+func getOrderPrice() (sell1, buy1 float64, ret bool) {
+	ret, orderBook := GetOrderBook()
+	if !ret {
+		logger.Infoln("get orderBook failed 1")
+		ret, orderBook = GetOrderBook() //try again
+		if !ret {
+			logger.Infoln("get orderBook failed 2")
+			return 0, 0, ret
+		}
+	}
+
+	logger.Infoln("卖一", orderBook.Asks[len(orderBook.Asks)-1])
+	logger.Infoln("买一", orderBook.Bids[0])
+
+	return orderBook.Asks[len(orderBook.Asks)-1].Price, orderBook.Bids[0].Price, ret
+}
+
 func getBuyPrice() (price string, nPrice float64, warning string) {
 	//compute the price
 	slippage, err := strconv.ParseFloat(Option["slippage"], 64)
@@ -132,19 +149,12 @@ func getBuyPrice() (price string, nPrice float64, warning string) {
 		slippage = 0.01
 	}
 
-	ret, orderBook := GetOrderBook()
+	_, buy1, ret := getOrderPrice()
 	if !ret {
-		logger.Infoln("get orderBook failed 1")
-		ret, orderBook = GetOrderBook() //try again
-		if !ret {
-			logger.Infoln("get orderBook failed 2")
-			return
-		}
+		return
 	}
 
-	logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
-	logger.Infoln("买一", orderBook.Bids[0])
-	nPrice = orderBook.Bids[0].Price + slippage
+	nPrice = buy1 + slippage
 	price = fmt.Sprintf("%f", nPrice)
 	warning += "---->限价单" + price
 
@@ -159,19 +169,12 @@ func getSellPrice() (price string, nPrice float64, warning string) {
 		slippage = 0.01
 	}
 
-	ret, orderBook := GetOrderBook()
+	sell1, _, ret := getOrderPrice()
 	if !ret {
-		logger.Infoln("get orderBook failed 1")
-		ret, orderBook = GetOrderBook() //try again
-		if !ret {
-			logger.Infoln("get orderBook failed 2")
-			return
-		}
+		return
 	}
 
-	logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
-	logger.Infoln("买一", orderBook.Bids[0])
-	nPrice = orderBook.Asks[len(orderBook.Asks)-1].Price - slippage
+	nPrice = sell1 - slippage
 	price = fmt.Sprintf("%f", nPrice)
 	warning += "---->限价单" + price
 
