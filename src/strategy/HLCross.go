@@ -43,14 +43,14 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 		HLCross.PrevHighPrice = records[length-2].High
 		HLCross.PrevLowPrice = records[length-2].Low
 
-		logger.Infof("nowClose %0.02f prevHigh %0.02f prevLow %0.02f\n", records[length-1].Close, records[length-2].High, records[length-2].Low)
+		logger.Infof("lastPrice %0.02f prevHigh %0.02f prevLow %0.02f\n",
+			lastPrice, records[length-2].High, records[length-2].Low)
 	}
 
 	//HLCross cross
-	if records[length-1].Close > records[length-2].High {
-		logger.Infoln("HLCross up")
+	if lastPrice > records[length-2].High {
 		Buy()
-	} else if records[length-1].Close < records[length-2].Low {
+	} else if lastPrice < records[length-2].Low {
 		Sell()
 	}
 
