@@ -90,4 +90,8 @@
 
   Version 0.36
   time 2014-05-07 auto rename secret.sample to secret.json
+  
+  Version 0.37
+  time 2014-05-13 redesign the strategy API, make it simple and clear
+                  add a three crow strategy sample.
 */

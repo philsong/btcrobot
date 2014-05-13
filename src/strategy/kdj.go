@@ -37,21 +37,8 @@ func init() {
 func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 	//实现自己的策略
 
-	var Time []string
-	var Price []float64
-	var Volumn []float64
-	for _, v := range records {
-		Time = append(Time, v.TimeStr)
-		Price = append(Price, v.Close)
-		Volumn = append(Volumn, v.Volumn)
-		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
-		//Price = append(Price, v.Low)
-	}
-
-	length := len(records)
-
 	if kdjStrategy.PrevTime == records[length-1].TimeStr &&
-		kdjStrategy.PrevPrice == records[length-1].Close {
+		kdjStrategy.PrevPrice == lastPrice {
 		return false
 	}
 
@@ -61,7 +48,7 @@ func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 	if kdjStrategy.PrevTime != records[length-1].TimeStr ||
 		kdjStrategy.PrevPrice != records[length-1].Close {
 		kdjStrategy.PrevTime = records[length-1].TimeStr
-		kdjStrategy.PrevPrice = records[length-1].Close
+		kdjStrategy.PrevPrice = lastPrice
 
 		logger.Infoln(records[length-1].TimeStr, records[length-1].Close)
 		logger.Infof("d(黄线）%0.0f\tk(白线）%0.0f\tj(红线）%0.0f\n", d[length-2], k[length-2], j[length-2])
@@ -90,7 +77,8 @@ func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 	}
 
 	//do sell when price is below stoploss point
-	processStoploss(Price)
+	processStoploss(lastPrice)
+	processTimeout()
 
 	return true
 }

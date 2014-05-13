@@ -30,7 +30,6 @@ func init() {
 	Register("OPENORDER", oo)
 }
 
-//KDJ-EX strategy
 func (oo *OOStrategy) Tick(records []Record) bool {
 
 	const btcslap = 0.2

@@ -125,15 +125,9 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 		return false
 	}
 
-	var Time []string
 	var Price []float64
-	var Volumn []float64
 	for _, v := range records {
-		Time = append(Time, v.TimeStr)
 		Price = append(Price, v.Close)
-		Volumn = append(Volumn, v.Volumn)
-		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
-		//Price = append(Price, v.Low)
 	}
 
 	//compute the indictor
@@ -207,7 +201,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 
 		//backup the kline data for analyze
 		if Config["env"] == "dev" {
-			backup(Time[length-1])
+			backup(records[length-1].TimeStr)
 		}
 	}
 
@@ -224,7 +218,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 	}
 
 	//do sell when price is below stoploss point
-	if Price[length-1] < emamacdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
+	if lastPrice < emamacdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 
 		emamacdStrategy.PrevEMATrade = "sell"
 		emamacdStrategy.PrevMACDTrade = "init"
@@ -232,7 +226,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 	}
 
 	//do sell when price is below stoploss point
-	processStoploss(Price)
+	processStoploss(lastPrice)
 
 	processTimeout()
 

@@ -132,15 +132,9 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
 
-	var Time []string
 	var Price []float64
-	var Volumn []float64
 	for _, v := range records {
-		Time = append(Time, v.TimeStr)
 		Price = append(Price, v.Close)
-		Volumn = append(Volumn, v.Volumn)
-		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
-		//Price = append(Price, v.Low)
 	}
 
 	//compute the indictor
@@ -148,7 +142,6 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	emaLong := EMA(Price, longEMA)
 	EMAdif := getMACDdif(emaShort, emaLong)
 
-	length := len(Price)
 	if emaStrategy.PrevEMACross == "unknown" {
 		if is_uptrend(EMAdif[length-3]) {
 			emaStrategy.PrevEMACross = "up"
@@ -170,7 +163,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	//go TriggerPrice(Price[length-1])
 	if EMAdif[length-1] != emaStrategy.PrevEMAdif {
 		emaStrategy.PrevEMAdif = EMAdif[length-1]
-		logger.Infof("EMA [%0.02f,%0.02f,%0.02f] Diff:%0.03f\t%0.03f\n", Price[length-1], emaShort[length-1], emaLong[length-1], EMAdif[length-2], EMAdif[length-1])
+		logger.Infof("EMA [%0.02f,%0.02f,%0.02f] Diff:%0.03f\t%0.03f\n", lastPrice, emaShort[length-1], emaLong[length-1], EMAdif[length-2], EMAdif[length-1])
 	}
 
 	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
@@ -212,12 +205,12 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 
 		//backup the kline data for analyze
 		if Config["env"] == "dev" {
-			backup(Time[length-1])
+			backup(records[length-1].TimeStr)
 		}
 	}
 
 	//do sell when price is below stoploss point
-	processStoploss(Price)
+	processStoploss(lastPrice)
 
 	processTimeout()
 

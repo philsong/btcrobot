@@ -74,15 +74,9 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 		return false
 	}
 
-	var Time []string
 	var Price []float64
-	var Volumn []float64
 	for _, v := range records {
-		Time = append(Time, v.TimeStr)
 		Price = append(Price, v.Close)
-		Volumn = append(Volumn, v.Volumn)
-		//Price = append(Price, (v.Close+v.Open+v.High+v.Low)/4.0)
-		//Price = append(Price, v.Low)
 	}
 
 	//compute the indictor
@@ -91,8 +85,6 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 	MACDdif := getMACDdif(emaShort, emaLong)
 	MACDSignal := getMACDSignal(MACDdif, signalPeriod)
 	MACDHistogram := getMACDHistogram(MACDdif, MACDSignal)
-
-	length := len(Price)
 
 	if MACDdif[length-1] != macdStrategy.PrevMACDdif {
 		macdStrategy.PrevMACDdif = MACDdif[length-1]
@@ -109,7 +101,8 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 	}
 
 	//do sell when price is below stoploss point
-	processStoploss(Price)
+	processStoploss(lastPrice)
+	processTimeout()
 
 	return true
 }

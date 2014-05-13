@@ -35,16 +35,6 @@ func init() {
 
 //HLCross strategy
 func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
-	var Time []string
-	var Price []float64
-	var Volumn []float64
-	for _, v := range records {
-		Time = append(Time, v.TimeStr)
-		Price = append(Price, v.Close)
-		Volumn = append(Volumn, v.Volumn)
-	}
-
-	length := len(Price)
 
 	if HLCross.PrevClosePrice != records[length-1].Close ||
 		HLCross.PrevHighPrice != records[length-2].High ||
@@ -65,7 +55,7 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 	}
 
 	//do sell when price is below stoploss point
-	processStoploss(Price)
+	processStoploss(lastPrice)
 
 	processTimeout()
 
