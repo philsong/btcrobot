@@ -19,7 +19,6 @@ package strategy
 
 import (
 	. "common"
-	"logger"
 )
 
 type OOStrategy struct {
@@ -32,31 +31,20 @@ func init() {
 
 func (oo *OOStrategy) Tick(records []Record) bool {
 
-	const btcslap = 0.2
-	const ltcslap = 0.05
-	const ordercount = 1
+	const btcslap = 1.8
+	const ltcslap = 0.8
 
-	ret, orderbook := GetOrderBook()
+	sell1, buy1, ret := getOrderPrice()
 	if !ret {
-		logger.Infoln("get orderbook failed 1")
-		ret, orderbook = GetOrderBook() //try again
-		if !ret {
-			logger.Infoln("get orderbook failed 2")
-			return false
-		}
+		return false
 	}
 
-	logger.Infoln("卖一", orderbook.Asks[len(orderbook.Asks)-1])
-	logger.Infoln("买一", orderbook.Bids[0])
+	diff := btcslap
 
-	diff := 1.0
-
-	if orderbook.Bids[0].Price+diff <= orderbook.Asks[len(orderbook.Asks)-1].Price {
-		for i := 1; i <= ordercount; i++ {
-			buyID := Buy()
-			if buyID != "0" {
-				Sell()
-			}
+	if buy1+diff <= sell1 {
+		buyID := Buy()
+		if buyID != "0" {
+			Sell()
 		}
 	}
 
