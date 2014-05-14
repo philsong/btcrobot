@@ -32,6 +32,7 @@ var buy_average float64
 var buy_amount float64
 var lastPrice float64
 var length int
+var isStoploss bool
 
 var gTradeAPI TradeAPI
 
@@ -173,8 +174,20 @@ func getSellPrice() (price string, nPrice float64, warning string) {
 	if !ret {
 		return
 	}
-
 	nPrice = sell1 - slippage
+
+	if !isStoploss && Option["discipleMode"] == "1" {
+		if nPrice < PrevBuyPirce {
+			discipleValue, err := strconv.ParseFloat(Option["discipleValue"], 64)
+			if err != nil {
+				logger.Errorln("config item discipleValue is not float")
+				discipleValue = 0.01
+			}
+
+			nPrice = PrevBuyPirce + discipleValue
+		}
+	}
+
 	price = fmt.Sprintf("%f", nPrice)
 	warning += "---->限价单" + price
 
@@ -225,6 +238,9 @@ func Buy() string {
 	if PrevTrade == "buy" {
 		return "0"
 	}
+
+	//init
+	isStoploss = false
 
 	//compute the price
 	price, nPrice, warning := getBuyPrice()
@@ -405,6 +421,7 @@ func processStoploss(Price float64) bool {
 		warning := "stop loss, 卖出Sell Out---->"
 		logger.Infoln(warning)
 
+		isStoploss = true
 		Sell()
 	}
 
@@ -434,11 +451,11 @@ func processTimeout() bool {
 		logger.Infoln(warning)
 		sellID := Sell()
 		if sellID != "0" {
-			warning += "[委托成功]"
+			warning += "[re-sell委托成功]"
 			delete(resellOrders, tm)
 			sellOrders[time.Now()] = sellID //append or just update "set"
 		} else {
-			warning += "[委托失败]"
+			warning += "[re-sell委托失败]"
 		}
 
 		logger.Infoln(warning)
@@ -476,9 +493,9 @@ func processTimeout() bool {
 				warning := fmt.Sprintf("<-----buy Delegation timeout, cancel %s[deal:%f]-------------->", id, order.Deal_amount)
 				logger.Infoln(order)
 				if CancelOrder(id) {
-					warning += "[Cancel委托成功]"
+					warning += "[buy Cancel委托成功]"
 				} else {
-					warning += "[Cancel委托失败]"
+					warning += "[buy Cancel委托失败]"
 					recancelbuyOrders[time.Now()] = id
 				}
 
@@ -523,7 +540,7 @@ func processTimeout() bool {
 
 					warning := "<--------------sell Delegation timeout, cancel-------------->" + id
 					if CancelOrder(id) {
-						warning += "[Cancel委托成功]"
+						warning += "[sell Cancel委托成功]"
 
 						delete(sellOrders, tm)
 						//update to delete, start a new order for sell in below
@@ -539,15 +556,15 @@ func processTimeout() bool {
 						tradeAmount := fmt.Sprintf("%f", sell_amount)
 						sellID := sell(tradePrice, tradeAmount)
 						if sellID != "0" {
-							warning += "[委托成功]"
+							warning += "[resell 委托成功]"
 							sellOrders[time.Now()] = sellID //append or just update "set"
 						} else {
-							warning += "[委托失败]"
+							warning += "[resell 委托失败]"
 							resellOrders[time.Now()] = tradeAmount
 						}
 						logger.Infoln(warning)
 					} else {
-						warning += "[Cancel委托失败]"
+						warning += "[sell Cancel委托失败]"
 					}
 					logger.Infoln(warning)
 					time.Sleep(1 * time.Second)
