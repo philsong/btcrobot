@@ -19,7 +19,9 @@ package strategy
 
 import (
 	. "common"
+	. "config"
 	"logger"
+	"strconv"
 )
 
 type HLCrossStrategy struct {
@@ -35,6 +37,16 @@ func init() {
 
 //HLCross strategy
 func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
+	//read config
+	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
+
+	var Price []float64
+	for _, v := range records {
+		Price = append(Price, v.Close)
+	}
+
+	//compute the indictor
+	emaShort := EMA(Price, shortEMA)
 
 	if HLCross.PrevClosePrice != records[length-1].Close ||
 		HLCross.PrevHighPrice != records[length-2].High ||
@@ -48,9 +60,13 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 	}
 
 	//HLCross cross
-	if lastPrice > records[length-2].High {
+	if Price[length-2] > emaShort[length-2] &&
+		records[length-2].Volumn > 100 &&
+		records[length-2].High > records[length-3].High &&
+		records[length-2].Low > records[length-3].Low {
 		Buy()
-	} else if lastPrice < records[length-2].Low {
+	} else if Price[length-2] < emaShort[length-2] && records[length-2].High < records[length-3].High &&
+		records[length-2].Low < records[length-3].Low {
 		Sell()
 	}
 

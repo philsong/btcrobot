@@ -15,7 +15,7 @@ type Strategy interface {
 	Tick(records []Record) bool
 }
 
-const timeout = 5 //minute
+const timeout = 1 //minute
 
 var strategys = make(map[string]Strategy)
 var PrevTrade string
