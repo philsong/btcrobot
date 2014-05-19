@@ -12,6 +12,7 @@ export GOPATH=`pwd`
 
 go get -u github.com/go-martini/martini
 go get -u github.com/codegangsta/martini-contrib/auth
+go get github.com/syndtr/goleveldb/leveldb
 
 export GOPATH="$OLDGOPATH"
 export PATH="$OLDPATH"

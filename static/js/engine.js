@@ -112,7 +112,8 @@ $(function() {
     $('#sellThreshold').val(data.sellThreshold);
     $('#MACDbuyThreshold').val(data.MACDbuyThreshold);
     $('#MACDsellThreshold').val(data.MACDsellThreshold);
-
+    $('#basePrice').val(data.basePrice);
+    $('#fluctuation').val(data.fluctuation);
     // Switch
     $("[data-toggle='switch']").wrap('<div class="switch" />').parent().bootstrapSwitch();
 

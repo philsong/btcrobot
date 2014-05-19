@@ -13,6 +13,7 @@ set GOPATH=%~dp0
 
 go get -u github.com/go-martini/martini
 go get -u github.com/codegangsta/martini-contrib/auth
+go get github.com/syndtr/goleveldb/leveldb
 
 set GOPATH=%OLDGOPATH%
 

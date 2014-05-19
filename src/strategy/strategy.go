@@ -3,6 +3,7 @@ package strategy
 import (
 	. "common"
 	. "config"
+	"db"
 	"email"
 	"fmt"
 	"logger"
@@ -209,10 +210,28 @@ func buy(price, amount string) string {
 	}
 
 	if buyID != "0" {
-		buyOrders[time.Now()] = buyID
+		timestamp := time.Now()
+		err := db.SetTx("buy", buyID, timestamp.Unix(), price, amount)
+		if err != nil {
+			fmt.Println("SetTx")
+			fmt.Println(err)
+		}
+		buyOrders[timestamp] = buyID
 		PrevTrade = "buy"
 		PrevBuyPirce = nPrice
 	}
+	/*
+		{
+			fmt.Println("GetTx")
+			cmd, id, timestamp, amount, price, err := db.GetTx(buyID)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			fmt.Println(cmd, id, timestamp, amount, price, err)
+			fmt.Println(db.GetTx(buyID))
+		}
+	*/
 
 	return buyID
 }
@@ -226,11 +245,14 @@ func sell(price, amount string) string {
 	}
 
 	if sellID != "0" {
-		sellOrders[time.Now()] = sellID
+		timestamp := time.Now()
+		db.SetTx("sell", sellID, timestamp.Unix(), price, amount)
+		sellOrders[timestamp] = sellID
 		PrevTrade = "sell"
 		PrevBuyPirce = 0
 	}
 
+	//fmt.Println(db.GetTx(sellID))
 	return sellID
 }
 
