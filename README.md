@@ -118,3 +118,25 @@ Doge捐助地址：DNp3z6yf2bvKPYfU2bN1SpGXPXGFFM9A43
 
 注：在第5步运行前可以根据需要修改 conf目录里的 配置，亦可在第6步配置。
 
+## How You Can Help
+
+### Donations
+
+Donations help me to keep working on btcrobot and keep it free and open source, without having to worry about income. Any amount is really helpful! Thank you so much.
+
+The btcrobot donation Bitcoin address is **1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8**
+
+
+Again, thank you. :heart:
+
+### Contributing
+
+Help us build! We're in beta right now [and seeking help to find bugs]. If you are interested in contributing, jump in! Anyone is welcome to send pull requests. Issue reports are good too, but pull requests are much better. Here's how you do it:
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Write the code, **and tests to confirm it works**
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create new Pull Request
+
