@@ -94,4 +94,7 @@
   Version 0.37
   time 2014-05-13 redesign the strategy API, make it simple and clear
                   add a three crow strategy sample.
+
+  Version 0.38
+  time 2014-05-18 add  circular order strategy
 */

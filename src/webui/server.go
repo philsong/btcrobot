@@ -152,6 +152,9 @@ func webui() {
 		Option["MACDbuyThreshold"] = req.FormValue("MACDbuyThreshold")
 		Option["MACDsellThreshold"] = req.FormValue("MACDsellThreshold")
 
+		Option["basePrice"] = req.FormValue("basePrice")
+		Option["fluctuation"] = req.FormValue("fluctuation")
+
 		Option["stoploss"] = req.FormValue("stoploss")
 
 		// 更新个人信息
