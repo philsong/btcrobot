@@ -86,10 +86,11 @@ func Tick(tradeAPI TradeAPI, records []Record) bool {
 				records[length-2].Close, records[length-1].Close, records[length-1].Volumn)
 			return false
 		}
+
+		lastPrice = records[length-1].Close
 	}
 
 	gTradeAPI = tradeAPI
-	lastPrice = records[length-1].Close
 
 	return strategy.Tick(records)
 }

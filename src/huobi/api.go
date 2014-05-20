@@ -50,33 +50,28 @@ func (w Huobi) GetOrderBook() (ret bool, orderBook OrderBook) {
 }
 
 func (w Huobi) GetOrder(order_id string) (ret bool, order Order) {
+	tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
+
+	symbol := Option["symbol"]
+	if symbol == "ltc_cny" {
+		ret = false
+		return
+	}
+
+	ret, hbOrder := tradeAPI.Get_order(order_id)
+	if ret == false {
+		ret = false
+		return
+	}
+
+	ret = true
+
+	order.Id = hbOrder.Id
+	order.Price = hbOrder.order_price
+	order.Amount = hbOrder.order_amount
+	order.Deal_amount = hbOrder.processed_amount
+
 	return
-	/*
-		symbol := Option["symbol"]
-		tradeAPI := NewHuobiTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
-
-		ret, hbOrder := tradeAPI.Get_order(order_id)
-		if ret == false {
-			return
-		}
-
-		m.Orders_id = hbOrder.Id
-
-		m.Orders.Amount, err = strconv.ParseFloat(hbOrder.order_amount, 64)
-		if err != nil {
-			logger.Errorln("config item stoploss is not float")
-			return false
-		}
-
-		m.Orders.Deal_amount, err = strconv.ParseFloat(hbOrder.processed_amount, 64)
-		if err != nil {
-			logger.Errorln("config item stoploss is not float")
-			return false
-		}
-
-
-	*/
-	//return tradeAPI.Get_order(symbol, order_id)
 }
 
 func (w Huobi) GetKLine(peroid int) (ret bool, records []Record) {
