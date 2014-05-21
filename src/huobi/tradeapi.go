@@ -145,15 +145,14 @@ type HBOrderItem struct {
 type HBOrder struct {
 	Id               int
 	Type             int
-	order_price      float64
-	order_amount     float64
-	processed_price  float64
-	processed_amount float64
-	order_time       int
-	vot              float64
-	fee              float64
-	total            float64
-	status           float64
+	Order_price      string
+	Order_amount     string
+	Processed_amount string
+	Processed_price  string
+	Total            string
+	Fee              string
+	Vot              string
+	Status           int
 }
 
 func (w *HuobiTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool) {
@@ -273,23 +272,24 @@ func (w *HuobiTrade) Get_order(id string) (ret bool, m HBOrder) {
 	body, err := w.httpRequest(pParams)
 	if err != nil {
 		ret = false
+		logger.Infoln(err)
 		return
 	}
 
 	_, ret = w.check_json_result(body)
 	if ret == false {
+		logger.Infoln(body)
 		return
 	}
 
 	doc := json.NewDecoder(strings.NewReader(body))
-
 	if err := doc.Decode(&m); err == io.EOF {
-		logger.Traceln(err)
+		ret = false
+		logger.Infoln(err)
 	} else if err != nil {
-		logger.Fatal(err)
+		ret = false
+		logger.Infoln(err)
 	}
-
-	logger.Infoln(m)
 
 	return
 }

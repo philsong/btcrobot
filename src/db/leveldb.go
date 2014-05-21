@@ -253,8 +253,6 @@ func (db *LevelDb) getTx(refid string) (cmd, id string, timestamp int64,
 		return
 	}
 
-	fmt.Println(buf)
-
 	dr := bytes.NewBuffer(buf)
 
 	var cmdLen int32

@@ -21,6 +21,7 @@ import (
 	. "common"
 	. "config"
 	"logger"
+	"strconv"
 	"time"
 )
 
@@ -64,13 +65,34 @@ func (w Huobi) GetOrder(order_id string) (ret bool, order Order) {
 		return
 	}
 
-	ret = true
-
 	order.Id = hbOrder.Id
-	order.Price = hbOrder.order_price
-	order.Amount = hbOrder.order_amount
-	order.Deal_amount = hbOrder.processed_amount
 
+	Price, err := strconv.ParseFloat(hbOrder.Order_price, 64)
+	if err != nil {
+		logger.Errorln("config item order_price is not float")
+		ret = false
+		return
+	}
+	order.Price = Price
+
+	Amount, err := strconv.ParseFloat(hbOrder.Order_amount, 64)
+	if err != nil {
+		logger.Errorln("config item order_amount is not float")
+		ret = false
+		return
+	}
+	order.Amount = Amount
+
+	Deal_amount, err := strconv.ParseFloat(hbOrder.Processed_amount, 64)
+	if err != nil {
+		logger.Errorln("config item processed_amount is not float")
+		ret = false
+		return
+	}
+
+	order.Deal_amount = Deal_amount
+
+	ret = true
 	return
 }
 

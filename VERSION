@@ -97,4 +97,8 @@
 
   Version 0.38
   time 2014-05-18 add  circular order strategy
+
+  Version 0.39
+  time 2014-05-21 add getorder interface for huobi
+                  save the tx record to leveldb
 */
