@@ -32,7 +32,6 @@ log
 pid
 release
 pkg
-thirdparty/src
 src/github.com
 src/code.google.com
 src/labix.org
