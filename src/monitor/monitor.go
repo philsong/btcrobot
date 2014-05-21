@@ -20,7 +20,6 @@ package monitor
 import (
 	. "common"
 	. "config"
-	"db"
 	"fmt"
 	"huobi"
 	"logger"
@@ -123,8 +122,6 @@ func RobotWorker() {
 	logger.Infof("程序将持续运行%d小时后停止", time.Duration(totalHour))
 
 	time.Sleep(time.Duration(totalHour) * time.Hour)
-
-	db.OpenDB("txdb")
 
 	logger.Infof("程序到达设定时长%d小时，停止运行。", time.Duration(totalHour))
 }
