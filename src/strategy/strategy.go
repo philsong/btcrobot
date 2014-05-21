@@ -18,6 +18,7 @@ type Strategy interface {
 
 const timeout = 1 //minute
 
+var magic int64
 var strategys = make(map[string]Strategy)
 var PrevTrade string
 var PrevBuyPirce float64
@@ -212,27 +213,24 @@ func buy(price, amount string) string {
 
 	if buyID != "0" {
 		timestamp := time.Now()
-		err := db.SetTx("buy", buyID, timestamp.Unix(), price, amount)
+		magic += 1
+		err := db.SetTx("buy", buyID, timestamp.Unix(), amount, price, magic)
 		if err != nil {
-			fmt.Println("SetTx")
-			fmt.Println(err)
+			fmt.Println("SetTx", err)
 		}
 		buyOrders[timestamp] = buyID
 		PrevTrade = "buy"
 		PrevBuyPirce = nPrice
 	}
-	/*
-		{
-			fmt.Println("GetTx")
-			cmd, id, timestamp, amount, price, err := db.GetTx(buyID)
-			if err != nil {
-				fmt.Println(err)
-			}
 
-			fmt.Println(cmd, id, timestamp, amount, price, err)
-			fmt.Println(db.GetTx(buyID))
+	{
+		cmd, id, timestamp, amount, price, magic, err := db.GetTx(buyID)
+		if err != nil {
+			fmt.Println("GetTx", err)
+		} else {
+			fmt.Println("buy items:", cmd, id, timestamp, amount, price, magic)
 		}
-	*/
+	}
 
 	return buyID
 }
@@ -247,13 +245,22 @@ func sell(price, amount string) string {
 
 	if sellID != "0" {
 		timestamp := time.Now()
-		db.SetTx("sell", sellID, timestamp.Unix(), price, amount)
+		magic += 1
+		db.SetTx("sell", sellID, timestamp.Unix(), price, amount, magic)
 		sellOrders[timestamp] = sellID
 		PrevTrade = "sell"
 		PrevBuyPirce = 0
 	}
 
-	//fmt.Println(db.GetTx(sellID))
+	{
+		cmd, id, timestamp, amount, price, magic, err := db.GetTx(sellID)
+		if err != nil {
+			fmt.Println("GetTx", err)
+		} else {
+			fmt.Println("sell items:", cmd, id, timestamp, amount, price, magic)
+		}
+	}
+
 	return sellID
 }
 

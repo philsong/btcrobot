@@ -223,7 +223,7 @@ func (db *LevelDb) RollbackClose() {
 	db.close()
 }
 
-func GetTx(refid string) (cmd, id string, timestamp int64, amount, price string, err error) {
+func GetTx(refid string) (cmd, id string, timestamp int64, amount, price string, magic int64, err error) {
 	if gpdb != nil {
 		return gpdb.getTx(refid)
 	} else {
@@ -232,9 +232,9 @@ func GetTx(refid string) (cmd, id string, timestamp int64, amount, price string,
 	}
 }
 
-func SetTx(cmd, id string, timestamp int64, amount, price string) (err error) {
+func SetTx(cmd, id string, timestamp int64, amount, price string, magic int64) (err error) {
 	if gpdb != nil {
-		return gpdb.setTx(cmd, id, timestamp, amount, price)
+		return gpdb.setTx(cmd, id, timestamp, amount, price, magic)
 	} else {
 		err = DbUnOpen
 		return
@@ -242,7 +242,7 @@ func SetTx(cmd, id string, timestamp int64, amount, price string) (err error) {
 }
 
 func (db *LevelDb) getTx(refid string) (cmd, id string, timestamp int64,
-	amount, price string, err error) {
+	amount, price string, magic int64, err error) {
 	var buf []byte
 
 	key := []byte(refid)
@@ -257,76 +257,152 @@ func (db *LevelDb) getTx(refid string) (cmd, id string, timestamp int64,
 
 	dr := bytes.NewBuffer(buf)
 
-	err = binary.Read(dr, binary.LittleEndian, &cmd)
+	var cmdLen int32
+	err = binary.Read(dr, binary.LittleEndian, &cmdLen)
 	if err != nil {
 		err = fmt.Errorf("Db Corrupt 1")
 		return
 	}
-	err = binary.Read(dr, binary.LittleEndian, &id)
+
+	cmdBuf := make([]byte, cmdLen)
+	err = binary.Read(dr, binary.LittleEndian, &cmdBuf)
 	if err != nil {
 		err = fmt.Errorf("Db Corrupt 2")
 		return
 	}
-	err = binary.Read(dr, binary.LittleEndian, &timestamp)
+	cmd = string(cmdBuf)
+
+	var idLen int32
+	err = binary.Read(dr, binary.LittleEndian, &idLen)
 	if err != nil {
 		err = fmt.Errorf("Db Corrupt 3")
 		return
 	}
 
-	err = binary.Read(dr, binary.LittleEndian, &amount)
+	idBuf := make([]byte, idLen)
+	err = binary.Read(dr, binary.LittleEndian, &idBuf)
 	if err != nil {
 		err = fmt.Errorf("Db Corrupt 4")
 		return
 	}
+	id = string(idBuf)
 
-	err = binary.Read(dr, binary.LittleEndian, &price)
+	err = binary.Read(dr, binary.LittleEndian, &timestamp)
 	if err != nil {
 		err = fmt.Errorf("Db Corrupt 5")
 		return
 	}
 
-	return cmd, id, timestamp, amount, price, nil
+	var amountLen int32
+	err = binary.Read(dr, binary.LittleEndian, &amountLen)
+	if err != nil {
+		err = fmt.Errorf("Db Corrupt 6")
+		return
+	}
+
+	amountBuf := make([]byte, amountLen)
+	err = binary.Read(dr, binary.LittleEndian, &amountBuf)
+	if err != nil {
+		err = fmt.Errorf("Db Corrupt 7")
+		return
+	}
+	amount = string(amountBuf)
+
+	var priceLen int32
+	err = binary.Read(dr, binary.LittleEndian, &priceLen)
+	if err != nil {
+		err = fmt.Errorf("Db Corrupt 8")
+		return
+	}
+
+	priceBuf := make([]byte, priceLen)
+	err = binary.Read(dr, binary.LittleEndian, &priceBuf)
+	if err != nil {
+		err = fmt.Errorf("Db Corrupt 9")
+		return
+	}
+	price = string(priceBuf)
+
+	err = binary.Read(dr, binary.LittleEndian, &magic)
+	if err != nil {
+		err = fmt.Errorf("Db Corrupt 10")
+		return
+	}
+
+	return cmd, id, timestamp, amount, price, magic, nil
 }
 
 func (db *LevelDb) setTx(cmd, id string, timestamp int64,
-	amount, price string) error {
+	amount, price string, magic int64) error {
 
 	var txW bytes.Buffer
 
-	err := binary.Write(&txW, binary.LittleEndian, []byte(cmd))
+	cmdLen := int32(len(cmd))
+	err := binary.Write(&txW, binary.LittleEndian, cmdLen)
+	if err != nil {
+		err = fmt.Errorf("Write fail 1")
+		return err
+	}
+
+	err = binary.Write(&txW, binary.LittleEndian, []byte(cmd))
 	if err != nil {
 		fmt.Println(err)
-		err = fmt.Errorf("Write fail 1 ")
+		err = fmt.Errorf("Write fail 2")
+		return err
+	}
+
+	idLen := int32(len(id))
+	err = binary.Write(&txW, binary.LittleEndian, idLen)
+	if err != nil {
+		err = fmt.Errorf("Write fail 3")
 		return err
 	}
 
 	err = binary.Write(&txW, binary.LittleEndian, []byte(id))
 	if err != nil {
 		fmt.Println(err)
-		err = fmt.Errorf("Write fail 2 ")
+		err = fmt.Errorf("Write fail 4")
 		return err
 	}
 
 	err = binary.Write(&txW, binary.LittleEndian, timestamp)
 	if err != nil {
-		err = fmt.Errorf("Write fail 3")
-		return err
-	}
-
-	err = binary.Write(&txW, binary.LittleEndian, []byte(amount))
-	if err != nil {
-		err = fmt.Errorf("Write fail 4")
-		return err
-	}
-
-	err = binary.Write(&txW, binary.LittleEndian, []byte(price))
-	if err != nil {
 		err = fmt.Errorf("Write fail 5")
 		return err
 	}
 
-	key := []byte(id)
-	db.lDb.Put(key, txW.Bytes(), db.wo)
+	amountLen := int32(len(amount))
+	err = binary.Write(&txW, binary.LittleEndian, amountLen)
+	if err != nil {
+		err = fmt.Errorf("Write fail 6")
+		return err
+	}
+	err = binary.Write(&txW, binary.LittleEndian, []byte(amount))
+	if err != nil {
+		err = fmt.Errorf("Write fail 7")
+		return err
+	}
+
+	priceLen := int32(len(price))
+	err = binary.Write(&txW, binary.LittleEndian, priceLen)
+	if err != nil {
+		err = fmt.Errorf("Write fail 8")
+		return err
+	}
+	err = binary.Write(&txW, binary.LittleEndian, []byte(price))
+	if err != nil {
+		err = fmt.Errorf("Write fail 9")
+		return err
+	}
+
+	err = binary.Write(&txW, binary.LittleEndian, magic)
+	if err != nil {
+		err = fmt.Errorf("Write fail 10")
+		return err
+	}
+
+	keyId := []byte(id)
+	db.lDb.Put(keyId, txW.Bytes(), db.wo)
 
 	return nil
 }
