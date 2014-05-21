@@ -3,9 +3,6 @@
 *.a
 *.so
 
-# mac file
-.DS_Store
-
 # Folders
 _obj
 _test
@@ -23,17 +20,4 @@ _cgo_export.*
 _testmain.go
 
 *.exe
-.idea
-*.exe
-secret.json
-cache
-bin
-log
-pid
-release
-pkg
-kdj_ex.go
-kdj_xc.go
-ema_kdj.go
-tx.db*
-
+*.test

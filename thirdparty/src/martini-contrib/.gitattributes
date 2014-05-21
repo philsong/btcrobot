@@ -1,0 +1,4 @@
+# Auto detect text files and perform LF normalization
+*.go text eol=lf 
+*.html text eol=lf 
+*.tmpl text eol=lf 
