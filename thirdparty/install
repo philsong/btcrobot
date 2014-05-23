@@ -14,7 +14,7 @@ gofmt -w src
 
 go install github.com/go-martini/martini
 go install github.com/codegangsta/martini-contrib/auth
-go install github.com/syndtr/goleveldb/leveldb
+go install github.com/philsong/goleveldb/leveldb
 
 export GOPATH="$OLDGOPATH"
 export PATH="$OLDPATH"
