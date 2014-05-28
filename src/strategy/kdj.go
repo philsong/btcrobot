@@ -33,10 +33,8 @@ func init() {
 	Register("KDJ", kdjStrategy)
 }
 
-//xxx strategy
+//kdjStrategy strategy
 func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
-	//实现自己的策略
-
 	if kdjStrategy.PrevTime == records[length-1].TimeStr &&
 		kdjStrategy.PrevPrice == lastPrice {
 		return false
@@ -58,22 +56,17 @@ func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 	if ((j[length-2] < k[length-2] && k[length-2] < d[length-2]) || PrevTrade == "sell") &&
 		(j[length-1] > k[length-1] && k[length-1] > d[length-1]) {
 		logger.Infoln("KDJ up cross")
-		if (PrevTrade == "init" && d[length-2] <= 30) || PrevTrade == "sell" {
-			//do buy
+		if d[length-2] <= 30 {
 			Buy()
 		}
-
 	}
 
 	if ((j[length-2] > k[length-2] && k[length-2] > d[length-2]) || PrevTrade == "buy") &&
 		(j[length-1] < k[length-1] && k[length-1] < d[length-1]) {
-
 		logger.Infoln("KDJ down cross")
-		if (PrevTrade == "init" && d[length-2] >= 70) || PrevTrade == "buy" {
-			//do sell
+		if d[length-2] >= 70 {
 			Sell()
 		}
-
 	}
 
 	//do sell when price is below stoploss point
