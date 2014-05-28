@@ -297,6 +297,7 @@ func Buy() string {
 	nAmount, err := strconv.ParseFloat(amount, 64)
 	if err != nil {
 		logger.Infoln("amount is not float")
+		return "0"
 	}
 
 	Available_cny := GetAvailable_cny()
@@ -312,6 +313,8 @@ func Buy() string {
 		if nAmount < nMinTradeAmount {
 			warning += "没有足够的法币可用"
 			logger.Infoln(warning)
+			PrevTrade = "buy"
+			PrevBuyPirce = nPrice
 			return "0"
 		}
 
