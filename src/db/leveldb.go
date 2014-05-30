@@ -89,7 +89,6 @@ func OpenDB(args ...interface{}) (*LevelDb, error) {
 		return nil, err
 	}
 
-	fmt.Println(dbpath)
 	db, err := openDB(dbpath, false)
 	if err != nil {
 		return nil, err

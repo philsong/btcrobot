@@ -101,4 +101,8 @@
   Version 0.39
   time 2014-05-21 add getorder interface for huobi
                   save the tx record to leveldb
+
+  Version 0.40
+  time 2014-05-30 add kdj_ex strategy
+                  optimize setup progress
 */

@@ -1,4 +1,6 @@
 BTC/LTC Robot
+
+IPO通知 http://coinzbot.com/?page_id=2
 ===========
 BTC/LTC自动化算法交易引擎
 
@@ -24,6 +26,8 @@ https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/ha
 
   Weibo:http://weibo.com/bocaicfa
 
+
+<li><a href="http://coinzbot.com/?page_id=2" target="_blank">IPO通知</a></li>
 
 支持多个交易平台-火币、OKCoin，自动买卖，机器人EMA，MACD，KDJ, 对冲，高低突破，及各种MIX算法
 

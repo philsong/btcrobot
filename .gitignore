@@ -35,7 +35,6 @@ pkg
 thirdparty/src
 src/github.com
 src/code.google.com
-kdj_ex.go
 kdj_xc.go
 ema_kdj.go
 tx.db*
