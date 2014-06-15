@@ -88,13 +88,13 @@ type OKMarketOrder struct {
 }
 
 type _OKOrderBook struct {
-	Asks [60]interface{}
-	Bids [60]interface{}
+	Asks [200]interface{}
+	Bids [200]interface{}
 }
 
 type OKOrderBook struct {
-	Asks [60]OKMarketOrder
-	Bids [60]OKMarketOrder
+	Asks [200]OKMarketOrder
+	Bids [200]OKMarketOrder
 }
 
 func convert2struct(_okOrderBook _OKOrderBook) (okOrderBook OKOrderBook) {
