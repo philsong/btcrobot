@@ -61,7 +61,7 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 
 	//HLCross cross
 	if Price[length-2] > emaShort[length-2] &&
-		records[length-2].Volumn > 50 &&
+		records[length-2].Volumn > 500 &&
 		records[length-2].High > records[length-3].High &&
 		records[length-2].Low > records[length-3].Low {
 		Buy()
