@@ -19,6 +19,7 @@ package strategy
 
 import (
 	. "common"
+	"fmt"
 )
 
 type OOStrategy struct {
@@ -40,7 +41,7 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 	}
 
 	diff := btcslap
-
+	fmt.Println(buy1, diff, sell1)
 	if buy1+diff <= sell1 {
 		buyID := Buy()
 		if buyID != "0" {
