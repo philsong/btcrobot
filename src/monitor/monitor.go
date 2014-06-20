@@ -18,6 +18,7 @@
 package monitor
 
 import (
+	"bitvc"
 	. "common"
 	. "config"
 	"fmt"
@@ -66,6 +67,8 @@ func tradeAPI() (tradeAPI TradeAPI) {
 		tradeAPI = huobi.NewHuobi()
 	} else if Option["tradecenter"] == "okcoin" {
 		tradeAPI = okcoin.NewOkcoin()
+	} else if Option["tradecenter"] == "bitvc" {
+		tradeAPI = bitvc.NewBitvc()
 	} else {
 		logger.Fatalln("Please config the tradecenter firstly...")
 

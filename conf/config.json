@@ -7,6 +7,9 @@
 	
 	"from_email": "xxxx@gmail.com",
 
+	"bitvc_login_url" : "https://www.bitvc.com/user/login",
+
+	
 	"hb_base_url": "https://www.huobi.com/",
 	"hb_api_url": "https://api.huobi.com/api.php",
 	"hb_kline_url": "https://market.huobi.com/market/huobi.php?a=kline&period=%03d&r=%f",
