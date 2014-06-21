@@ -25,6 +25,7 @@ import (
 	"huobi"
 	"logger"
 	"okcoin"
+	"peatio"
 	"strategy"
 	"strconv"
 	"time"
@@ -55,9 +56,10 @@ func marketAPI() (marketAPI MarketAPI) {
 		marketAPI = huobi.NewHuobi()
 	} else if Option["datacenter"] == "okcoin" {
 		marketAPI = okcoin.NewOkcoin()
+	} else if Option["datacenter"] == "peatio" {
+		marketAPI = peatio.NewPeatio()
 	} else {
-		logger.Fatalln("Please config the datacenter firstly...")
-
+		logger.Fatalln("Please config the market center...")
 	}
 	return
 }
@@ -69,9 +71,10 @@ func tradeAPI() (tradeAPI TradeAPI) {
 		tradeAPI = okcoin.NewOkcoin()
 	} else if Option["tradecenter"] == "bitvc" {
 		tradeAPI = bitvc.NewBitvc()
+	} else if Option["tradecenter"] == "peatio" {
+		tradeAPI = peatio.NewPeatio()
 	} else {
-		logger.Fatalln("Please config the tradecenter firstly...")
-
+		logger.Fatalln("Please config the exchange center...")
 	}
 	return
 }

@@ -20,6 +20,7 @@ package peatio
 import (
 	. "config"
 	"crypto/hmac"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -68,7 +69,8 @@ func (w *PeatioTrade) createSign(pParams map[string]string) string {
 		v.Add(item.Key, item.Val)
 	}
 
-	h := md5.New()
+	key := []byte("todo")
+	h := hmac.New(sha256.New, key)
 
 	io.WriteString(h, v.Encode())
 	sign := fmt.Sprintf("%x", h.Sum(nil))
