@@ -206,9 +206,12 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 	}
 
 	//macd cross
-	if EMAdif[length-1] > 0 || emamacdStrategy.PrevEMATrade == "buy" {
-		if (MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] < MACDsellThreshold) &&
-			emamacdStrategy.PrevMACDTrade != "sell" {
+	if (EMAdif[length-1] > 0 || emamacdStrategy.PrevEMATrade == "buy") &&
+		emamacdStrategy.PrevMACDTrade != "sell" {
+		if (MACDHistogram[length-2] > 0.000001 ||
+			MACDHistogram[length-3] > 0.000001 ||
+			MACDHistogram[length-4] > 0.000001) &&
+			MACDHistogram[length-1] < MACDsellThreshold {
 			emamacdStrategy.PrevMACDTrade = "sell"
 			emamacdStrategy.PrevBuyPirce = 0
 			emamacdStrategy.PrevEMATrade = "sell"
