@@ -27,6 +27,10 @@ $(function() {
 
     $('#username').val(data.username);
     $('#password').val(data.password);
+
+    $('#bitvc_email').val(data.bitvc_email);
+    $('#bitvc_password').val(data.bitvc_password);
+
     $('#huobi_access_key').val(data.huobi_access_key);
     $('#huobi_secret_key').val(data.huobi_secret_key);
 

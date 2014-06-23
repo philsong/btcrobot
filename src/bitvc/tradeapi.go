@@ -30,6 +30,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"util"
@@ -55,14 +56,14 @@ func (w *BitvcTrade) httpRequest(pParams map[string]string) (string, error) {
 		v.Add(key, val)
 	}
 
-	req, err := http.NewRequest("POST", Config["hb_api_url"], strings.NewReader(v.Encode()))
+	req, err := http.NewRequest("POST", Config["bitvc_login_url"], strings.NewReader(v.Encode()))
 	if err != nil {
 		logger.Fatal(err)
 		return "", err
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Referer", Config["hb_base_url"])
+	req.Header.Set("Referer", Config["bitvc_base_url"])
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)
@@ -366,9 +367,33 @@ func (w *BitvcTrade) SellLTC(price, amount string) string {
 func (w *BitvcTrade) Login() bool {
 	login_url := Config["bitvc_login_url"]
 	email := Config["bitvc_email"]
-	password := Config["bitvc_password"]
+	clear_password := Config["bitvc_password"]
+	password := util.Md5(clear_password + "hi,pwd")
 
-	post_arg := url.Values{"email": {email}, "password": {password}}
+	/*
+			function calc_password_security_score(t) {
+		    var e = 0;
+		    return t.length < 4 ? e :
+		     (t.length >= 8 && e++, t.length >= 10 && e++, /[a-z]/.test(t) && /[A-Z]/.test(t) && e++, /[0-9]/.test(t) && e++, /.[!,@,#,$,%,^,&,*,?,_,~, -,£,(,)]/.test(t) && e++, e)
+			}*/
+
+	var pwd_security_score int
+
+	if len(clear_password) < 4 {
+		pwd_security_score = 0
+	} else if len(clear_password) >= 8 {
+		pwd_security_score++
+		if len(clear_password) >= 10 {
+			pwd_security_score++
+		}
+	}
+	//fuck正则，不玩了！
+	reg := regexp.MustCompile(`[[:ascii:]]`)
+	fmt.Printf("%q\n", reg.FindAllString(password, -1))
+	// ["H" " 世界！123 G" "."]
+
+	str_pwd_security_score := fmt.Sprintf("%d", pwd_security_score)
+	post_arg := url.Values{"email": {email}, "password": {password}, "backurl": {"/index/index"}, "pwd_security_score": {str_pwd_security_score}}
 
 	//logger.Traceln(strings.NewReader(post_arg.Encode()))
 	req, err := http.NewRequest("POST", login_url, strings.NewReader(post_arg.Encode()))
@@ -377,7 +402,7 @@ func (w *BitvcTrade) Login() bool {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Referer", "https://www.huobi.com/")
+	req.Header.Set("Referer", Config["bitvc_base_url"])
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)

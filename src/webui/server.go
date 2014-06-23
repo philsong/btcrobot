@@ -37,6 +37,9 @@ func webui() {
 		SecretOption["username"] = req.FormValue("username")
 		SecretOption["password"] = req.FormValue("password")
 
+		SecretOption["bitvc_email"] = req.FormValue("bitvc_email")
+		SecretOption["bitvc_password"] = req.FormValue("bitvc_password")
+
 		SecretOption["huobi_access_key"] = req.FormValue("huobi_access_key")
 		SecretOption["huobi_secret_key"] = req.FormValue("huobi_secret_key")
 
