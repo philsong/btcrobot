@@ -347,7 +347,7 @@ func webui() {
 	})
 
 	m.Use(auth.Basic(SecretOption["username"], SecretOption["password"]))
-	m.Use(martini.Static("./static"))
+	m.Use(martini.Static("../static"))
 
 	logger.Infoln(http.ListenAndServe(Config["host"], m))
 
