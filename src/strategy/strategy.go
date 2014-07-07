@@ -135,9 +135,9 @@ func getTradePrice(tradeDirection string, price float64) string {
 
 	var finalTradePrice float64
 	if tradeDirection == "buy" {
-		finalTradePrice = price * (1 + slippage*0.001)
+		finalTradePrice = price * (1 + slippage*0.01)
 	} else if tradeDirection == "sell" {
-		finalTradePrice = price * (1 - slippage*0.001)
+		finalTradePrice = price * (1 - slippage*0.01)
 	} else {
 		finalTradePrice = price
 	}
@@ -175,7 +175,7 @@ func getBuyPrice() (price string, nPrice float64, warning string) {
 		return
 	}
 
-	nPrice = buy1 + slippage
+	nPrice = buy1 * (1 + slippage*0.01)
 	price = fmt.Sprintf("%f", nPrice)
 	warning += "---->限价单" + price
 
@@ -194,7 +194,7 @@ func getSellPrice() (price string, nPrice float64, warning string) {
 	if !ret {
 		return
 	}
-	nPrice = sell1 - slippage
+	nPrice = sell1 * (1 - slippage*0.01)
 
 	if !isStoploss && Option["discipleMode"] == "1" {
 		if nPrice < PrevBuyPirce {
@@ -470,6 +470,7 @@ func processStoploss(Price float64) bool {
 	if Price <= stoplossPrice {
 		warning := "stop loss, 卖出Sell Out---->"
 		logger.Infoln(warning)
+		logger.Infoln(Price, stoplossPrice, PrevBuyPirce, stoploss)
 
 		isStoploss = true
 		Sell()
