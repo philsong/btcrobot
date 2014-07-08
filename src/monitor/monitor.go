@@ -85,6 +85,11 @@ func RobotWorker() {
 		fmt.Println("test working...")
 
 		var tradeAPI TradeAPI
+		tradeAPI = bitvc.NewBitvc()
+		tradeAPI.GetAccount()
+		tradeAPI.GetOrderBook()
+		return
+
 		tradeAPI = okcoin.NewOkcoin()
 		tradeAPI.GetAccount()
 		tradeAPI.GetOrderBook()
@@ -214,6 +219,34 @@ func testHuobiAPI() {
 	}
 
 	fmt.Println(tradeAPI.Get_orders())
+}
+
+func testBitVCAPI() {
+	tradeAPI := bitvc.NewBitvc()
+	accout_info, _ := tradeAPI.GetAccount()
+	fmt.Println(accout_info)
+	/*
+		//	fmt.Println(tradeAPI.GetAccount())
+		if false {
+			buyId := tradeAPI.BuyBTC("1000", "0.001")
+			sellId := tradeAPI.SellBTC("10000", "0.001")
+
+			//fmt.Println(tradeAPI.Get_delegations())
+			if tradeAPI.Cancel_order(buyId) {
+				fmt.Printf("cancel %s success \n", buyId)
+			} else {
+				fmt.Printf("cancel %s falied \n", buyId)
+			}
+
+			if tradeAPI.Cancel_order(sellId) {
+				fmt.Printf("cancel %s success \n", sellId)
+			} else {
+				fmt.Printf("cancel %s falied \n", sellId)
+			}
+		}
+
+		fmt.Println(tradeAPI.Get_orders())
+	*/
 }
 
 func testOkcoinBTCAPI() {

@@ -152,7 +152,7 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 
 type ErrorMsg struct {
 	Result    bool
-	ErrorCode string
+	ErrorCode int
 }
 
 func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret bool) {

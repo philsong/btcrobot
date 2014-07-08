@@ -173,6 +173,9 @@ type Account_info struct {
 }
 
 func (w *BitvcTrade) GetAccount() (account_info Account_info, ret bool) {
+
+	w.Login()
+
 	pParams := make(map[string]string)
 
 	ret = true
@@ -352,6 +355,66 @@ func (w *BitvcTrade) SellLTC(price, amount string) string {
 }
 
 /*
+		function calc_password_security_score(t) {
+	    var e = 0;
+	    return t.length < 4 ? e :
+	     (t.length >= 8 && e++, t.length >= 10 && e++, /[a-z]/.test(t) && /[A-Z]/.test(t) && e++, /[0-9]/.test(t) && e++, /.[!,@,#,$,%,^,&,*,?,_,~, -,£,(,)]/.test(t) && e++, e)
+		}
+*/
+func getPSS(clear_password string) int {
+	pwd_security_score := 0
+	fmt.Println(clear_password)
+	if len(clear_password) < 4 {
+		pwd_security_score = 0
+	} else {
+		if len(clear_password) >= 8 {
+			pwd_security_score++
+		}
+
+		if len(clear_password) >= 10 {
+			pwd_security_score++
+		}
+
+		regLower := regexp.MustCompile(`[[:lower:]]`)
+		fmt.Printf("%q\n", regLower.FindAllString(clear_password, -1))
+		regUpper := regexp.MustCompile(`[[:upper:]]`)
+		fmt.Printf("%q\n", regUpper.FindAllString(clear_password, -1))
+
+		matchedLower, err := regexp.MatchString(`[[:lower:]]`, clear_password)
+		fmt.Println(matchedLower, err)
+		matchedUpper, err := regexp.MatchString(`[[:upper:]]`, clear_password)
+		fmt.Println(matchedUpper, err)
+
+		if matchedLower && matchedUpper {
+			pwd_security_score++
+		}
+
+		regDigit := regexp.MustCompile(`[[:digit:]]`)
+		fmt.Printf("%q\n", regDigit.FindAllString(clear_password, -1))
+
+		matchedDigit, err := regexp.MatchString(`[[:digit:]]`, clear_password)
+		fmt.Println(matchedDigit, err)
+
+		if matchedDigit {
+			pwd_security_score++
+		}
+
+		regSpecial := regexp.MustCompile(`[!|@|#|$|%|\\^|&|\\*|\\?|_|~|-|£|\\(|\\)]`)
+		fmt.Printf("%q\n", regSpecial.FindAllString(clear_password, -1))
+
+		matchedSpecial, err := regexp.MatchString(`[!|@|#|$|%|\\^|&|\\*|\\?|_|~|-|£|\\(|\\)]`, clear_password)
+		fmt.Println(matchedSpecial, err)
+
+		if matchedSpecial {
+			pwd_security_score++
+		}
+	}
+
+	fmt.Println(pwd_security_score)
+	return pwd_security_score
+}
+
+/*
 	txcode := map[int]string{
 		0:  `买单已委托，<a href="/trade/index.php?a=delegation">查看结果</a>`,
 		2:  `没有足够的人民币`,
@@ -365,33 +428,13 @@ func (w *BitvcTrade) SellLTC(price, amount string) string {
 	logger.Traceln(txcode[m.Code])
 */
 func (w *BitvcTrade) Login() bool {
+	fmt.Println("login....")
 	login_url := Config["bitvc_login_url"]
-	email := Config["bitvc_email"]
-	clear_password := Config["bitvc_password"]
+	email := SecretOption["bitvc_email"]
+	clear_password := SecretOption["bitvc_password"]
 	password := util.Md5(clear_password + "hi,pwd")
 
-	/*
-			function calc_password_security_score(t) {
-		    var e = 0;
-		    return t.length < 4 ? e :
-		     (t.length >= 8 && e++, t.length >= 10 && e++, /[a-z]/.test(t) && /[A-Z]/.test(t) && e++, /[0-9]/.test(t) && e++, /.[!,@,#,$,%,^,&,*,?,_,~, -,£,(,)]/.test(t) && e++, e)
-			}*/
-
-	var pwd_security_score int
-
-	if len(clear_password) < 4 {
-		pwd_security_score = 0
-	} else if len(clear_password) >= 8 {
-		pwd_security_score++
-		if len(clear_password) >= 10 {
-			pwd_security_score++
-		}
-	}
-	//fuck正则，不玩了！
-	reg := regexp.MustCompile(`[[:ascii:]]`)
-	fmt.Printf("%q\n", reg.FindAllString(password, -1))
-	// ["H" " 世界！123 G" "."]
-
+	pwd_security_score := getPSS(clear_password)
 	str_pwd_security_score := fmt.Sprintf("%d", pwd_security_score)
 	post_arg := url.Values{"email": {email}, "password": {password}, "backurl": {"/index/index"}, "pwd_security_score": {str_pwd_security_score}}
 

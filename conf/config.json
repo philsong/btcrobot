@@ -35,5 +35,5 @@
 	"fatalconsole": "1",
 	"debugconsole": "0",
 
-	"env": "product"
+	"env": "dev"
 }
