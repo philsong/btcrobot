@@ -87,7 +87,7 @@ func RobotWorker() {
 		var tradeAPI TradeAPI
 		tradeAPI = bitvc.NewBitvc()
 		tradeAPI.GetAccount()
-		tradeAPI.GetOrderBook()
+		//tradeAPI.GetOrderBook()
 		return
 
 		tradeAPI = okcoin.NewOkcoin()

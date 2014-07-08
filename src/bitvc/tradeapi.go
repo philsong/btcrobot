@@ -50,13 +50,13 @@ func NewBitvcTrade(access_key, secret_key string) *BitvcTrade {
 	return w
 }
 
-func (w *BitvcTrade) httpRequest(pParams map[string]string) (string, error) {
+func (w *BitvcTrade) httpRequest(reqURL string, pParams map[string]string) (string, error) {
 	v := url.Values{}
 	for key, val := range pParams {
 		v.Add(key, val)
 	}
 
-	req, err := http.NewRequest("POST", Config["bitvc_login_url"], strings.NewReader(v.Encode()))
+	req, err := http.NewRequest("POST", reqURL, strings.NewReader(v.Encode()))
 	if err != nil {
 		logger.Fatal(err)
 		return "", err
@@ -172,6 +172,9 @@ type Account_info struct {
 	Loan_btc_display      string
 }
 
+/*
+{"code":0,"msg":"","ext":{"cny_balance":{"CNY":{"total":340062540230000,"available":340062540230000,"frozen":0},"BTC":{"total":177247000000,"available":177247000000,"frozen":0},"LTC":{"total":0,"available":0,"frozen":0},"now_btc_price":"38380100000000","now_ltc_price":"471500000000","LOAN_CNY":0,"LOAN_BTC":177247000000,"LOAN_LTC":0,"net_asset":340062540230000,"total":1020338298700000},"coin_saving_balance":{"btc_total":"0","ltc_total":"0"}}}
+*/
 func (w *BitvcTrade) GetAccount() (account_info Account_info, ret bool) {
 
 	w.Login()
@@ -180,12 +183,13 @@ func (w *BitvcTrade) GetAccount() (account_info Account_info, ret bool) {
 
 	ret = true
 
-	body, err := w.httpRequest(pParams)
+	body, err := w.httpRequest("https://www.bitvc.com/ajax/user_balance", pParams)
 	if err != nil {
 		ret = false
 		return
 	}
 
+	fmt.Println(body)
 	_, ret = w.check_json_result(body)
 	if ret == false {
 		return
@@ -209,7 +213,7 @@ func (w *BitvcTrade) Get_orders() (ret bool, m []HBOrderItem) {
 
 	ret = true
 
-	body, err := w.httpRequest(pParams)
+	body, err := w.httpRequest(Config["bitvc_login_url"], pParams)
 	if err != nil {
 		ret = false
 		return
@@ -238,7 +242,7 @@ func (w *BitvcTrade) Get_order(id string) (ret bool, m HBOrder) {
 
 	ret = true
 
-	body, err := w.httpRequest(pParams)
+	body, err := w.httpRequest(Config["bitvc_login_url"], pParams)
 	if err != nil {
 		ret = false
 		logger.Infoln(err)
@@ -266,7 +270,7 @@ func (w *BitvcTrade) Get_order(id string) (ret bool, m HBOrder) {
 func (w *BitvcTrade) Cancel_order(id string) bool {
 	pParams := make(map[string]string)
 
-	body, err := w.httpRequest(pParams)
+	body, err := w.httpRequest(Config["bitvc_login_url"], pParams)
 	if err != nil {
 		return false
 	}
@@ -300,7 +304,7 @@ func (w *BitvcTrade) Cancel_order(id string) bool {
 func (w *BitvcTrade) doTrade(method, price, amount string) int {
 	pParams := make(map[string]string)
 
-	body, err := w.httpRequest(pParams)
+	body, err := w.httpRequest(Config["bitvc_login_url"], pParams)
 	if err != nil {
 		return 0
 	}
@@ -448,7 +452,7 @@ func (w *BitvcTrade) Login() bool {
 	req.Header.Set("Referer", Config["bitvc_base_url"])
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
-	logger.Traceln(req)
+	logger.Infoln(req)
 
 	//jar := NewJar()
 	jar, _ := cookiejar.New(nil)
@@ -459,13 +463,13 @@ func (w *BitvcTrade) Login() bool {
 		logger.Fatal(err)
 	}
 	defer resp.Body.Close()
-	logger.Tracef("Login resp StatusCode=%v", resp.StatusCode)
-	logger.Tracef("Login resp=%v", resp)
+	logger.Infof("Login resp StatusCode=%v", resp.StatusCode)
+	logger.Infof("Login resp=%v", resp)
 	if resp.StatusCode == 200 {
 		var body string
 
 		contentEncoding := resp.Header.Get("Content-Encoding")
-		logger.Tracef("HTTP returned Content-Encoding %s", contentEncoding)
+		logger.Infof("HTTP returned Content-Encoding %s", contentEncoding)
 		switch contentEncoding {
 		case "gzip":
 			body = DumpGZIP(resp.Body)
@@ -489,7 +493,7 @@ func (w *BitvcTrade) Login() bool {
 		w.isLogin = true
 		return true
 	} else {
-		logger.Tracef("resp %v", resp)
+		logger.Infof("resp %v", resp)
 	}
 
 	return false
