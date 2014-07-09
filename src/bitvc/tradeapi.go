@@ -33,6 +33,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 	"util"
 )
 
@@ -456,7 +457,7 @@ func (w *BitvcTrade) Login() bool {
 
 	//jar := NewJar()
 	jar, _ := cookiejar.New(nil)
-	w.client = &http.Client{nil, nil, jar}
+	w.client = &http.Client{nil, nil, jar, 10 * time.Second}
 	//w.client = new(http.Client)
 	resp, err := w.client.Do(req)
 	if err != nil {
