@@ -27,13 +27,14 @@ import (
 	"logger"
 	"math/rand"
 	"net/http"
-	"net/http/cookiejar"
+	//"net/http/cookiejar"
 	"net/url"
 	"os"
 	"regexp"
+	//"runtime"
 	"strconv"
 	"strings"
-	"time"
+	//"time"
 	"util"
 )
 
@@ -456,8 +457,16 @@ func (w *BitvcTrade) Login() bool {
 	logger.Infoln(req)
 
 	//jar := NewJar()
+	/* how to do compatible like c define?
 	jar, _ := cookiejar.New(nil)
-	w.client = &http.Client{nil, nil, jar, 10 * time.Second}
+	fmt.Println("version:", runtime.Version())
+	if runtime.Version() != "go1.3" {
+		w.client = &http.Client{nil, nil, jar}
+	} else {
+		w.client = &http.Client{nil, nil, jar, 10 * time.Second}
+	}
+	*/
+
 	//w.client = new(http.Client)
 	resp, err := w.client.Do(req)
 	if err != nil {
