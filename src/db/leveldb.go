@@ -192,7 +192,7 @@ func CreateDB(args ...interface{}) (*LevelDb, error) {
 		return nil, err
 	}
 
-	fmt.Println(dbpath)
+	//fmt.Println(dbpath)
 	// No special setup needed, just OpenBB
 	db, err := openDB(dbpath, true)
 	return db, err

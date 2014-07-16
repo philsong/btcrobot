@@ -18,18 +18,15 @@
 package peatio
 
 import (
-	"bufio"
 	. "common"
 	. "config"
-	"encoding/csv"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"logger"
-	"math/rand"
 	"net/http"
-	"os"
 	"strconv"
+	"strings"
+	"time"
 	"util"
 )
 
@@ -49,22 +46,18 @@ import (
 
 func (w *Peatio) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, records []Record) {
 	ret = false
-	var huobisymbol string
-	if symbol == "btc_cny" {
-		huobisymbol = "huobibtccny"
-	} else {
-		huobisymbol = "huobiltccny"
-		logger.Fatal("huobi does not support LTC by now, wait for huobi provide it.", huobisymbol)
+	if symbol != "btc_cny" {
+		logger.Fatal("I only add btccny for peatio by now.")
 		return
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf(Config["hb_kline_url"], peroid, rand.Float64()), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf(Config["peatio_kline_url"], peroid), nil)
 	if err != nil {
 		logger.Fatal(err)
 		return
 	}
 
-	req.Header.Set("Referer", Config["hb_base_url"])
+	req.Header.Set("Referer", Config["peatio_base_url"])
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 
@@ -104,126 +97,78 @@ func (w *Peatio) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, record
 		}
 	}
 
-	ioutil.WriteFile(fmt.Sprintf("cache/hbKLine_%03d.data", peroid), []byte(body), 0644)
+	ioutil.WriteFile(fmt.Sprintf("cache/peatioKLine_%03d.data", peroid), []byte(body), 0644)
 
-	return analyzePeroidLine(fmt.Sprintf("cache/hbKLine_%03d.data", peroid))
+	return analyzePeroidLine(body)
 }
 
-func analyzePeroidLine(filename string) (ret bool, records []Record) {
-	// convert to standard csv file
-	data2csv(filename, 2)
+func analyzePeroidLine(content string) (ret bool, records []Record) {
+	logger.Traceln("peatioKLine analyzePeroidLine begin....")
+	content = strings.TrimPrefix(content, "[[")
+	content = strings.TrimSuffix(content, "]]")
 
 	ret = false
-	file, err := os.Open(filename + ".csv")
-	if err != nil {
-		fmt.Println("ParsePeroidCSV Error:", err)
-		return
-	}
-	defer file.Close()
-	reader := csv.NewReader(file)
-	/*
-		record, err := reader.ReadAll()
-		fmt.Println(record)
-		return
-	*/
-
-	for {
-		line, err := reader.Read()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			logger.Fatal("Error:", err)
-			return
-		}
-
-		if len(line) < 8 {
-			logger.Fatal("Error:", "record is zero, maybe it is not a cvs format!!!", len(line))
+	for _, value := range strings.Split(content, `],[`) {
+		//logger.Traceln(value)
+		v := strings.Split(value, ",")
+		if len(v) < 6 {
+			logger.Debugln("wrong data")
 			return
 		}
 
 		var record Record
-		record.TimeStr = line[0] + " " + line[1]
-		record.Open, err = strconv.ParseFloat(line[2], 64)
+		Time, err := strconv.ParseInt(v[0], 0, 64)
 		if err != nil {
-			logger.Fatal("ParsePeroidCSV item price is not number")
-		}
-		record.High, err = strconv.ParseFloat(line[3], 64)
-		if err != nil {
-			logger.Fatal("ParsePeroidCSV item price is not number")
-		}
-		record.Low, err = strconv.ParseFloat(line[4], 64)
-		if err != nil {
-			logger.Fatal("ParsePeroidCSV item price is not number")
-		}
-		record.Close, err = strconv.ParseFloat(line[5], 64)
-		if err != nil {
-			logger.Fatal("ParsePeroidCSV item price is not number")
+			logger.Debugln("config item is not float")
+			return
 		}
 
-		record.Volumn, err = strconv.ParseFloat(line[6], 64)
+		Open, err := strconv.ParseFloat(v[1], 64)
 		if err != nil {
-			logger.Fatal("ParsePeroidCSV item Volumn is not number")
+			logger.Debugln("config item is not float")
+			return
 		}
-		_, err = strconv.ParseFloat(line[7], 64)
+
+		Close, err := strconv.ParseFloat(v[2], 64)
 		if err != nil {
-			logger.Fatal("ParsePeroidCSV item Amount is not number")
+			logger.Debugln("config item is not float")
+			return
 		}
+
+		High, err := strconv.ParseFloat(v[3], 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		Low, err := strconv.ParseFloat(v[4], 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		Volumn, err := strconv.ParseFloat(v[5], 64)
+		if err != nil {
+			logger.Debugln("config item is not float")
+			return
+		}
+
+		const layout = "2006-01-02 15:04:05"
+		t := time.Unix(Time, 0)
+		record.TimeStr = t.Format(layout)
+		record.Time = Time
+		record.Open = Open
+		record.High = High
+		record.Low = Low
+		record.Close = Close
+		record.Volumn = Volumn
+
+		//logger.Traceln(records)
 
 		records = append(records, record)
 	}
 
+	logger.Traceln("Okcoin parsePeroidArray end....")
 	ret = true
 	return
-}
-
-// convert to standard csv file
-func data2csv(filename string, skipline int) {
-	lines, err := readLines(filename)
-	if err != nil {
-		logger.Fatalf("readLines: %s", err)
-	}
-	/*
-		for i, line := range lines {
-			fmt.Println(i, line)
-		}
-	*/
-
-	if err := writeLines(lines, filename+".csv", skipline); err != nil {
-		logger.Fatalf("writeLines: %s", err)
-	}
-}
-
-// reads a whole file into memory and returns a slice of its lines.
-func readLines(path string) ([]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	var lines []string
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
-}
-
-// writes the lines to the given file.
-func writeLines(lines []string, path string, skipline int) error {
-	file, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	w := bufio.NewWriter(file)
-	for i, line := range lines {
-		if i < skipline {
-			continue
-		}
-
-		fmt.Fprintln(w, line)
-	}
-	return w.Flush()
 }

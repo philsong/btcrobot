@@ -112,7 +112,7 @@ func RobotWorker() {
 		totalHour = 1
 	}
 
-	fmt.Println("robot working...")
+	fmt.Println("trade robot start working...")
 
 	go func() {
 		for _ = range ticker.C {

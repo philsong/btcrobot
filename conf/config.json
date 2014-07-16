@@ -10,9 +10,9 @@
 	"bitvc_base_url" : "https://www.bitvc.com/",
 	"bitvc_login_url" : "https://www.bitvc.com/user/login",
 
-	"peatio_base_url": "https://demo.peat.io/",
+	"peatio_base_url": "https://peatio.com",
 	"peatio_api_url": "https://peatio.com/api/v2/markets",
-	"peatio_kline_url": "https://peatio.com/market/?a=kline&period=%03d&r=%f",
+	"peatio_kline_url": "https://peatio.com/api/v2/k.json?market=btccny&limit=100&period=%d",
 	"peatio_trade_detail": "http://peatio.com/staticmarket/detail.html?jsoncallback=jQuery%s_%d&_=%d",
 
 	
@@ -35,5 +35,5 @@
 	"fatalconsole": "1",
 	"debugconsole": "0",
 
-	"env": "dev22"
+	"env": "product"
 }
