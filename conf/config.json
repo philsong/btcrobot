@@ -14,6 +14,7 @@
 	"peatio_api_url": "https://peatio.com/api/v2/markets",
 	"peatio_kline_url": "https://peatio.com/api/v2/k.json?market=btccny&limit=100&period=%d",
 	"peatio_trade_detail": "http://peatio.com/staticmarket/detail.html?jsoncallback=jQuery%s_%d&_=%d",
+	"peatio_depth_url":"https://peatio.com/api/v2/order_book.json?market=btccny&asks_limit=10&bids_limit=10",
 
 	
 	"hb_base_url": "https://www.huobi.com/",
