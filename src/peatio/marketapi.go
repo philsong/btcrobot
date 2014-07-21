@@ -168,7 +168,7 @@ func analyzePeroidLine(content string) (ret bool, records []Record) {
 		records = append(records, record)
 	}
 
-	logger.Traceln("Okcoin parsePeroidArray end....")
+	logger.Traceln("peatioKLine parsePeroidArray end....")
 	ret = true
 	return
 }

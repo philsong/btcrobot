@@ -33,16 +33,9 @@ func NewPeatio() *Peatio {
 	return w
 }
 
-func (w Peatio) CancelOrder(order_id string) (ret bool) {
-	tradeAPI := NewPeatioTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
+func (w Peatio) GetKLine(peroid int) (ret bool, records []Record) {
 	symbol := Option["symbol"]
-	if symbol == "btc_cny" {
-		return tradeAPI.Cancel_order(order_id)
-	} else if symbol == "ltc_cny" {
-		return false
-	}
-
-	return false
+	return w.AnalyzeKLinePeroid(symbol, peroid)
 }
 
 func (w Peatio) GetOrderBook() (ret bool, orderBook OrderBook) {
@@ -96,9 +89,16 @@ func (w Peatio) GetOrder(order_id string) (ret bool, order Order) {
 	return
 }
 
-func (w Peatio) GetKLine(peroid int) (ret bool, records []Record) {
+func (w Peatio) CancelOrder(order_id string) (ret bool) {
+	tradeAPI := NewPeatioTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
 	symbol := Option["symbol"]
-	return w.AnalyzeKLinePeroid(symbol, peroid)
+	if symbol == "btc_cny" {
+		return tradeAPI.Cancel_order(order_id)
+	} else if symbol == "ltc_cny" {
+		return false
+	}
+
+	return false
 }
 
 func (w Peatio) GetAccount() (account Account, ret bool) {

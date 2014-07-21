@@ -21,7 +21,7 @@ import (
 	. "common"
 	. "config"
 	"encoding/json"
-	"fmt"
+	//"fmt"
 	"io/ioutil"
 	"logger"
 	"net/http"
@@ -33,7 +33,7 @@ import (
 func (w *Peatio) getOrderBook(symbol string) (ret bool, orderBook OrderBook) {
 	//init to false
 	ret = false
-	req, err := http.NewRequest("GET", fmt.Sprintf(Config["peatio_depth_url"], symbol), nil)
+	req, err := http.NewRequest("GET", Config["peatio_depth_url"], nil)
 	if err != nil {
 		logger.Fatal(err)
 		return
@@ -88,13 +88,13 @@ type OKMarketOrder struct {
 }
 
 type _OKOrderBook struct {
-	Asks [200]interface{}
-	Bids [200]interface{}
+	Asks [10]interface{}
+	Bids [10]interface{}
 }
 
 type OKOrderBook struct {
-	Asks [200]OKMarketOrder
-	Bids [200]OKMarketOrder
+	Asks [10]OKMarketOrder
+	Bids [10]OKMarketOrder
 }
 
 func convert2struct(_okOrderBook _OKOrderBook) (okOrderBook OKOrderBook) {
@@ -147,7 +147,7 @@ func (w *Peatio) analyzeOrderBook(content string) (ret bool, orderBook OrderBook
 	}
 
 	//OrderBook
-	//logger.Infoln(orderBook)
+	logger.Infoln(orderBook)
 	ret = true
 	return
 }
