@@ -87,40 +87,40 @@ type OKMarketOrder struct {
 	Amount float64 //委单量
 }
 
-type _OKOrderBook struct {
+type _PeatioOrderBook struct {
 	Asks [10]interface{}
 	Bids [10]interface{}
 }
 
-type OKOrderBook struct {
+type PeatioOrderBook struct {
 	Asks [10]OKMarketOrder
 	Bids [10]OKMarketOrder
 }
 
-func convert2struct(_okOrderBook _OKOrderBook) (okOrderBook OKOrderBook) {
-	for k, v := range _okOrderBook.Asks {
+func convert2struct(_peatioOrderBook _PeatioOrderBook) (peatioOrderBook PeatioOrderBook) {
+	for k, v := range _peatioOrderBook.Asks {
 		switch vt := v.(type) {
 		case []interface{}:
 			for ik, iv := range vt {
 				switch ik {
 				case 0:
-					okOrderBook.Asks[k].Price = util.InterfaceToFloat64(iv)
+					peatioOrderBook.Asks[k].Price = util.InterfaceToFloat64(iv)
 				case 1:
-					okOrderBook.Asks[k].Amount = util.InterfaceToFloat64(iv)
+					peatioOrderBook.Asks[k].Amount = util.InterfaceToFloat64(iv)
 				}
 			}
 		}
 	}
 
-	for k, v := range _okOrderBook.Bids {
+	for k, v := range _peatioOrderBook.Bids {
 		switch vt := v.(type) {
 		case []interface{}:
 			for ik, iv := range vt {
 				switch ik {
 				case 0:
-					okOrderBook.Bids[k].Price = util.InterfaceToFloat64(iv)
+					peatioOrderBook.Bids[k].Price = util.InterfaceToFloat64(iv)
 				case 1:
-					okOrderBook.Bids[k].Amount = util.InterfaceToFloat64(iv)
+					peatioOrderBook.Bids[k].Amount = util.InterfaceToFloat64(iv)
 				}
 			}
 		}
@@ -131,23 +131,23 @@ func convert2struct(_okOrderBook _OKOrderBook) (okOrderBook OKOrderBook) {
 func (w *Peatio) analyzeOrderBook(content string) (ret bool, orderBook OrderBook) {
 	//init to false
 	ret = false
-	var _okOrderBook _OKOrderBook
-	if err := json.Unmarshal([]byte(content), &_okOrderBook); err != nil {
+	var _peatioOrderBook _PeatioOrderBook
+	if err := json.Unmarshal([]byte(content), &_peatioOrderBook); err != nil {
 		logger.Infoln(err)
 		return
 	}
 
-	okOrderBook := convert2struct(_okOrderBook)
+	peatioOrderBook := convert2struct(_peatioOrderBook)
 
 	for i := 0; i < 10; i++ {
-		orderBook.Asks[i].Price = okOrderBook.Asks[len(_okOrderBook.Asks)-10+i].Price
-		orderBook.Asks[i].Amount = okOrderBook.Asks[len(_okOrderBook.Asks)-10+i].Amount
-		orderBook.Bids[i].Price = okOrderBook.Bids[i].Price
-		orderBook.Bids[i].Amount = okOrderBook.Bids[i].Amount
+		orderBook.Asks[i].Price = peatioOrderBook.Asks[len(_peatioOrderBook.Asks)-10+i].Price
+		orderBook.Asks[i].Amount = peatioOrderBook.Asks[len(_peatioOrderBook.Asks)-10+i].Amount
+		orderBook.Bids[i].Price = peatioOrderBook.Bids[i].Price
+		orderBook.Bids[i].Amount = peatioOrderBook.Bids[i].Amount
 	}
 
 	//OrderBook
-	logger.Infoln(orderBook)
+	//logger.Infoln(orderBook)
 	ret = true
 	return
 }
