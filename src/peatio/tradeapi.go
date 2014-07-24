@@ -344,9 +344,9 @@ func (w *PeatioTrade) Cancel_order(id string) bool {
 	}
 }
 
-func (w *PeatioTrade) doTrade(method, price, amount string) int {
+func (w *PeatioTrade) doTrade(side, price, amount string) int {
 	pParams := make(map[string]string)
-	pParams["method"] = method
+	pParams["side"] = side
 	pParams["access_key"] = w.access_key
 	pParams["price"] = price
 	pParams["amount"] = amount
