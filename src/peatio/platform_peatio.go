@@ -1,5 +1,7 @@
 package peatio
 
+/* todo: 懒得搞了，你们玩呗
+
 // https://peatio.com/documents/api_v2 http://demo.peat.io/documents/websocket_api
 import (
 	"crypto/hmac"
@@ -285,3 +287,4 @@ func (p *iPeatio) GetFee() (fee Fee, err error) {
 	fee.Sell = 0.0
 	return
 }
+*/
