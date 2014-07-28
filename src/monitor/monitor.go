@@ -18,12 +18,14 @@
 package monitor
 
 import (
+	"Bittrex"
 	"bitvc"
 	. "common"
 	. "config"
 	"fmt"
 	"huobi"
 	"logger"
+	"mintpal"
 	"okcoin"
 	"peatio"
 	"strategy"
@@ -58,6 +60,8 @@ func marketAPI() (marketAPI MarketAPI) {
 		marketAPI = okcoin.NewOkcoin()
 	} else if Option["datacenter"] == "peatio" {
 		marketAPI = peatio.NewPeatio()
+	} else if Option["datacenter"] == "bittrex" {
+		marketAPI = Bittrex.NewBittrex()
 	} else {
 		logger.Fatalln("Please config the market center...")
 	}
@@ -73,6 +77,8 @@ func tradeAPI() (tradeAPI TradeAPI) {
 		tradeAPI = bitvc.NewBitvc()
 	} else if Option["tradecenter"] == "peatio" {
 		tradeAPI = peatio.NewPeatio()
+	} else if Option["tradecenter"] == "bittrex" {
+		tradeAPI = Bittrex.NewBittrex()
 	} else {
 		logger.Fatalln("Please config the exchange center...")
 	}
@@ -83,6 +89,14 @@ func RobotWorker() {
 	fmt.Println("env", Config["env"])
 	if DebugEnv || Config["env"] == "dev" {
 		fmt.Println("test working...")
+		mintpal.Manager().GetMarketSummary("")
+		mintpal.Manager().GetMarketStats("BC", "BTC")
+		mintpal.Manager().GetMarketTrades("BC", "BTC")
+		mintpal.Manager().GetMarketOrders("BC", "BTC", "BUY")
+		mintpal.Manager().GetMarketOrders("BC", "BTC", "SELL")
+		mintpal.Manager().GetMarketChartData("BC", "BTC", "MAX")
+
+		return
 
 		var tradeAPI TradeAPI
 		tradeAPI = bitvc.NewBitvc()

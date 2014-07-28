@@ -3,7 +3,7 @@ package mintpal
 //Market
 type MarketSummary struct {
 	Status string
-	count  int
+	Count  int
 	Data   []marketSummary
 }
 
@@ -14,6 +14,7 @@ type MarketStats struct {
 
 type marketSummary struct {
 	MarketID       string `json:"market_id"`
+	Coin           string
 	Code           string
 	Exchange       string
 	LastPrice      string `json:"last_price"`

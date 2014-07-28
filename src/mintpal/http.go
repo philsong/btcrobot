@@ -20,7 +20,7 @@ func get(url string, pointer interface{}) error {
 		fmt.Println(err)
 		return err
 	}
-	fmt.Println(string(b))
+	//fmt.Println(string(b))
 	err = json.Unmarshal(b, pointer)
 	if err != nil {
 		fmt.Println(err)

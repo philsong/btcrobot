@@ -25,7 +25,7 @@ func (p *manager) GetMarketSummary(exchange string) (summary *MarketSummary, err
 	if err != nil {
 		fmt.Println(err)
 	}
-	//debug(summary)
+	debug(summary)
 	return
 }
 
@@ -39,7 +39,7 @@ func (p *manager) GetMarketStats(code, exchange string) (stats *MarketStats, err
 	if err != nil {
 		fmt.Println(err)
 	}
-	//debug(stats)
+	debug(stats)
 	return
 }
 
@@ -53,7 +53,7 @@ func (p *manager) GetMarketTrades(code, exchange string) (trades *MarketTrades, 
 	if err != nil {
 		fmt.Println(err)
 	}
-	//debug(trades)
+	debug(trades)
 	return
 }
 
@@ -85,6 +85,6 @@ func (p *manager) GetMarketChartData(code, exchange, period string) (chart *Mark
 	if err != nil {
 		fmt.Println(err)
 	}
-	//debug(chart)
+	debug(chart)
 	return
 }
