@@ -1,6 +1,6 @@
 package peatio
 
-/* todo: 懒得搞了，你们玩呗
+// todo: 懒得搞了，你们玩呗
 
 // https://peatio.com/documents/api_v2 http://demo.peat.io/documents/websocket_api
 import (
@@ -27,6 +27,90 @@ type iPeatio struct {
 	symbol    string
 	step      int64
 	timeout   time.Duration
+}
+
+type (
+	/*
+		Record struct {
+			Time   int64
+			Open   float64
+			High   float64
+			Low    float64
+			Close  float64
+			Volume float64
+		}*/
+
+	MarketOrder struct {
+		Price  float64
+		Amount float64
+	}
+
+	Fee struct {
+		Sell float64
+		Buy  float64
+	}
+
+	Ticker struct {
+		High   float64
+		Low    float64
+		Sell   float64
+		Buy    float64
+		Last   float64
+		Volume float64
+	}
+
+	Trade struct {
+		Id     int64
+		Time   int64
+		Amount float64
+		Price  float64
+		Type   int64
+	}
+
+	Order struct {
+		Id         int64
+		Amount     float64
+		DealAmount float64
+		Price      float64
+		Status     int64
+		Type       int64
+	}
+
+	Depth struct {
+		Asks []MarketOrder
+		Bids []MarketOrder
+	}
+
+	Account struct {
+		Stocks        float64
+		FrozenStocks  float64
+		Balance       float64
+		FrozenBalance float64
+	}
+)
+
+func toString(s interface{}) string {
+	if v, ok := s.(string); ok {
+		return v
+	}
+	return fmt.Sprintf("%v", s)
+}
+
+func toFloat(s interface{}) float64 {
+	var ret float64
+	switch v := s.(type) {
+	case float64:
+		ret = v
+	case int64:
+		ret = float64(v)
+	case string:
+		ret, _ = strconv.ParseFloat(v, 64)
+	}
+	return ret
+}
+
+func float2str(i float64) string {
+	return strconv.FormatFloat(i, 'f', -1, 64)
 }
 
 func newPeatio(accessKey, secretKey, currency string, peroid int64) (*iPeatio, error) {
@@ -287,4 +371,3 @@ func (p *iPeatio) GetFee() (fee Fee, err error) {
 	fee.Sell = 0.0
 	return
 }
-*/
