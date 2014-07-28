@@ -48,12 +48,12 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 		}
 
 		if EMAdif > buyThreshold {
-			logger.Infof("EMAdif(%0.03f) > buyThreshold(%0.03f), trigger to buy\n", EMAdif, buyThreshold)
+			logger.Infof("EMAdif(%0.04f) > buyThreshold(%0.04f), trigger to buy\n", EMAdif, buyThreshold)
 			emaStrategy.LessBuyThreshold = false
 			return true
 		} else {
 			if emaStrategy.LessBuyThreshold == false {
-				logger.Infof("cross up, but EMAdif(%0.03f) <= buyThreshold(%0.03f)\n", EMAdif, buyThreshold)
+				logger.Infof("cross up, but EMAdif(%0.04f) <= buyThreshold(%0.04f)\n", EMAdif, buyThreshold)
 				emaStrategy.LessBuyThreshold = true
 			}
 		}
@@ -69,12 +69,12 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 		}
 
 		if EMAdif < sellThreshold {
-			logger.Infof("EMAdif(%0.03f) <  sellThreshold(%0.03f), trigger to sell\n", EMAdif, sellThreshold)
+			logger.Infof("EMAdif(%0.04f) <  sellThreshold(%0.04f), trigger to sell\n", EMAdif, sellThreshold)
 			emaStrategy.LessSellThreshold = false
 			return true
 		} else {
 			if emaStrategy.LessSellThreshold == false {
-				logger.Infof("cross down, but EMAdif(%0.03f) >= sellThreshold(%0.03f)\n", EMAdif, sellThreshold)
+				logger.Infof("cross down, but EMAdif(%0.04f) >= sellThreshold(%0.04f)\n", EMAdif, sellThreshold)
 				emaStrategy.LessSellThreshold = true
 			}
 		}
@@ -163,7 +163,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	//go TriggerPrice(Price[length-1])
 	if EMAdif[length-1] != emaStrategy.PrevEMAdif {
 		emaStrategy.PrevEMAdif = EMAdif[length-1]
-		logger.Infof("EMA [%0.02f,%0.02f,%0.02f] Diff:%0.03f\t%0.03f\n", lastPrice, emaShort[length-1], emaLong[length-1], EMAdif[length-2], EMAdif[length-1])
+		logger.Infof("EMA [%0.02f,%0.02f,%0.02f] Diff:%0.04f\t%0.04f\n", lastPrice, emaShort[length-1], emaLong[length-1], EMAdif[length-2], EMAdif[length-1])
 	}
 
 	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen

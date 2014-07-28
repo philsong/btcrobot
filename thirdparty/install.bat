@@ -14,6 +14,8 @@ set GOPATH=%~dp0
 go install github.com/go-martini/martini
 go install github.com/codegangsta/martini-contrib/auth
 go install github.com/philsong/goleveldb/leveldb
+go install github.com/bitly/go-simplejson
+go install  github.com/philsong/go-bittrex
 
 set GOPATH=%OLDGOPATH%
 

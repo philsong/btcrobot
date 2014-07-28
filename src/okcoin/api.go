@@ -89,6 +89,7 @@ func (w Okcoin) GetAccount() (account Account, ret bool) {
 
 	userInfo, ret := tradeAPI.GetAccount()
 
+	logger.Infoln("account:", userInfo)
 	if !ret {
 		logger.Traceln("okcoin GetAccount failed")
 		return

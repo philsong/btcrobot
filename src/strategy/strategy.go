@@ -311,7 +311,7 @@ func Buy() string {
 			nMinTradeAmount = 0.01
 		}
 		if nAmount < nMinTradeAmount {
-			warning += "没有足够的法币可用"
+			warning += "没有足够的法币余额"
 			logger.Infoln(warning)
 			PrevTrade = "buy"
 			PrevBuyPirce = nPrice
@@ -349,7 +349,7 @@ func Sell() string {
 	//compute the amount
 	Available_coin := GetAvailable_coin()
 	if Available_coin < 0.01 {
-		warning = "没有足够的币可卖"
+		warning = "没有足够的币"
 		logger.Infoln(warning)
 		PrevTrade = "sell"
 		PrevBuyPirce = 0
@@ -404,6 +404,10 @@ func GetAvailable_cny() float64 {
 		return -1
 	}
 
+	logger.Infoln("account:")
+	logger.Infoln(account)
+	logger.Infoln("--------------")
+
 	numAvailable_cny, err := strconv.ParseFloat(account.Available_cny, 64)
 	if err != nil {
 		logger.Errorln("tradeAmount is not float")
@@ -420,6 +424,7 @@ func GetAvailable_btc() float64 {
 		return -1
 	}
 
+	logger.Infoln(account)
 	numAvailable_btc, err := strconv.ParseFloat(account.Available_btc, 64)
 	if err != nil {
 		logger.Errorln("Available_btc is not float")

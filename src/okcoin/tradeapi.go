@@ -104,7 +104,7 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("Referer", "https://www.okcoin.com/")
+	req.Header.Set("Referer", "https://www.okcoin.cn/")
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
 	logger.Traceln(req)
@@ -139,7 +139,7 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 			ioutil.WriteFile("cache/okapi_url.json", bodyByte, 0644)
 		}
 
-		logger.Traceln(body)
+		logger.Errorln(body)
 
 		return body, nil
 
@@ -199,15 +199,27 @@ func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret boo
 　　　　 }
 　　｝
 */
-type Money struct {
-	CNY string
+type Asset struct {
+	Net   string
+	Total string
+}
+type UnionFund struct {
 	BTC string
 	LTC string
 }
 
+type Money struct {
+	BTC string
+	CNY string
+	LTC string
+}
+
 type Funds struct {
-	Free    Money
-	Freezed Money
+	Free      Money
+	Freezed   Money
+	Borrow    Money
+	Asset     Asset
+	UnionFund UnionFund
 }
 
 type Info struct {
