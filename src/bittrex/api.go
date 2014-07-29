@@ -24,13 +24,29 @@ import (
 	"github.com/philsong/go-bittrex"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
 type Bittrex struct {
-	init       bool
-	records    []Record
-	LastEproch string
+	init      bool
+	records   []Record
+	LastEpoch string
+}
+
+var (
+	once   sync.Once
+	manage *Bittrex
+)
+
+func Manager() (m *Bittrex) {
+	if manage == nil {
+		once.Do(func() {
+			manage = new(Bittrex)
+		})
+	}
+	m = manage
+	return
 }
 
 func NewBittrex() *Bittrex {
@@ -50,25 +66,29 @@ func (w Bittrex) GetOrder(order_id string) (ret bool, order Order) {
 	return
 }
 
-func (w Bittrex) GetKLine(peroid int) (ret bool, records []Record) {
+func (w *Bittrex) GetKLine(peroid int) (ret bool, records []Record) {
 	//symbol := Option["symbol"]
 
 	// Bittrex client
-	bittrex := bittrex.New(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
+	bittrex := bittrex.New(SecretOption["bittrex_access_key"], SecretOption["bittrex_secret_key"])
 
+	fmt.Println(w.init, len(w.records), w.LastEpoch)
 	if w.init == false {
 		candles, err := bittrex.GetHisCandles("BTC-BC")
 		if err != nil {
-			ret = true
-		} else {
 			ret = false
+			fmt.Println(err)
+			return
+		} else {
+			ret = true
 		}
+		fmt.Println(err, len(candles))
 
 		var record Record
 		for _, candle := range candles {
 			TimeStr := strings.TrimPrefix(candle.TimeStamp, "/Date(")
 			TimeStr = strings.TrimSuffix(TimeStr, "000)/")
-			secs, _ := strconv.Atoi(TimeStr)
+			//secs, _ := strconv.Atoi(TimeStr)
 			//fmt.Println(time.Unix(int64(secs), 0))
 			//fmt.Println(TimeStr, candle.TimeStamp, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume)
 			//return
@@ -80,26 +100,32 @@ func (w Bittrex) GetKLine(peroid int) (ret bool, records []Record) {
 			record.Low = candle.Low
 			record.Volumn = candle.Volume
 			records = append(records, record)
-			fmt.Println(time.Unix(int64(secs), 0))
-			fmt.Println(TimeStr, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume)
+			//fmt.Println(time.Unix(int64(secs), 0))
+			//fmt.Println(TimeStr, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume)
 		}
-		fmt.Println(time.Now())
-		fmt.Println(err, len(candles))
 
-		if w.init == false && err != nil {
+		secs, _ := strconv.Atoi(records[len(records)-1].TimeStr)
+		fmt.Println(time.Unix(int64(secs), 0))
+
+		if w.init == false && len(records) > 0 {
 			w.init = true
 			w.records = records
-			w.LastEproch = records[len(records)-1].TimeStr
+			w.LastEpoch = records[len(records)-1].TimeStr + "000"
+			fmt.Println(w.LastEpoch)
 		}
 
 	} else {
 		records = w.records
-		candles, err := bittrex.GetNewCandles("BTC-BC", w.LastEproch)
+		candles, err := bittrex.GetNewCandles("BTC-BC", w.LastEpoch)
 		if err != nil {
-			ret = true
-		} else {
 			ret = false
+			fmt.Println(err)
+			return
+		} else {
+			ret = true
 		}
+
+		fmt.Println(err, len(candles))
 
 		var record Record
 		for _, candle := range candles {
@@ -118,11 +144,18 @@ func (w Bittrex) GetKLine(peroid int) (ret bool, records []Record) {
 			record.Volumn = candle.Volume
 			records = append(records, record)
 			fmt.Println(time.Unix(int64(secs), 0))
-			fmt.Println(TimeStr, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume)
+			//fmt.Println(TimeStr, candle.Open, candle.Close, candle.High, candle.Low, candle.Volume)
 		}
-		fmt.Println(time.Now())
-		fmt.Println(err, len(candles))
+
+		if len(records) > 0 {
+			w.records = records
+			w.LastEpoch = records[len(records)-1].TimeStr + "000"
+		}
+		secs, _ := strconv.Atoi(records[len(records)-1].TimeStr)
+		fmt.Println(len(records), time.Unix(int64(secs), 0))
 	}
+
+	fmt.Println(time.Now())
 
 	//fmt.Println(records)
 	return

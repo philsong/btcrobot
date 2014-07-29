@@ -20,6 +20,7 @@ package peatio
 import (
 	. "common"
 	. "config"
+	"fmt"
 	"logger"
 	"strconv"
 	"time"
@@ -44,13 +45,9 @@ func (w Peatio) GetOrderBook() (ret bool, orderBook OrderBook) {
 }
 
 func (w Peatio) Buy(tradePrice, tradeAmount string) (buyId string) {
-	tradeAPI := NewPeatioTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
-
-	if Option["symbol"] == "btc_cny" {
-		buyId = tradeAPI.BuyBTC(tradePrice, tradeAmount)
-	} else if Option["symbol"] == "ltc_cny" {
-		buyId = tradeAPI.BuyLTC(tradePrice, tradeAmount)
-	}
+	tradeAPI, _ := newPeatio(SecretOption["peatio_access_key"], SecretOption["peatio_secret_key"], "btc", 0)
+	ibuyId, _ := tradeAPI.Buy(toFloat(tradePrice), toFloat(tradeAmount))
+	buyId = fmt.Sprintf("%d", ibuyId)
 
 	if buyId != "0" {
 		logger.Infoln("执行买入委托成功", tradePrice, tradeAmount)
@@ -68,13 +65,9 @@ func (w Peatio) Buy(tradePrice, tradeAmount string) (buyId string) {
 }
 
 func (w Peatio) Sell(tradePrice, tradeAmount string) (sellId string) {
-	tradeAPI := NewPeatioTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
-
-	if Option["symbol"] == "btc_cny" {
-		sellId = tradeAPI.SellBTC(tradePrice, tradeAmount)
-	} else if Option["symbol"] == "ltc_cny" {
-		sellId = tradeAPI.SellLTC(tradePrice, tradeAmount)
-	}
+	tradeAPI, _ := newPeatio(SecretOption["peatio_access_key"], SecretOption["peatio_secret_key"], "btc", 0)
+	isellId, _ := tradeAPI.Buy(toFloat(tradePrice), toFloat(tradeAmount))
+	sellId = fmt.Sprintf("%d", isellId)
 
 	if sellId != "0" {
 		logger.Infoln("执行卖出委托成功", tradePrice, tradeAmount)
@@ -92,79 +85,54 @@ func (w Peatio) Sell(tradePrice, tradeAmount string) (sellId string) {
 }
 
 func (w Peatio) GetOrder(order_id string) (ret bool, order Order) {
-	tradeAPI := NewPeatioTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
-
 	symbol := Option["symbol"]
 	if symbol == "ltc_cny" {
 		ret = false
 		return
 	}
 
-	ret, hbOrder := tradeAPI.Get_order(order_id)
-	if ret == false {
-		ret = false
-		return
-	}
-
-	order.Id = hbOrder.Id
-
-	Price, err := strconv.ParseFloat(hbOrder.Order_price, 64)
+	tradeAPI, _ := newPeatio(SecretOption["peatio_access_key"], SecretOption["peatio_secret_key"], "btc", 0)
+	iorder_id, _ := strconv.Atoi(order_id)
+	pOrder, err := tradeAPI.GetOrder(int64(iorder_id))
 	if err != nil {
-		logger.Errorln("config item order_price is not float")
-		ret = false
-		return
-	}
-	order.Price = Price
-
-	Amount, err := strconv.ParseFloat(hbOrder.Order_amount, 64)
-	if err != nil {
-		logger.Errorln("config item order_amount is not float")
-		ret = false
-		return
-	}
-	order.Amount = Amount
-
-	Deal_amount, err := strconv.ParseFloat(hbOrder.Processed_amount, 64)
-	if err != nil {
-		logger.Errorln("config item processed_amount is not float")
 		ret = false
 		return
 	}
 
-	order.Deal_amount = Deal_amount
+	order.Id = int(pOrder.Id)
+	order.Price = pOrder.Price
+	order.Amount = pOrder.Amount
+	order.Deal_amount = pOrder.DealAmount
 
 	ret = true
 	return
 }
 
 func (w Peatio) CancelOrder(order_id string) (ret bool) {
-	tradeAPI := NewPeatioTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
-	symbol := Option["symbol"]
-	if symbol == "btc_cny" {
-		return tradeAPI.Cancel_order(order_id)
-	} else if symbol == "ltc_cny" {
-		return false
-	}
+	tradeAPI, _ := newPeatio(SecretOption["peatio_access_key"], SecretOption["peatio_secret_key"], "btc", 0)
+	iorder_id, _ := strconv.Atoi(order_id)
 
-	return false
+	ret, _ = tradeAPI.CancelOrder(int64(iorder_id))
+	return
 }
 
 func (w Peatio) GetAccount() (account Account, ret bool) {
-	tradeAPI := NewPeatioTrade(SecretOption["huobi_access_key"], SecretOption["huobi_secret_key"])
+	tradeAPI, _ := newPeatio(SecretOption["peatio_access_key"], SecretOption["peatio_secret_key"], "btc", 0)
 
-	userInfo, ret := tradeAPI.GetAccount()
+	userInfo, err := tradeAPI.GetAccount()
 
-	if !ret {
+	if err != nil {
 		logger.Traceln("Peatio GetAccount failed")
-
+		ret = false
 		return
 	} else {
-		account.Available_cny = userInfo.Available_cny_display
-		account.Available_btc = userInfo.Available_btc_display
+		ret = true
+		account.Available_cny = float2str(userInfo.Balance)
+		account.Available_btc = float2str(userInfo.Stocks)
 		account.Available_ltc = "N/A"
 
-		account.Frozen_cny = userInfo.Frozen_cny_display
-		account.Frozen_btc = userInfo.Frozen_btc_display
+		account.Frozen_cny = float2str(userInfo.FrozenBalance)
+		account.Frozen_btc = float2str(userInfo.FrozenStocks)
 		account.Frozen_ltc = "N/A"
 
 		logger.Infof("Peatio资产: \n 可用cny:%-10s \tbtc:%-10s \tltc:%-10s \n 冻结cny:%-10s \tbtc:%-10s \tltc:%-10s\n",

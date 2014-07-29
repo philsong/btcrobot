@@ -61,7 +61,7 @@ func marketAPI() (marketAPI MarketAPI) {
 	} else if Option["datacenter"] == "peatio" {
 		marketAPI = peatio.NewPeatio()
 	} else if Option["datacenter"] == "bittrex" {
-		marketAPI = Bittrex.NewBittrex()
+		marketAPI = Bittrex.Manager()
 	} else {
 		logger.Fatalln("Please config the market center...")
 	}
@@ -78,7 +78,7 @@ func tradeAPI() (tradeAPI TradeAPI) {
 	} else if Option["tradecenter"] == "peatio" {
 		tradeAPI = peatio.NewPeatio()
 	} else if Option["tradecenter"] == "bittrex" {
-		tradeAPI = Bittrex.NewBittrex()
+		tradeAPI = Bittrex.Manager()
 	} else {
 		logger.Fatalln("Please config the exchange center...")
 	}

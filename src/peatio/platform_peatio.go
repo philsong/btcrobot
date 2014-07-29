@@ -20,6 +20,16 @@ import (
 	"util"
 )
 
+const (
+	_ = iota // ignore first value by assigning to blank identifier
+	ORDER_TYPE_BUY
+	ORDER_TYPE_SELL
+	ORDER_STATE_PARTIAL
+	ORDER_STATE_PENDING
+	ORDER_STATE_CLOSED
+	ORDER_STATE_CANCELED
+)
+
 type iPeatio struct {
 	accessKey string
 	secretKey string
@@ -67,7 +77,7 @@ type (
 		Type   int64
 	}
 
-	Order struct {
+	POrder struct {
 		Id         int64
 		Amount     float64
 		DealAmount float64
@@ -81,7 +91,7 @@ type (
 		Bids []MarketOrder
 	}
 
-	Account struct {
+	PAccount struct {
 		Stocks        float64
 		FrozenStocks  float64
 		Balance       float64
@@ -242,7 +252,7 @@ func (p *iPeatio) tapiCall(httpMethod, method string, params map[string]string) 
 	return
 }
 
-func (p *iPeatio) GetAccount() (account Account, err error) {
+func (p *iPeatio) GetAccount() (account PAccount, err error) {
 	js, err := p.tapiCall("GET", "members/me", map[string]string{})
 	if err != nil {
 		return
@@ -283,7 +293,7 @@ func (p *iPeatio) Sell(price, amount float64) (int64, error) {
 	return p.__trade("sell", price, amount)
 }
 
-func (p *iPeatio) GetOrders() (orders []Order, err error) {
+func (p *iPeatio) GetOrders() (orders []POrder, err error) {
 	js, err := p.tapiCall("GET", "orders", map[string]string{
 		"state":  "wait",
 		"market": p.symbol,
@@ -294,7 +304,7 @@ func (p *iPeatio) GetOrders() (orders []Order, err error) {
 	}
 	for _, item := range js.MustArray() {
 		mp := item.(map[string]interface{})
-		var order Order
+		var order POrder
 		order.Id = int64(toFloat(mp["id"]))
 		order.Amount = toFloat(mp["volume"])
 		order.Price = toFloat(mp["price"])
@@ -314,7 +324,7 @@ func (p *iPeatio) GetOrders() (orders []Order, err error) {
 	return
 }
 
-func (p *iPeatio) GetOrder(orderId int64) (order Order, err error) {
+func (p *iPeatio) GetOrder(orderId int64) (order POrder, err error) {
 	var js *Json
 	js, err = p.tapiCall("GET", "order", map[string]string{
 		"id": strconv.FormatInt(orderId, 10),
@@ -333,7 +343,7 @@ func (p *iPeatio) GetOrder(orderId int64) (order Order, err error) {
 	} else {
 		order.Type = ORDER_TYPE_SELL
 	}
-	switch mp["side"].(string) {
+	switch mp["state"].(string) {
 	case "wait":
 		if order.DealAmount > 0 {
 			order.Status = ORDER_STATE_PARTIAL
