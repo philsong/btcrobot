@@ -17,6 +17,11 @@ import (
 
 func webui() {
 	m := martini.Classic()
+
+	m.Get("/", func(res http.ResponseWriter, req *http.Request) { // res and req are injected by Martini
+		http.Redirect(res, req, req.URL.Path+"/index.html", 200)
+	})
+
 	m.Get("/secret", func() string {
 		// show something
 		err := LoadSecretOption()
