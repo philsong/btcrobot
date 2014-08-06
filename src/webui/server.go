@@ -19,7 +19,7 @@ func webui() {
 	m := martini.Classic()
 
 	m.Get("/", func(res http.ResponseWriter, req *http.Request) { // res and req are injected by Martini
-		http.Redirect(res, req, req.URL.Path+"/index.html", 200)
+		http.Redirect(res, req, "/index.html", http.StatusFound)
 	})
 
 	m.Get("/secret", func() string {
