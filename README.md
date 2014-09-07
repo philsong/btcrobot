@@ -24,6 +24,8 @@ https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/ha
   it's working.
 
   Weibo:http://weibo.com/bocaicfa
+  
+  比特趋势社区：http://bitstrex.com/
 
 
 支持多个交易平台-火币、OKCoin，自动买卖，机器人EMA，MACD，KDJ, 对冲，高低突破，及各种MIX算法
@@ -48,10 +50,6 @@ https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E
 
 
 BTC捐助地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
-
-LTC捐助地址：LXwX5XeZeVfXM2b4GRs6HM1mNn4K9En3F4
-
-Doge捐助地址：DNp3z6yf2bvKPYfU2bN1SpGXPXGFFM9A43
 
 # 本地搭建 #
 
