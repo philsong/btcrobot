@@ -44,15 +44,17 @@ var ErrorCodeMap = map[int64]string{
 }
 
 type Okcoin struct {
+	tradeAPI *OkcoinTrade
 }
 
 func NewOkcoin() *Okcoin {
 	w := new(Okcoin)
+	w.tradeAPI = NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
 	return w
 }
 
 func (w Okcoin) CancelOrder(order_id string) (ret bool) {
-	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+	tradeAPI := w.tradeAPI
 	symbol := Option["symbol"]
 	return tradeAPI.Cancel_order(symbol, order_id)
 }
@@ -64,7 +66,7 @@ func (w Okcoin) GetOrderBook() (ret bool, orderBook OrderBook) {
 
 func (w Okcoin) GetOrder(order_id string) (ret bool, order Order) {
 	symbol := Option["symbol"]
-	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+	tradeAPI := w.tradeAPI
 
 	ret, ok_orderTable := tradeAPI.Get_order(symbol, order_id)
 	if ret == false {
@@ -85,11 +87,11 @@ func (w Okcoin) GetKLine(peroid int) (ret bool, records []Record) {
 }
 
 func (w Okcoin) GetAccount() (account Account, ret bool) {
-	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+	tradeAPI := w.tradeAPI
 
 	userInfo, ret := tradeAPI.GetAccount()
 
-	logger.Infoln("account:", userInfo)
+	//logger.Infoln("account:", userInfo)
 	if !ret {
 		logger.Traceln("okcoin GetAccount failed")
 		return
@@ -117,7 +119,7 @@ func (w Okcoin) GetAccount() (account Account, ret bool) {
 }
 
 func (w Okcoin) Buy(tradePrice, tradeAmount string) (buyId string) {
-	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+	tradeAPI := w.tradeAPI
 
 	symbol := Option["symbol"]
 	if symbol == "btc_cny" {
@@ -132,14 +134,13 @@ func (w Okcoin) Buy(tradePrice, tradeAmount string) (buyId string) {
 		logger.Infoln("执行买入委托失败", tradePrice, tradeAmount)
 	}
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	return buyId
 }
 
 func (w Okcoin) Sell(tradePrice, tradeAmount string) (sellId string) {
-	tradeAPI := NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
-
+	tradeAPI := w.tradeAPI
 	symbol := Option["symbol"]
 	if symbol == "btc_cny" {
 		sellId = tradeAPI.SellBTC(tradePrice, tradeAmount)
@@ -152,7 +153,7 @@ func (w Okcoin) Sell(tradePrice, tradeAmount string) (sellId string) {
 		logger.Infoln("执行卖出委托失败", tradePrice, tradeAmount)
 	}
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(1 * time.Second)
 	_, ret := w.GetAccount()
 
 	if !ret {

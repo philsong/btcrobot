@@ -19,6 +19,7 @@ package strategy
 
 import (
 	. "common"
+	. "config"
 	"fmt"
 )
 
@@ -32,7 +33,7 @@ func init() {
 
 func (oo *OOStrategy) Tick(records []Record) bool {
 
-	const btcslap = 1.8
+	const btcslap = 0.5
 	const ltcslap = 0.8
 
 	sell1, buy1, ret := getOrderPrice()
@@ -43,9 +44,19 @@ func (oo *OOStrategy) Tick(records []Record) bool {
 	diff := btcslap
 	fmt.Println(buy1, diff, sell1)
 	if buy1+diff <= sell1 {
-		buyID := Buy()
+		amount := Option["tradeAmount"]
+
+		buyID := buy(toString(buy1+0.01), amount)
 		if buyID != "0" {
-			Sell()
+			sellID := sell(toString(sell1-0.01), amount)
+			for {
+				fmt.Println(sellID, GetLastError(), "retry sell")
+				if sellID == "0" && GetLastError() == 10001 {
+					sellID = sell(toString(sell1-0.01), amount)
+				} else {
+					break
+				}
+			}
 		}
 	}
 

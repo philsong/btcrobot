@@ -38,4 +38,5 @@ src/code.google.com
 kdj_xc.go
 ema_kdj.go
 tx.db*
+txdb*
 

@@ -11,7 +11,7 @@ goto end
 set OLDGOPATH=%GOPATH%
 set GOPATH=%~dp0
 
-go get -u github.com/go-martini/martini
+go get -u github.com/philsong/martini
 go get -u github.com/codegangsta/martini-contrib/auth
 go get -u github.com/philsong/goleveldb/leveldb
 go get -u github.com/bitly/go-simplejson

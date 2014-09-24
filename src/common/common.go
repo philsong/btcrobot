@@ -2,6 +2,8 @@ package common
 
 //trade interface type and method
 
+var g_errno int
+
 type Account struct {
 	Available_cny string
 	Available_btc string
@@ -50,4 +52,12 @@ type TradeAPI interface {
 	CancelOrder(order_id string) bool
 	GetAccount() (Account, bool)
 	GetOrderBook() (ret bool, orderBook OrderBook)
+}
+
+func GetLastError() (errno int) {
+	return g_errno
+}
+
+func SetLastError(errno int) {
+	g_errno = errno
 }

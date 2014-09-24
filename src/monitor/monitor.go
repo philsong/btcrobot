@@ -19,11 +19,14 @@ package monitor
 
 import (
 	"Bittrex"
+	"bitstamp"
 	"bitvc"
 	. "common"
 	. "config"
+	"encoding/json"
 	"fmt"
 	"huobi"
+	"io/ioutil"
 	"logger"
 	"mintpal"
 	"okcoin"
@@ -115,6 +118,56 @@ func RobotWorker() {
 
 		//testHuobiAPI()
 		//testOkcoinLTCAPI()
+		return
+	}
+
+	if Config["mode"] == "bitstamp" {
+		bistamp, err := bitstamp.NewFromConfig("fuck")
+		if err != nil {
+			panic(err)
+		}
+
+		/*
+			ticker, err := bistamp.GetTicker()
+			if err != nil {
+				logger.Errorf("Could not fetch ticker :", err)
+			}
+			if ticker.Last == 0 {
+				logger.Errorf("Ticker probably wrongly filled")
+			}
+
+			fmt.Println(ticker)
+
+			orderbook, err := bistamp.GetOrderBook()
+			if err != nil {
+				logger.Errorf("Could not fetch orderbook :", err)
+			}
+			if orderbook.Orders[0].Price == 0. {
+				logger.Errorf("Orderbook probably wrongly filled")
+			}
+
+			fmt.Println(orderbook)
+		*/
+		trades, err := bistamp.GetTradesParams(1, 10, "desc")
+		if err != nil {
+			logger.Errorf("Could not fetch trades :", err)
+		}
+		if len(trades) == 0 || trades[0].Price == 0. {
+			logger.Errorf("trades probably wrongly filled")
+		}
+
+		var content []byte
+
+		//
+		content, err = json.Marshal(&trades)
+		if err != nil {
+			logger.Errorf("Marshal failed")
+			return
+		}
+
+		fmt.Println(content)
+		ioutil.WriteFile("trades.json", content, 777)
+		fmt.Println(trades)
 		return
 	}
 

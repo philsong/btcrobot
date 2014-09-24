@@ -18,6 +18,7 @@
 package okcoin
 
 import (
+	. "common"
 	. "config"
 	"crypto/md5"
 	"encoding/json"
@@ -62,6 +63,7 @@ import (
 type OkcoinTrade struct {
 	partner    string
 	secret_key string
+	errno      int64
 }
 
 func NewOkcoinTrade(partner, secret_key string) *OkcoinTrade {
@@ -139,8 +141,6 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 			ioutil.WriteFile("cache/okapi_url.json", bodyByte, 0644)
 		}
 
-		logger.Errorln(body)
-
 		return body, nil
 
 	} else {
@@ -172,6 +172,7 @@ func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret boo
 
 	if errorMsg.Result != true {
 		logger.Errorln(errorMsg)
+		SetLastError(errorMsg.ErrorCode)
 		ret = false
 		return
 	}
@@ -354,6 +355,8 @@ func (w *OkcoinTrade) Cancel_order(symbol, order_id string) bool {
 	if m.Result == true {
 		return true
 	} else {
+		logger.Infoln(m)
+
 		return false
 	}
 }

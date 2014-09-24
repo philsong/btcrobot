@@ -33,7 +33,7 @@ type Strategy interface {
 	Tick(records []Record) bool
 }
 
-const timeout = 1 //minute
+const timeout = 10 //minute
 
 var magic int64
 var strategys = make(map[string]Strategy)
@@ -404,13 +404,9 @@ func GetAvailable_cny() float64 {
 		return -1
 	}
 
-	logger.Infoln("account:")
-	logger.Infoln(account)
-	logger.Infoln("--------------")
-
 	numAvailable_cny, err := strconv.ParseFloat(account.Available_cny, 64)
 	if err != nil {
-		logger.Errorln("tradeAmount is not float")
+		logger.Errorln("Available_cny is not float")
 		return -1
 	}
 	//balance > 0
@@ -424,7 +420,6 @@ func GetAvailable_btc() float64 {
 		return -1
 	}
 
-	logger.Infoln(account)
 	numAvailable_btc, err := strconv.ParseFloat(account.Available_btc, 64)
 	if err != nil {
 		logger.Errorln("Available_btc is not float")
@@ -478,15 +473,15 @@ func processStoploss(Price float64) bool {
 		logger.Infoln(Price, stoplossPrice, PrevBuyPirce, stoploss)
 
 		isStoploss = true
+
 		Sell()
 	}
 
 	return true
 }
 
+//check timeout trade
 func processTimeout() bool {
-	//check timeout trade
-
 	//last cancel failed, recancel
 	for tm, id := range recancelbuyOrders {
 		warning := fmt.Sprintf("<-----re-cancel %s-------------->", id)
@@ -495,6 +490,11 @@ func processTimeout() bool {
 			delete(recancelbuyOrders, tm)
 		} else {
 			warning += "[Cancel委托失败]"
+			errno := GetLastError()
+			if errno == 10009 {
+				logger.Infoln(errno)
+				delete(recancelbuyOrders, tm)
+			}
 		}
 
 		logger.Infoln(warning)
@@ -529,8 +529,10 @@ func processTimeout() bool {
 				continue
 			}
 			if order.Amount == order.Deal_amount {
+
 				buy_average = (buy_amount*buy_average + order.Deal_amount*order.Price) / (buy_amount + order.Deal_amount)
-				logger.Infof("buy_average=%0.02f\n", buy_average)
+				logger.Infof("buy_average full=%0.02f,%0.02f,%0.02f\n", buy_average, order.Deal_amount, buy_amount)
+
 				dealOrders[tm] = order
 				buy_amount += order.Deal_amount
 				delete(buyOrders, tm)
@@ -541,7 +543,7 @@ func processTimeout() bool {
 
 				if order.Deal_amount > 0.0001 { //部分成交的买卖单
 					buy_average = (buy_amount*buy_average + order.Deal_amount*order.Price) / (buy_amount + order.Deal_amount)
-					logger.Infof("part of buy_average=%0.02f\n", buy_average)
+					logger.Infof("buy_average partial=%0.02f,%0.02f,%0.02f\n", buy_average, order.Deal_amount, buy_amount)
 					dealOrders[tm] = order
 					buy_amount += order.Deal_amount
 				}
@@ -578,7 +580,6 @@ func processTimeout() bool {
 
 			if order.Amount == order.Deal_amount {
 				delete(sellOrders, tm)
-				buy_amount -= order.Deal_amount
 			} else {
 				if int64(now.Sub(tm)/time.Minute) <= timeout {
 					continue
@@ -594,14 +595,13 @@ func processTimeout() bool {
 						}
 					}
 
-					warning := "<--------------sell Delegation timeout, cancel-------------->" + id
+					warning := fmt.Sprintf("<-----sell Delegation timeout, cancel %s[deal:%f]-------------->", id, order.Deal_amount)
 					if CancelOrder(id) {
 						warning += "[sell Cancel委托成功]"
 
 						delete(sellOrders, tm)
 						//update to delete, start a new order for sell in below
 
-						buy_amount -= order.Deal_amount
 						sell_amount := order.Amount - order.Deal_amount
 
 						logger.Infoln("卖一", (orderBook.Asks[len(orderBook.Asks)-1]))
@@ -621,6 +621,12 @@ func processTimeout() bool {
 						logger.Infoln(warning)
 					} else {
 						warning += "[sell Cancel委托失败]"
+
+						errno := GetLastError()
+						if errno == 10009 {
+							logger.Infoln(errno)
+							delete(sellOrders, tm)
+						}
 					}
 					logger.Infoln(warning)
 					time.Sleep(1 * time.Second)
@@ -634,7 +640,7 @@ func processTimeout() bool {
 }
 
 //todo:need to think about edge issue carefully
-//compute any period k-line base on 1 minte kline
+//compute any period k-line base on 1 minute kline
 func getKLine(records []Record, periods int) (recordsN []Record) {
 	length := len(records)
 	lengthN := length / periods
@@ -663,4 +669,32 @@ func getKLine(records []Record, periods int) (recordsN []Record) {
 	}
 
 	return recordsN
+}
+
+func toString(s interface{}) string {
+	if v, ok := s.(string); ok {
+		return v
+	}
+	return fmt.Sprintf("%v", s)
+}
+
+func toFloat(s interface{}) float64 {
+	var ret float64
+	switch v := s.(type) {
+	case float64:
+		ret = v
+	case int64:
+		ret = float64(v)
+	case string:
+		ret, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			logger.Errorln("convert ", s, " to float failed")
+			return ret
+		}
+	}
+	return ret
+}
+
+func float2str(i float64) string {
+	return strconv.FormatFloat(i, 'f', -1, 64)
 }

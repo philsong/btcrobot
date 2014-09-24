@@ -60,7 +60,7 @@ type LevelDb struct {
 
 func init() {
 	var err error
-	gpdb, err = CreateDB("tx.db")
+	gpdb, err = CreateDB("txdb")
 	if err != nil {
 		fmt.Println(err)
 		logger.Infoln("init db failed!")

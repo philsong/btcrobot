@@ -87,7 +87,7 @@ func (emamacdStrategy *EMAMACDStrategy) checkThreshold(direction string, EMAdif 
 }
 
 func (emamacdStrategy *EMAMACDStrategy) is_upcross(prevema, ema float64) bool {
-	if is_uptrend(ema) {
+	if is_up(ema) {
 		if prevema <= 0 || emamacdStrategy.PrevEMACross == "down" {
 			return true
 		}
@@ -97,7 +97,7 @@ func (emamacdStrategy *EMAMACDStrategy) is_upcross(prevema, ema float64) bool {
 }
 
 func (emamacdStrategy *EMAMACDStrategy) is_downcross(prevema, ema float64) bool {
-	if is_downtrend(ema) {
+	if is_down(ema) {
 		if prevema >= 0 || emamacdStrategy.PrevEMACross == "up" {
 			return true
 		}
@@ -141,17 +141,17 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 
 	length := len(Price)
 	if emamacdStrategy.PrevEMACross == "unknown" {
-		if is_uptrend(EMAdif[length-3]) {
+		if is_up(EMAdif[length-3]) {
 			emamacdStrategy.PrevEMACross = "up"
-		} else if is_downtrend(EMAdif[length-3]) {
+		} else if is_down(EMAdif[length-3]) {
 			emamacdStrategy.PrevEMACross = "down"
 		} else {
 			emamacdStrategy.PrevEMACross = "unknown"
 		}
 		logger.Infoln("prev cross is", emamacdStrategy.PrevEMACross)
-		if is_uptrend(EMAdif[length-3]) {
+		if is_up(EMAdif[length-3]) {
 			logger.Infoln("上一个趋势是上涨，等待卖出点触发")
-		} else if is_downtrend(EMAdif[length-3]) {
+		} else if is_down(EMAdif[length-3]) {
 			logger.Infoln("上一个趋势是下跌，等待买入点触发")
 		} else {
 			logger.Infoln("上一个趋势是unknown。。。")
@@ -170,13 +170,13 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 	}
 
 	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
-	if emamacdStrategy.LessBuyThreshold && is_downtrend(EMAdif[length-1]) {
+	if emamacdStrategy.LessBuyThreshold && is_down(EMAdif[length-1]) {
 		emamacdStrategy.LessBuyThreshold = false
 		emamacdStrategy.PrevEMACross = "down" //reset
 		logger.Infoln("down->up(EMA diff < buy threshold)->down ^")
 
 	}
-	if emamacdStrategy.LessSellThreshold && is_uptrend(EMAdif[length-1]) {
+	if emamacdStrategy.LessSellThreshold && is_up(EMAdif[length-1]) {
 		emamacdStrategy.LessSellThreshold = false
 		emamacdStrategy.PrevEMACross = "up" //reset
 		logger.Infoln("up->down(EMA diff > sell threshold)->up V")

@@ -39,13 +39,9 @@ func init() {
 	Register("EMA", emaStrategy)
 }
 
-func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64) bool {
-	if direction == "buy" {
-		buyThreshold, err := strconv.ParseFloat(Option["buyThreshold"], 64)
-		if err != nil {
-			logger.Errorln("config item buyThreshold is not float")
-			return false
-		}
+func (emaStrategy *EMAStrategy) checkThreshold(tradeType string, EMAdif float64) bool {
+	if tradeType == "buy" {
+		buyThreshold := toFloat(Option["buyThreshold"])
 
 		if EMAdif > buyThreshold {
 			logger.Infof("EMAdif(%0.04f) > buyThreshold(%0.04f), trigger to buy\n", EMAdif, buyThreshold)
@@ -58,11 +54,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 			}
 		}
 	} else {
-		sellThreshold, err := strconv.ParseFloat(Option["sellThreshold"], 64)
-		if err != nil {
-			logger.Errorln("config item sellThreshold is not float")
-			return false
-		}
+		sellThreshold := toFloat(Option["sellThreshold"])
 
 		if sellThreshold > 0 {
 			sellThreshold = -sellThreshold
@@ -83,14 +75,7 @@ func (emaStrategy *EMAStrategy) checkThreshold(direction string, EMAdif float64)
 	return false
 }
 
-/* test cases
-2014/03/23 07:17:58 EMA Diff:-0.002	-0.000	Price:96.41
-2014/03/23 07:18:06 EMA Diff:-0.002	0.003	Price:96.44
-2014/03/23 07:18:12 EMA Diff:-0.002	-0.000	Price:96.41
-2014/03/23 07:18:56 EMA Diff:-0.000	0.014	Price:96.52
-*/
-
-func is_uptrend(ema float64) bool {
+func is_up(ema float64) bool {
 	if ema > 0.000001 {
 		return true
 	} else {
@@ -98,7 +83,7 @@ func is_uptrend(ema float64) bool {
 	}
 }
 
-func is_downtrend(ema float64) bool {
+func is_down(ema float64) bool {
 	if ema < -0.000001 {
 		return true
 	} else {
@@ -106,21 +91,17 @@ func is_downtrend(ema float64) bool {
 	}
 }
 
-func (emaStrategy *EMAStrategy) is_upcross(prevema, ema float64) bool {
-	if is_uptrend(ema) {
-		if prevema <= 0 || emaStrategy.PrevEMACross == "down" {
-			return true
-		}
+func (emaStrategy *EMAStrategy) is_upcross(emaLast, emaCurr float64) bool {
+	if (emaLast <= 0 || emaStrategy.PrevEMACross == "down") && is_up(emaCurr) {
+		return true
 	}
 
 	return false
 }
 
-func (emaStrategy *EMAStrategy) is_downcross(prevema, ema float64) bool {
-	if is_downtrend(ema) {
-		if prevema >= 0 || emaStrategy.PrevEMACross == "up" {
-			return true
-		}
+func (emaStrategy *EMAStrategy) is_downcross(emaLast, emaCurr float64) bool {
+	if (emaLast >= 0 || emaStrategy.PrevEMACross == "up") && is_down(emaCurr) {
+		return true
 	}
 
 	return false
@@ -141,67 +122,81 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	emaShort := EMA(Price, shortEMA)
 	emaLong := EMA(Price, longEMA)
 	EMAdif := getMACDdif(emaShort, emaLong)
+	emaLast := EMAdif[length-3]
+	emaCurr := EMAdif[length-2]
 
 	if emaStrategy.PrevEMACross == "unknown" {
-		if is_uptrend(EMAdif[length-3]) {
+		if is_up(emaLast) {
 			emaStrategy.PrevEMACross = "up"
-		} else if is_downtrend(EMAdif[length-3]) {
+		} else if is_down(EMAdif[length-3]) {
 			emaStrategy.PrevEMACross = "down"
 		} else {
 			emaStrategy.PrevEMACross = "unknown"
 		}
+
 		logger.Infoln("prev cross is", emaStrategy.PrevEMACross)
-		if is_uptrend(EMAdif[length-3]) {
-			logger.Infoln("上一个趋势是上涨，等待卖出点触发")
-		} else if is_downtrend(EMAdif[length-3]) {
-			logger.Infoln("上一个趋势是下跌，等待买入点触发")
-		} else {
-			logger.Infoln("上一个趋势是unknown。。。")
-		}
 	}
 
 	//go TriggerPrice(Price[length-1])
-	if EMAdif[length-1] != emaStrategy.PrevEMAdif {
-		emaStrategy.PrevEMAdif = EMAdif[length-1]
-		logger.Infof("EMA [%0.02f,%0.02f,%0.02f] Diff:%0.04f\t%0.04f\n", lastPrice, emaShort[length-1], emaLong[length-1], EMAdif[length-2], EMAdif[length-1])
+	if emaCurr != emaStrategy.PrevEMAdif {
+		emaStrategy.PrevEMAdif = emaCurr
+		logger.Infof("EMA [%0.02f,%0.02f,%0.02f] Diff:%0.04f\t%0.04f\n", lastPrice, emaShort[length-1], emaLong[length-1], emaLast, emaCurr)
+	}
+
+	ret, orderBook := GetOrderBook()
+	if !ret {
+		logger.Infoln("get order book failed")
+	} else {
+		//logger.Infoln(orderBook)
+
+		askstotal := 0.0
+		for i := 0; i < len(orderBook.Asks); i++ {
+			askstotal += orderBook.Asks[i].Amount
+		}
+		bidstotal := 0.0
+		for i := 0; i < len(orderBook.Bids); i++ {
+			bidstotal += orderBook.Bids[i].Amount
+		}
+
+		logger.Infoln("sell:buy", askstotal, bidstotal)
 	}
 
 	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
-	if emaStrategy.LessBuyThreshold && is_downtrend(EMAdif[length-1]) {
+	if emaStrategy.LessBuyThreshold && is_down(emaCurr) {
 		emaStrategy.LessBuyThreshold = false
 		emaStrategy.PrevEMACross = "down" //reset
 		logger.Infoln("down->up(EMA diff < buy threshold)->down ^")
 
 	}
-	if emaStrategy.LessSellThreshold && is_uptrend(EMAdif[length-1]) {
+	if emaStrategy.LessSellThreshold && is_up(emaCurr) {
 		emaStrategy.LessSellThreshold = false
 		emaStrategy.PrevEMACross = "up" //reset
 		logger.Infoln("up->down(EMA diff > sell threshold)->up V")
 	}
 
+	//do buy when cross up
+	if emaStrategy.is_upcross(emaLast, emaCurr) || emaStrategy.LessBuyThreshold {
+		if Option["enable_trading"] == "1" && PrevTrade != "buy" {
+			emaStrategy.PrevEMACross = "up"
+			if emaStrategy.checkThreshold("buy", emaCurr) {
+				Buy()
+			}
+		}
+	}
+
+	//do sell when cross down
+	if emaStrategy.is_downcross(emaLast, emaCurr) || emaStrategy.LessSellThreshold {
+		emaStrategy.PrevEMACross = "down"
+		if Option["enable_trading"] == "1" && PrevTrade != "sell" {
+			if emaStrategy.checkThreshold("sell", emaCurr) {
+				Sell()
+			}
+		}
+	}
+
 	//EMA cross
-	if (emaStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessBuyThreshold) ||
-		(emaStrategy.is_downcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessSellThreshold) { //up cross
-
-		//do buy when cross up
-		if emaStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessBuyThreshold {
-			if Option["enable_trading"] == "1" && PrevTrade != "buy" {
-				emaStrategy.PrevEMACross = "up"
-				if emaStrategy.checkThreshold("buy", EMAdif[length-1]) {
-					Buy()
-				}
-			}
-		}
-
-		//do sell when cross down
-		if emaStrategy.is_downcross(EMAdif[length-2], EMAdif[length-1]) || emaStrategy.LessSellThreshold {
-			emaStrategy.PrevEMACross = "down"
-			if Option["enable_trading"] == "1" && PrevTrade != "sell" {
-				if emaStrategy.checkThreshold("sell", EMAdif[length-1]) {
-					Sell()
-				}
-			}
-		}
+	if (emaStrategy.is_upcross(emaLast, emaCurr) || emaStrategy.LessBuyThreshold) ||
+		(emaStrategy.is_downcross(emaLast, emaCurr) || emaStrategy.LessSellThreshold) {
 
 		//backup the kline data for analyze
 		if Config["env"] == "dev" {

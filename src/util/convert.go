@@ -7,6 +7,30 @@ import (
 	"strconv"
 )
 
+func toString(s interface{}) string {
+	if v, ok := s.(string); ok {
+		return v
+	}
+	return fmt.Sprintf("%v", s)
+}
+
+func toFloat(s interface{}) float64 {
+	var ret float64
+	switch v := s.(type) {
+	case float64:
+		ret = v
+	case int64:
+		ret = float64(v)
+	case string:
+		ret, _ = strconv.ParseFloat(v, 64)
+	}
+	return ret
+}
+
+func float2str(i float64) string {
+	return strconv.FormatFloat(i, 'f', -1, 64)
+}
+
 // 将url.Values（表单数据）转换为Model（struct）
 func ConvertAssign(dest interface{}, form url.Values) error {
 	destType := reflect.TypeOf(dest)
