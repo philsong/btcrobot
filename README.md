@@ -1,7 +1,7 @@
 BTC/LTC Robot
 
 ===========
-BTC/LTC自动化算法交易引擎
+## Golang BTC/LTC trading bot engine
 
 ![btcrobot logo](
 https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/hacking-bitcoin-with-go.png)
@@ -9,7 +9,7 @@ https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/ha
   btcrobot is a Bitcoin, Litecoin and Altcoin trading bot written in golang,
   it features multiple trading methods using technical analysis.
 
-  Disclaimer:
+  ## Disclaimer:
 
   USE AT YOUR OWN RISK!
 
@@ -41,14 +41,14 @@ Help us build! We're in beta right now [and seeking help to find bugs]. If you a
 5. Push to the branch (`git push origin my-new-feature`)
 6. Create new Pull Request
 
-  声明：
-  
-  本软件风险巨大！！！使用前务必小量测试N天！！！目前还在快速完善发展中，欢迎各路程序员贡献代码！
-  
-  Weibo:http://weibo.com/bocaicfa
-  
-  比特趋势社区：http://bitstrex.com/
 
+声明：
+
+本软件风险巨大！！！使用前务必小量测试N天！！！目前还在快速完善发展中，欢迎各路程序员贡献代码！
+
+Weibo:http://weibo.com/bocaicfa
+
+比特趋势社区：http://bitstrex.com/
 
 支持多个交易平台-火币、OKCoin，自动买卖，机器人EMA，MACD，KDJ, 对冲，高低突破，及各种MIX算法
 
@@ -59,15 +59,15 @@ Update:
 2013/4/23：EMA、MACD等各种指标和其他策略，在市场深度不够时，已然失效。。。业界其他程序员即使基于robot写了策略，也极少开源，原因就是一旦公开策略，使用人数变多，该策略就失效。即日起本人也不再公开发布新的策略，改变开发方向为专注于该开源框架的完善，然后提供回测和策略接口甚至提供策略交易市场，让用户方便自己实现自己的策略并可回测，及交流。有任何建议及合作都可互相探讨。
 
 
-安装说明（限win系统）如下：
+## 安装说明（限win系统）如下：
 https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%EF%BC%88%E9%99%90win%E7%B3%BB%E7%BB%9F%EF%BC%89
 
 
-使用指南如下:
+## 使用指南如下:
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
 
 
-捐助清单如下：
+## 捐助清单如下：
 https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E5%BC%80%E5%8F%91%E7%9A%84%E4%BA%BA
 
 
