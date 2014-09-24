@@ -59,19 +59,16 @@ Update:
 2013/4/23：EMA、MACD等各种指标和其他策略，在市场深度不够时，已然失效。。。业界其他程序员即使基于robot写了策略，也极少开源，原因就是一旦公开策略，使用人数变多，该策略就失效。即日起本人也不再公开发布新的策略，改变开发方向为专注于该开源框架的完善，然后提供回测和策略接口甚至提供策略交易市场，让用户方便自己实现自己的策略并可回测，及交流。有任何建议及合作都可互相探讨。
 
 
-## 安装说明（限win系统）如下：
-https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%EF%BC%88%E9%99%90win%E7%B3%BB%E7%BB%9F%EF%BC%89
-
-
-## 使用指南如下:
+## 使用指南:
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
 
 
-## 捐助清单如下：
+## 捐助开发清单：
 https://github.com/philsong/btcrobot/wiki/%E6%84%9F%E8%B0%A2%E6%8D%90%E5%8A%A9%E5%BC%80%E5%8F%91%E7%9A%84%E4%BA%BA
 
 
 BTC捐助地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
+
 
 # 本地搭建 #
 
@@ -139,4 +136,5 @@ BTC捐助地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
 注：在第5步运行前可以根据需要修改 conf目录里的 配置，亦可在第6步配置。
 
-
+## 安装说明（限win系统）：
+https://github.com/philsong/btcrobot/wiki/%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E%EF%BC%88%E9%99%90win%E7%B3%BB%E7%BB%9F%EF%BC%89
