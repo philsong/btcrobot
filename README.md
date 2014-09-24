@@ -12,10 +12,6 @@ https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/ha
   Disclaimer:
 
   USE AT YOUR OWN RISK!
-  
-  声明：
-  
-  本软件风险巨大！！！使用前务必小量测试N天！！！目前还在快速完善发展中，欢迎各路程序员贡献代码！
 
   The author of this project is NOT responsible for any damage or loss caused
   by this software. There can be bugs and the bot may not perform as expected
@@ -23,6 +19,32 @@ https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/ha
   backtesting on historical data. Also look at the code to see what how
   it's working.
 
+## How You Can Help
+
+### Donations
+
+Donations help me to keep working on btcrobot and keep it free and open source, without having to worry about income. Any amount is really helpful! Thank you so much.
+
+The btcrobot donation Bitcoin address is **1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8**
+
+
+Again, thank you. :heart:
+
+### Contributing
+
+Help us build! We're in beta right now [and seeking help to find bugs]. If you are interested in contributing, jump in! Anyone is welcome to send pull requests. Issue reports are good too, but pull requests are much better. Here's how you do it:
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Write the code, **and tests to confirm it works**
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create new Pull Request
+
+  声明：
+  
+  本软件风险巨大！！！使用前务必小量测试N天！！！目前还在快速完善发展中，欢迎各路程序员贡献代码！
+  
   Weibo:http://weibo.com/bocaicfa
   
   比特趋势社区：http://bitstrex.com/
@@ -117,25 +139,4 @@ BTC捐助地址：1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8
 
 注：在第5步运行前可以根据需要修改 conf目录里的 配置，亦可在第6步配置。
 
-## How You Can Help
-
-### Donations
-
-Donations help me to keep working on btcrobot and keep it free and open source, without having to worry about income. Any amount is really helpful! Thank you so much.
-
-The btcrobot donation Bitcoin address is **1NDnnWCUu926z4wxA3sNBGYWNQD3mKyes8**
-
-
-Again, thank you. :heart:
-
-### Contributing
-
-Help us build! We're in beta right now [and seeking help to find bugs]. If you are interested in contributing, jump in! Anyone is welcome to send pull requests. Issue reports are good too, but pull requests are much better. Here's how you do it:
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Write the code, **and tests to confirm it works**
-4. Commit your changes (`git commit -am 'Add some feature'`)
-5. Push to the branch (`git push origin my-new-feature`)
-6. Create new Pull Request
 
