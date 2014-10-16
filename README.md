@@ -48,7 +48,6 @@ Help us build! We're in beta right now [and seeking help to find bugs]. If you a
 
 Weibo:http://weibo.com/bocaicfa
 
-比特趋势社区：http://bitstrex.com/
 
 支持多个交易平台-火币、OKCoin，自动买卖，机器人EMA，MACD，KDJ, 对冲，高低突破，及各种MIX算法
 
