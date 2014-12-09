@@ -14,6 +14,7 @@ set GOPATH=%~dp0;%~dp0\thirdparty
 gofmt -w src
 
 go install btcrobot
+go install backtest
 
 set GOPATH=%OLDGOPATH%
 

@@ -15,7 +15,7 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package okcoin
+package simulate
 
 import (
 	. "common"
@@ -28,7 +28,7 @@ import (
 	"util"
 )
 
-func (w *Okcoin) getOrderBook(symbol string) (ret bool, orderBook OrderBook) {
+func (w *Simulate) getOrderBook(symbol string) (ret bool, orderBook OrderBook) {
 	// init to false
 	ret = false
 	req, err := http.NewRequest("GET", fmt.Sprintf(Config["ok_depth_url"], symbol), nil)
@@ -125,7 +125,7 @@ func convert2struct(_okOrderBook _OKOrderBook) (okOrderBook OKOrderBook) {
 	return
 }
 
-func (w *Okcoin) analyzeOrderBook(content string) (ret bool, orderBook OrderBook) {
+func (w *Simulate) analyzeOrderBook(content string) (ret bool, orderBook OrderBook) {
 	// init to false
 	ret = false
 	var _okOrderBook _OKOrderBook

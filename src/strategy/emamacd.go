@@ -106,9 +106,9 @@ func (emamacdStrategy *EMAMACDStrategy) is_downcross(prevema, ema float64) bool 
 	return false
 }
 
-//EMA strategy
+// EMA strategy
 func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
-	//read config
+	// read config
 	stoploss, err := strconv.ParseFloat(Option["stoploss"], 64)
 	if err != nil {
 		logger.Errorln("config item stoploss is not float")
@@ -130,7 +130,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 		Price = append(Price, v.Close)
 	}
 
-	//compute the indictor
+	// compute the indictor
 	emaShort := EMA(Price, shortEMA)
 	emaLong := EMA(Price, longEMA)
 	EMAdif := getMACDdif(emaShort, emaLong)
@@ -158,7 +158,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 		}
 	}
 
-	//go TriggerPrice(Price[length-1])
+	// go TriggerPrice(Price[length-1])
 	if EMAdif[length-1] != emamacdStrategy.PrevEMAdif {
 		emamacdStrategy.PrevEMAdif = EMAdif[length-1]
 		logger.Infof("EMA [%0.02f,%0.02f,%0.02f] Diff:%0.03f\t%0.03f\n", Price[length-1], emaShort[length-1], emaLong[length-1], EMAdif[length-2], EMAdif[length-1])
@@ -169,7 +169,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 		logger.Infof("MACD:d=%5.03f\ts=%5.03f\th=%5.03f\tpre-h=%5.03f\n", MACDdif[length-1], MACDSignal[length-1], MACDHistogram[length-1], MACDHistogram[length-2])
 	}
 
-	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
+	// reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
 	if emamacdStrategy.LessBuyThreshold && is_down(EMAdif[length-1]) {
 		emamacdStrategy.LessBuyThreshold = false
 		emamacdStrategy.PrevEMACross = "down" //reset
@@ -182,7 +182,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 		logger.Infoln("up->down(EMA diff > sell threshold)->up V")
 	}
 
-	//EMA cross
+	// EMA cross
 	if emamacdStrategy.is_upcross(EMAdif[length-2], EMAdif[length-1]) || emamacdStrategy.LessBuyThreshold { //up cross
 
 		//do buy when cross up
@@ -199,13 +199,13 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 			}
 		}
 
-		//backup the kline data for analyze
+		// backup the kline data for analyze
 		if Config["env"] == "dev" {
 			backup(records[length-1].TimeStr)
 		}
 	}
 
-	//macd cross
+	// macd cross
 	if (EMAdif[length-1] > 0 || emamacdStrategy.PrevEMATrade == "buy") &&
 		emamacdStrategy.PrevMACDTrade != "sell" {
 		if (MACDHistogram[length-2] > 0.000001 ||
@@ -220,7 +220,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 		}
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 	if lastPrice < emamacdStrategy.PrevBuyPirce*(1-stoploss*0.01) {
 
 		emamacdStrategy.PrevEMATrade = "sell"
@@ -228,7 +228,7 @@ func (emamacdStrategy *EMAMACDStrategy) Tick(records []Record) bool {
 		emamacdStrategy.PrevBuyPirce = 0
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 	processStoploss(lastPrice)
 
 	processTimeout()

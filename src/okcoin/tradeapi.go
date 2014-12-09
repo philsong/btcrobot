@@ -41,7 +41,7 @@ import (
 	行情API
 	https://www.okcoin.com/shequ/themeview.do?tid=1000052&currentPage=1
 
-	//non-official API :P
+	// non-official API :P
 	K线数据step单位为second
 	https://www.okcoin.com/kline/period.do?step=60&symbol=okcoinbtccny&nonce=1394955131098
 
@@ -51,15 +51,16 @@ import (
 
 	https://www.okcoin.com/real/ticker.do?symbol=0&random=61
 
-	//old kline for btc
+	// old kline for btc
 	日数据
 	https://www.okcoin.com/klineData.do?type=3&marketFrom=0
 	5分钟数据
 	https://www.okcoin.com/klineData.do?type=1&marketFrom=0
 
-	/for ltc
+	// for ltc
 	https://www.okcoin.com/klineData.do?type=3&marketFrom=3
 */
+
 type OkcoinTrade struct {
 	partner    string
 	secret_key string
@@ -97,7 +98,6 @@ func (w *OkcoinTrade) httpRequest(api_url string, pParams map[string]string) (st
 	for key, val := range pParams {
 		v.Add(key, val)
 	}
-	//	fmt.Println(v.Encode())
 
 	req, err := http.NewRequest("POST", api_url, strings.NewReader(v.Encode()))
 	if err != nil {
@@ -200,6 +200,7 @@ func (w *OkcoinTrade) check_json_result(body string) (errorMsg ErrorMsg, ret boo
 　　　　 }
 　　｝
 */
+
 type Asset struct {
 	Net   string
 	Total string

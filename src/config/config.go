@@ -19,8 +19,8 @@
 package config
 
 import (
+	. "common"
 	"encoding/json"
-	//"fmt"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -37,12 +37,48 @@ var Option map[string]string
 var TradeOption map[string]string
 var SecretOption map[string]string
 
+var SimAccount map[string]string
+
+func init() {
+	binDir, err := ExecutableDir()
+	if err != nil {
+		return
+	}
+	ROOT = path.Dir(binDir)
+	return
+}
+
+func LoadSimulate() error {
+	var filename string
+
+	if !GetBacktest() {
+		filename = "/conf/simulate.json"
+	} else {
+		filename = "/test/simulate.json"
+	}
+
+	_Simulate, err := load_config(filename)
+	if err != nil {
+		return err
+	}
+	SimAccount = _Simulate
+	return nil
+}
+
+func SaveSimulate() error {
+	var filename string
+
+	if !GetBacktest() {
+		filename = "/conf/simulate.json"
+	} else {
+		filename = "/test/simulate.json"
+	}
+
+	return save_config(filename, SimAccount)
+}
+
 func init() {
 	LoadAll()
-	//fmt.Println(Config)
-	//fmt.Println(Option)
-	//fmt.Println(Licence)
-	//fmt.Println(Remind)
 	var pDebugEnv *bool
 	pDebugEnv = flag.Bool("d", false, "enable debug for dev")
 	flag.Parse()
@@ -55,66 +91,58 @@ func LoadAll() {
 	LoadSecretOption()
 }
 
-func get_config_path(file string) (filepath string, err error) {
-	binDir, err := ExecutableDir()
-	if err != nil {
-		return
-	}
-	ROOT = path.Dir(binDir)
-
-	filepath = ROOT + file
-
-	return
+func get_config_path(file string) (filepath string) {
+	return ROOT + file
 }
 
 func load_config(file string) (config map[string]string, err error) {
 	// Load 全局配置文件
-	configFile, err := get_config_path(file)
-	if err != nil {
-		return nil, (err)
-	}
+	configFile := get_config_path(file)
 
 	content, err := ioutil.ReadFile(configFile)
 	if err != nil {
-		return nil, (err)
+		return nil, err
 	}
 	config = make(map[string]string)
 	err = json.Unmarshal(content, &config)
 	if err != nil {
-		return nil, (err)
+		return nil, err
 	}
 
 	return config, nil
 }
 
+func SaveContent(file string, object interface{}) error {
+	content, err := json.Marshal(&object)
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(ROOT+file, content, 666)
+}
+
+func LoadFile(file string) (content []byte, err error) {
+	file = get_config_path(file)
+	content, err = ioutil.ReadFile(file)
+	return
+}
+
+func LoadContent(file string, object interface{}) error {
+	content, err := LoadFile(file)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(content, &object)
+}
+
 func save_config(file string, config map[string]string) (err error) {
-	binDir, err := ExecutableDir()
-	if err != nil {
-		return (err)
-	}
-	ROOT = path.Dir(binDir)
-
-	var content []byte
-
-	//
-	content, err = json.Marshal(&config)
-	if err != nil {
-		return (err)
-	}
-
-	configFile := ROOT + file
-	err = ioutil.WriteFile(configFile, content, 666)
-	if err != nil {
-		return (err)
-	}
-
-	return nil
+	return SaveContent(file, config)
 }
 
 func LoadConfig() error {
 	_Config, err := load_config("/conf/config.json")
 	if err != nil {
-		return (err)
+		return err
 	}
 	Config = make(map[string]string)
 	Config = _Config
@@ -124,7 +152,7 @@ func LoadConfig() error {
 func LoadOption() error {
 	_Option, err := load_config("/conf/option.json")
 	if err != nil {
-		return (err)
+		return err
 	}
 	Option = make(map[string]string)
 	Option = _Option
@@ -138,7 +166,7 @@ func SaveOption() error {
 func LoadTrade() (err error) {
 	_TradeOption, err := load_config("/conf/trade.json")
 	if err != nil {
-		return (err)
+		return err
 	}
 	TradeOption = make(map[string]string)
 	TradeOption = _TradeOption
@@ -160,15 +188,8 @@ func fileExists(name string) bool {
 }
 
 func LoadSecretOption() (err error) {
-	secretFile, err := get_config_path("/conf/secret.json")
-	if err != nil {
-		return err
-	}
-
-	secretSampleFile, err := get_config_path("/conf/secret.sample")
-	if err != nil {
-		return err
-	}
+	secretFile := get_config_path("/conf/secret.json")
+	secretSampleFile := get_config_path("/conf/secret.sample")
 
 	if !fileExists(secretFile) {
 		if err := os.Rename(secretSampleFile, secretFile); err != nil {

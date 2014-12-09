@@ -35,9 +35,9 @@ func init() {
 	Register("HLCross", HLCross)
 }
 
-//HLCross strategy
+// HLCross strategy
 func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
-	//read config
+	// read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 
 	var Price []float64
@@ -45,7 +45,7 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 		Price = append(Price, v.Close)
 	}
 
-	//compute the indictor
+	// compute the indictor
 	emaShort := EMA(Price, shortEMA)
 
 	if HLCross.PrevClosePrice != records[length-1].Close ||
@@ -59,7 +59,7 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 			lastPrice, records[length-2].High, records[length-2].Low)
 	}
 
-	//HLCross cross
+	// HLCross cross
 	if Price[length-2] > emaShort[length-2] &&
 		records[length-2].Volumn > 500 &&
 		records[length-2].High > records[length-3].High &&
@@ -71,7 +71,7 @@ func (HLCross *HLCrossStrategy) Tick(records []Record) bool {
 		Sell()
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 	processStoploss(lastPrice)
 
 	processTimeout()

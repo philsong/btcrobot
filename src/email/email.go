@@ -66,9 +66,7 @@ func SendMail(subject, content string, tos []string) error {
 
 func SendAlertEmail(receiver, alert string) error {
 	// Set up authentication information.
-
 	auth := smtp.PlainAuth("", SecretOption["smtp_username"], SecretOption["smtp_password"], SecretOption["smtp_host"])
-
 	from := mail.Address{"BTCRobot监控中心", SecretOption["smtp_username"]}
 	to := mail.Address{"收件人", receiver}
 	title := "BTCRobot来电--->" + alert

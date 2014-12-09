@@ -33,7 +33,7 @@ func init() {
 	Register("circular", circular)
 }
 
-//circular strategy
+// circular strategy
 func (circular *circularStrategy) Tick(records []Record) bool {
 	if circular.PrevClosePrice == lastPrice {
 		return false
@@ -60,7 +60,7 @@ func (circular *circularStrategy) Tick(records []Record) bool {
 		Buy()
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 	processStoploss(lastPrice)
 
 	processTimeout()

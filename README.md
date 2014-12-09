@@ -1,6 +1,6 @@
 BTC/LTC Robot
 
-===========
+============
 ## Golang BTC/LTC trading bot engine
 
 ![btcrobot logo](

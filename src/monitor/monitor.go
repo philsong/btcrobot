@@ -19,42 +19,19 @@ package monitor
 
 import (
 	"Bittrex"
-	"bitstamp"
 	"bitvc"
 	. "common"
 	. "config"
-	"encoding/json"
 	"fmt"
 	"huobi"
-	"io/ioutil"
 	"logger"
-	"mintpal"
 	"okcoin"
 	"peatio"
+	"simulate"
 	"strategy"
 	"strconv"
 	"time"
 )
-
-/*
-func backtesting() {
-	fmt.Println("back testing begin...")
-	huobi := huobi.NewHuobi()
-	huobi.Disable_trading = 1
-
-	peroids := []int{1, 5, 15, 30, 60, 100}
-	for _, peroid := range peroids {
-		if huobi.AnalyzeKLine(peroid) == true {
-		} else {
-			logger.Errorln("TradeKLine failed.")
-		}
-	}
-
-	fmt.Println("生成 1/5/15/30/60分钟及1天 周期的后向测试报告于log/reportxxx.log文件中,请查看")
-
-	fmt.Println("back testing end ...")
-}
-*/
 
 func marketAPI() (marketAPI MarketAPI) {
 	if Option["datacenter"] == "huobi" {
@@ -82,6 +59,8 @@ func tradeAPI() (tradeAPI TradeAPI) {
 		tradeAPI = peatio.NewPeatio()
 	} else if Option["tradecenter"] == "bittrex" {
 		tradeAPI = Bittrex.Manager()
+	} else if Option["tradecenter"] == "simulate" {
+		tradeAPI = simulate.NewSimulate()
 	} else {
 		logger.Fatalln("Please config the exchange center...")
 	}
@@ -89,89 +68,7 @@ func tradeAPI() (tradeAPI TradeAPI) {
 }
 
 func RobotWorker() {
-	fmt.Println("env", Config["env"])
-	if DebugEnv || Config["env"] == "dev" {
-		fmt.Println("test working...")
-		mintpal.Manager().GetMarketSummary("")
-		mintpal.Manager().GetMarketStats("BC", "BTC")
-		mintpal.Manager().GetMarketTrades("BC", "BTC")
-		mintpal.Manager().GetMarketOrders("BC", "BTC", "BUY")
-		mintpal.Manager().GetMarketOrders("BC", "BTC", "SELL")
-		mintpal.Manager().GetMarketChartData("BC", "BTC", "MAX")
-
-		return
-
-		var tradeAPI TradeAPI
-		tradeAPI = bitvc.NewBitvc()
-		tradeAPI.GetAccount()
-		//tradeAPI.GetOrderBook()
-		return
-
-		tradeAPI = okcoin.NewOkcoin()
-		tradeAPI.GetAccount()
-		tradeAPI.GetOrderBook()
-
-		tradeAPI = huobi.NewHuobi()
-		tradeAPI.GetAccount()
-		ret, orderbook := tradeAPI.GetOrderBook()
-		fmt.Println(ret, orderbook)
-
-		//testHuobiAPI()
-		//testOkcoinLTCAPI()
-		return
-	}
-
-	if Config["mode"] == "bitstamp" {
-		bistamp, err := bitstamp.NewFromConfig("fuck")
-		if err != nil {
-			panic(err)
-		}
-
-		/*
-			ticker, err := bistamp.GetTicker()
-			if err != nil {
-				logger.Errorf("Could not fetch ticker :", err)
-			}
-			if ticker.Last == 0 {
-				logger.Errorf("Ticker probably wrongly filled")
-			}
-
-			fmt.Println(ticker)
-
-			orderbook, err := bistamp.GetOrderBook()
-			if err != nil {
-				logger.Errorf("Could not fetch orderbook :", err)
-			}
-			if orderbook.Orders[0].Price == 0. {
-				logger.Errorf("Orderbook probably wrongly filled")
-			}
-
-			fmt.Println(orderbook)
-		*/
-		trades, err := bistamp.GetTradesParams(1, 10, "desc")
-		if err != nil {
-			logger.Errorf("Could not fetch trades :", err)
-		}
-		if len(trades) == 0 || trades[0].Price == 0. {
-			logger.Errorf("trades probably wrongly filled")
-		}
-
-		var content []byte
-
-		//
-		content, err = json.Marshal(&trades)
-		if err != nil {
-			logger.Errorf("Marshal failed")
-			return
-		}
-
-		fmt.Println(content)
-		ioutil.WriteFile("trades.json", content, 777)
-		fmt.Println(trades)
-		return
-	}
-
-	ticker := time.NewTicker(1 * time.Second) //2s
+	ticker := time.NewTicker(1 * time.Second) // one second
 	defer ticker.Stop()
 
 	totalHour, _ := strconv.ParseInt(Option["totalHour"], 0, 64)
@@ -207,8 +104,8 @@ func RobotWorker() {
 const worker_number = 1
 
 type message struct {
-	normal bool                   //true means exit normal, otherwise
-	state  map[string]interface{} //goroutine state
+	normal bool                   // true means exit normal, otherwise
+	state  map[string]interface{} // goroutine state
 }
 
 func worker(mess chan message) {
@@ -223,20 +120,6 @@ func worker(mess chan message) {
 		mess <- exit_message
 	}()
 
-	/*
-		now := time.Now()
-		seed := now.UnixNano()
-		rand.Seed(seed)
-		num := rand.Int63()
-		fmt.Println(num)
-		if num%2 != 0 {
-			fmt.Println("1")
-			panic("not evening")
-		} else {
-			fmt.Println("0")
-			runtime.Goexit()
-		}
-	*/
 	RobotWorker()
 }
 
@@ -266,12 +149,11 @@ func testHuobiAPI() {
 	accout_info, _ := tradeAPI.GetAccount()
 	fmt.Println(accout_info)
 
-	//	fmt.Println(tradeAPI.GetAccount())
+	fmt.Println(tradeAPI.GetAccount())
 	if false {
 		buyId := tradeAPI.BuyBTC("1000", "0.001")
 		sellId := tradeAPI.SellBTC("10000", "0.001")
 
-		//fmt.Println(tradeAPI.Get_delegations())
 		if tradeAPI.Cancel_order(buyId) {
 			fmt.Printf("cancel %s success \n", buyId)
 		} else {
@@ -293,12 +175,11 @@ func testBitVCAPI() {
 	accout_info, _ := tradeAPI.GetAccount()
 	fmt.Println(accout_info)
 	/*
-		//	fmt.Println(tradeAPI.GetAccount())
+		fmt.Println(tradeAPI.GetAccount())
 		if false {
 			buyId := tradeAPI.BuyBTC("1000", "0.001")
 			sellId := tradeAPI.SellBTC("10000", "0.001")
 
-			//fmt.Println(tradeAPI.Get_delegations())
 			if tradeAPI.Cancel_order(buyId) {
 				fmt.Printf("cancel %s success \n", buyId)
 			} else {
@@ -365,9 +246,9 @@ func testOkcoinLTCAPI() {
 	sellret = tradeAPI.SellLTC("150", "0.1")
 	fmt.Println(sellret)
 
-	//orderTable, ret := tradeAPI.Get_LTCorder("-1")
-	//fmt.Println(ret, orderTable)
+	ret, orderTable := tradeAPI.Get_LTCorder("-1")
+	fmt.Println(ret, orderTable)
 
-	//ret = tradeAPI.Cancel_LTCorder("100253")
-	//fmt.Println(ret)
+	ret = tradeAPI.Cancel_LTCorder("100253")
+	fmt.Println(ret)
 }

@@ -31,7 +31,7 @@ func init() {
 	Register("the3crow", the3crow)
 }
 
-//the3crow strategy
+// the3crow strategy
 func (the3crow *the3crowStrategy) Tick(records []Record) bool {
 	if the3crow.PrevClosePrice == lastPrice {
 		return false
@@ -62,7 +62,7 @@ func (the3crow *the3crowStrategy) Tick(records []Record) bool {
 	}
 	logger.Infoln("---------")
 
-	//the3crow cross
+	// the3crow cross
 	if records[length-2].Close > records[length-2].Open &&
 		records[length-3].Close > records[length-3].Open &&
 		records[length-4].Close > records[length-4].Open {
@@ -73,7 +73,7 @@ func (the3crow *the3crowStrategy) Tick(records []Record) bool {
 		Sell()
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 	processStoploss(lastPrice)
 
 	processTimeout()

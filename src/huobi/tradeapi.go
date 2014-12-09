@@ -387,13 +387,13 @@ func (w *HuobiTrade) SellBTC(price, amount string) string {
 }
 
 func (w *HuobiTrade) BuyLTC(price, amount string) string {
-	//todo
+	// todo
 	buyId := 0
 	return (fmt.Sprintf("%d", buyId))
 }
 
 func (w *HuobiTrade) SellLTC(price, amount string) string {
-	//todo
+	// todo
 	sellId := 0
 	return (fmt.Sprintf("%d", sellId))
 }

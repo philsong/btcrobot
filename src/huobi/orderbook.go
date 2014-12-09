@@ -31,8 +31,7 @@ import (
 )
 
 func (w *Huobi) getOrderBook(symbol string) (ret bool, hbOrderBook OrderBook) {
-
-	//init to false
+	// init to false
 	ret = false
 	var huobisymbol string
 	if symbol == "btc_cny" {
@@ -78,7 +77,6 @@ func (w *Huobi) getOrderBook(symbol string) (ret bool, hbOrderBook OrderBook) {
 	switch contentEncoding {
 	case "gzip":
 		body = util.DumpGZIP(resp.Body)
-
 	default:
 		bodyByte, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
@@ -86,7 +84,6 @@ func (w *Huobi) getOrderBook(symbol string) (ret bool, hbOrderBook OrderBook) {
 			return
 		} else {
 			body = string(bodyByte)
-
 			ioutil.WriteFile("cache/OrderBook.json", bodyByte, 0644)
 		}
 	}
@@ -96,8 +93,8 @@ func (w *Huobi) getOrderBook(symbol string) (ret bool, hbOrderBook OrderBook) {
 
 type SellBuy struct {
 	Price  float64
-	Level  float64 ////涨幅
-	Amount float64 //成交量
+	Level  float64 // 涨幅
+	Amount float64 // 成交量
 }
 
 type Trade struct {
@@ -132,7 +129,7 @@ type HBOrderBook struct {
 }
 
 func (w *Huobi) analyzeOrderBook2(body string) (ret bool, orderBook OrderBook) {
-	//init to false
+	// init to false
 	ret = false
 	body = strings.TrimPrefix(body, "view_detail(")
 	body = strings.TrimSuffix(body, ")")
@@ -152,7 +149,7 @@ func (w *Huobi) analyzeOrderBook2(body string) (ret bool, orderBook OrderBook) {
 
 func (w *Huobi) analyzeOrderBook(body string) (ret bool, orderBook OrderBook) {
 	logger.Debugln("analyzeOrderBook start....")
-	//init to false
+	// init to false
 	ret = false
 
 	ioutil.WriteFile("cache/view_detail.jsonp", []byte(body), 0644)
@@ -324,7 +321,7 @@ func parse_topbuy(topbuys []interface{}, topbuys_data *[5]Top_buy_sell) bool {
 	return true
 }
 
-//just fuck the huobi old shit bug
+// just fuck the huobi old shit bug
 func parse_topsell(topsells map[string]interface{}, topsells_data *[5]Top_buy_sell) bool {
 	index := 4
 	for k, v := range topsells {

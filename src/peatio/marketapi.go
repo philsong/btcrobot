@@ -86,7 +86,6 @@ func (w *Peatio) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, record
 	switch contentEncoding {
 	case "gzip":
 		body = util.DumpGZIP(resp.Body)
-
 	default:
 		bodyByte, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
@@ -162,9 +161,7 @@ func analyzePeroidLine(content string) (ret bool, records []Record) {
 		record.Low = Low
 		record.Close = Close
 		record.Volumn = Volumn
-
 		//logger.Traceln(records)
-
 		records = append(records, record)
 	}
 
