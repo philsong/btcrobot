@@ -45,12 +45,17 @@ func init() {
 	Register("KDJ-EX", kdjex)
 }
 
-//KDJ-EX strategy
-func (kdjex *KDJexStrategy) Tick(records []Record) bool {
+func SendEmail(warning string) {
+	if !GetBacktest() {
+		go email.TriggerTrender(warning)
+	}
+}
 
+// KDJ-EX strategy
+func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 	const btcslap = 0.2
 	const ltcslap = 0.01
-	const timeout = 300 //s
+	const timeout = 300 // 秒
 	const ordercount = 5
 
 	tradeAmount := Option["tradeAmount"]
@@ -67,6 +72,13 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 		slappage = btcslap
 	} else {
 		slappage = ltcslap
+	}
+
+	var coin string
+	if Option["symbol"] == "btc_cny" {
+		coin = "比特币"
+	} else {
+		coin = "莱特币"
 	}
 
 	nSplitTradeAmount := numTradeAmount / float64(ordercount)
@@ -94,7 +106,7 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 		return false
 	}
 
-	//K线为白，D线为黄，J线为红,K in middle
+	// K线为白，D线为黄，J线为红，K in middle
 	k, d, j := getKDJ(records)
 
 	if kdjex.PrevTime != records[length-1].TimeStr ||
@@ -118,12 +130,11 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 		logger.Infoln("----------------->KDJ up cross", kdjex.PrevKDJTrade, d[length-2])
 
 		if kdjex.PrevKDJTrade != "buy" && j[length-2] <= 20 {
-			//do buy
-
+			// do buy
 			ret, orderbook := GetOrderBook()
 			if !ret {
 				logger.Infoln("get orderbook failed 1")
-				ret, orderbook = GetOrderBook() //try again
+				ret, orderbook = GetOrderBook() // try again
 				if !ret {
 					logger.Infoln("get orderbook failed 2")
 					return false
@@ -138,7 +149,6 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 
 			avgLow := (records[length-2].Close + records[length-1].Low) / 2.0
 			logger.Infoln("X 两根K线的最低平均价", avgLow)
-			//fmt.Println(ret, orderbook)
 
 			warning := "KDJ up cross, 买入buy In<----限价单"
 			for i := 1; i <= ordercount; i++ {
@@ -148,6 +158,12 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 				if buyID != "0" {
 					warning += "[委托成功]"
 					kdjex.BuyId = append(kdjex.BuyId, buyID)
+					if !GetBacktest() {
+						logger.Tradef("在%s，根据策略%s周期%s，以价格%s买入%s个%s\n", Option["tradecenter"], Option["strategy"], Option["tick_interval"], tradePrice, splitTradeAmount, coin)
+					} else {
+						t := time.Unix(GetBtTime(), 0)
+						logger.Backtestf("%s 在simulate，根据策略%s周期%s，以价格%s买入%s个%s\n", t.Format("2006-01-02 15:04:05"), Option["strategy"], Option["tick_interval"], tradePrice, splitTradeAmount, coin)
+					}
 				} else {
 					warning += "[委托失败]"
 				}
@@ -163,12 +179,11 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 			logger.Infoln("------------>>>stoploss price", kdjex.PrevBuyPirce*(1-stoploss*0.01))
 
 			_, ret = GetAccount()
-
 			if !ret {
 				logger.Infoln("GetAccount failed")
 			}
 
-			go email.TriggerTrender(warning)
+			SendEmail(warning)
 		}
 	}
 
@@ -178,12 +193,11 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 		logger.Infoln("<----------------------KDJ down cross", kdjex.PrevKDJTrade, d[length-2])
 
 		if kdjex.PrevKDJTrade != "sell" && j[length-2] >= 80 {
-			//do sell
-
+			// do sell
 			ret, orderbook := GetOrderBook()
 			if !ret {
 				logger.Infoln("get orderbook failed 1")
-				ret, orderbook = GetOrderBook() //try again
+				ret, orderbook = GetOrderBook() // try again
 				if !ret {
 					logger.Infoln("get orderbook failed 2")
 					return false
@@ -207,6 +221,12 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 				if sellID != "0" {
 					warning += "[委托成功]"
 					kdjex.SellId = append(kdjex.SellId, sellID)
+					if !GetBacktest() {
+						logger.Tradef("在%s，根据策略%s周期%s，以价格%s卖出%s个%s\n", Option["tradecenter"], Option["strategy"], Option["tick_interval"], tradePrice, splitTradeAmount, coin)
+					} else {
+						t := time.Unix(GetBtTime(), 0)
+						logger.Backtestf("%s 在simulate，根据策略%s周期%s，以价格%s卖出%s个%s\n", t.Format("2006-01-02 15:04:05"), Option["strategy"], Option["tick_interval"], tradePrice, splitTradeAmount, coin)
+					}
 				} else {
 					warning += "[委托失败]"
 				}
@@ -218,15 +238,14 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 			kdjex.PrevKDJTrade = "sell"
 
 			_, ret = GetAccount()
-
 			if !ret {
 				logger.Infoln("GetAccount failed")
 			}
-			go email.TriggerTrender(warning)
+			SendEmail(warning)
 		}
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 
 	if Price[length-1] < kdjex.PrevBuyPirce*(1-stoploss*0.01) {
 		if Option["disable_trading"] != "1" && kdjex.PrevKDJTrade != "sell" {
@@ -234,16 +253,30 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 			kdjex.PrevBuyPirce = 0
 			warning := "!<------------------stop loss, 卖出Sell Out---->市价" + getTradePrice("", Price[length-1]) + ",委托价" + getTradePrice("sell", Price[length-1])
 			logger.Infoln(warning)
-			if sell(getTradePrice("sell", Price[length-1]), tradeAmount) != "0" {
+			tradePrice := getTradePrice("sell", Price[length-1])
+			if sell(tradePrice, tradeAmount) != "0" {
 				warning += "[委托成功]"
+				if !GetBacktest() {
+					logger.Tradef("在%s，根据策略%s周期%s，以价格%s卖出%s个%s\n", Option["tradecenter"], Option["strategy"], Option["tick_interval"], tradePrice, tradeAmount, coin)
+				} else {
+					t := time.Unix(GetBtTime(), 0)
+					logger.Backtestf("%s 在simulate，根据策略%s周期%s，以价格%s卖出%s个%s\n", t.Format("2006-01-02 15:04:05"), Option["strategy"], Option["tick_interval"], tradePrice, tradeAmount, coin)
+				}
 			} else {
 				warning += "[委托失败]"
 				for i := 1; i <= ordercount; i++ {
 					warning := "stop loss, 卖出Sell Out---->限价单"
-					sellID := sell(getTradePrice("sell", Price[length-1]), splitTradeAmount)
+					tradePrice := getTradePrice("sell", Price[length-1])
+					sellID := sell(tradePrice, splitTradeAmount)
 					if sellID != "0" {
 						warning += "[委托成功]"
 						kdjex.SellId = append(kdjex.SellId, sellID)
+						if !GetBacktest() {
+							logger.Tradef("在%s，根据策略%s周期%s，以价格%s卖出%s个%s\n", Option["tradecenter"], Option["strategy"], Option["tick_interval"], tradePrice, splitTradeAmount, coin)
+						} else {
+							t := time.Unix(GetBtTime(), 0)
+							logger.Backtestf("%s 在simulate，根据策略%s周期%s，以价格%s卖出%s个%s\n", t.Format("2006-01-02 15:04:05"), Option["strategy"], Option["tick_interval"], tradePrice, splitTradeAmount, coin)
+						}
 					} else {
 						warning += "[委托失败]"
 					}
@@ -256,15 +289,14 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 			kdjex.PrevKDJTrade = "sell"
 
 			_, ret := GetAccount()
-
 			if !ret {
 				logger.Infoln("GetAccount failed")
 			}
-			go email.TriggerTrender(warning)
+			SendEmail(warning)
 		}
 	}
 
-	//check timeout trade
+	// check timeout trade
 	now := time.Now()
 
 	logger.Infoln("time go ", int64(now.Sub(kdjex.BuyBegin)/time.Second))
@@ -273,7 +305,7 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 
 	if len(kdjex.BuyId) != 0 &&
 		int64(now.Sub(kdjex.BuyBegin)/time.Second) > timeout {
-		//todo-
+		// todo
 		for _, BuyId := range kdjex.BuyId {
 			warning := "<--------------buy order timeout, cancel-------------->" + BuyId
 			if CancelOrder(BuyId) {
@@ -290,7 +322,7 @@ func (kdjex *KDJexStrategy) Tick(records []Record) bool {
 
 	if len(kdjex.SellId) != 0 &&
 		int64(now.Sub(kdjex.SellBegin)/time.Second) > timeout {
-		//todo
+		// todo
 		for _, SellId := range kdjex.SellId {
 			warning := "<--------------sell order timeout, cancel------------->" + SellId
 			if CancelOrder(SellId) {

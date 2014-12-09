@@ -19,10 +19,14 @@ package strategy
 
 import (
 	. "common"
+	. "config"
+	"fmt"
 	"logger"
+	"time"
 )
 
 type KDJStrategy struct {
+	PrevTrade string
 	PrevTime  string
 	PrevPrice float64
 }
@@ -33,14 +37,37 @@ func init() {
 	Register("KDJ", kdjStrategy)
 }
 
-//kdjStrategy strategy
+func (strategy *KDJStrategy) kdjBuy(price float64) {
+	price = price + 0.5
+	lastPrice = price
+	strategy.PrevPrice = price
+	priceStr := fmt.Sprintf("%f", price)
+	amount := Option["tradeAmount"]
+	buy(priceStr, amount)
+	strategy.PrevTrade = "buy"
+	t := time.Unix(GetBtTime(), 0)
+	logger.Backtestf("%s 在simulate，根据策略%s周期%s，以价格%f买入%s个%s\n", t.Format("2006-01-02 15:04:05"), Option["strategy"], Option["tick_interval"], price, amount, "比特币")
+}
+
+func (strategy *KDJStrategy) kdjSell(price float64) {
+	price = price - 0.5
+	strategy.PrevPrice = price
+	priceStr := fmt.Sprintf("%f", price)
+	amount := Option["tradeAmount"]
+	sell(priceStr, amount)
+	strategy.PrevTrade = "sell"
+	t := time.Unix(GetBtTime(), 0)
+	logger.Backtestf("%s 在simulate，根据策略%s周期%s，以价格%f卖出%s个%s\n", t.Format("2006-01-02 15:04:05"), Option["strategy"], Option["tick_interval"], price, amount, "比特币")
+}
+
+// kdjStrategy strategy
 func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 	if kdjStrategy.PrevTime == records[length-1].TimeStr &&
 		kdjStrategy.PrevPrice == lastPrice {
 		return false
 	}
 
-	//K线为白，D线为黄，J线为红,K in middle
+	// K线为白，D线为黄，J线为红,K in middle
 	k, d, j := getKDJ(records)
 
 	if kdjStrategy.PrevTime != records[length-1].TimeStr ||
@@ -56,20 +83,20 @@ func (kdjStrategy *KDJStrategy) Tick(records []Record) bool {
 	if ((j[length-2] < k[length-2] && k[length-2] < d[length-2]) || PrevTrade == "sell") &&
 		(j[length-1] > k[length-1] && k[length-1] > d[length-1]) {
 		logger.Infoln("KDJ up cross")
-		if d[length-2] <= 30 {
-			Buy()
+		if k[length-2] <= 20 {
+			kdjStrategy.kdjBuy(records[length-1].Close)
 		}
 	}
 
 	if ((j[length-2] > k[length-2] && k[length-2] > d[length-2]) || PrevTrade == "buy") &&
 		(j[length-1] < k[length-1] && k[length-1] < d[length-1]) {
 		logger.Infoln("KDJ down cross")
-		if d[length-2] >= 70 {
-			Sell()
+		if k[length-2] >= 80 {
+			kdjStrategy.kdjSell(records[length-1].Close)
 		}
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 	processStoploss(lastPrice)
 	processTimeout()
 

@@ -15,13 +15,13 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package okcoin
+package simulate
 
 import (
 	. "common"
 	. "config"
 	"logger"
-	"time"
+	. "util"
 )
 
 var ErrorCodeMap = map[int64]string{
@@ -43,80 +43,58 @@ var ErrorCodeMap = map[int64]string{
 	10015: "下单价格与最新成交价偏差过大",
 }
 
-type Okcoin struct {
-	tradeAPI *OkcoinTrade
+type Simulate struct {
+	tradeAPI *SimulateTrade
 }
 
-func NewOkcoin() *Okcoin {
-	w := new(Okcoin)
-	w.tradeAPI = NewOkcoinTrade(SecretOption["ok_partner"], SecretOption["ok_secret_key"])
+func NewSimulate() *Simulate {
+	w := new(Simulate)
+	w.tradeAPI = NewSimulateTrade()
 	return w
 }
 
-func (w Okcoin) CancelOrder(order_id string) (ret bool) {
-	tradeAPI := w.tradeAPI
-	symbol := Option["symbol"]
-	return tradeAPI.Cancel_order(symbol, order_id)
+func (w Simulate) CancelOrder(order_id string) (ret bool) {
+	return true
 }
 
-func (w Okcoin) GetOrderBook() (ret bool, orderBook OrderBook) {
+func (w Simulate) GetOrderBook() (ret bool, orderBook OrderBook) {
 	symbol := Option["symbol"]
 	return w.getOrderBook(symbol)
 }
 
-func (w Okcoin) GetOrder(order_id string) (ret bool, order Order) {
-	symbol := Option["symbol"]
-	tradeAPI := w.tradeAPI
+func (w Simulate) GetOrder(order_id string) (ret bool, order Order) {
+	order.Id = int(StringToInteger(order_id))
+	order.Price = 1000
+	order.Amount = 1.0
+	order.Deal_amount = 1.0
 
-	ret, ok_orderTable := tradeAPI.Get_order(symbol, order_id)
-	if ret == false {
-		return
-	}
-
-	order.Id = ok_orderTable.Orders[0].Orders_id
-	order.Price = ok_orderTable.Orders[0].Avg_rate
-	order.Amount = ok_orderTable.Orders[0].Amount
-	order.Deal_amount = ok_orderTable.Orders[0].Deal_amount
+	ret = true
 
 	return
 }
 
-func (w Okcoin) GetKLine(peroid int) (ret bool, records []Record) {
+func (w Simulate) GetKLine(peroid int) (ret bool, records []Record) {
 	symbol := Option["symbol"]
 	return w.AnalyzeKLinePeroid(symbol, peroid)
 }
 
-func (w Okcoin) GetAccount() (account Account, ret bool) {
-	tradeAPI := w.tradeAPI
+func (w Simulate) GetAccount() (account Account, ret bool) {
+	LoadSimulate()
 
-	userInfo, ret := tradeAPI.GetAccount()
+	account.Available_cny = SimAccount["CNY"]
+	account.Available_btc = SimAccount["BTC"]
+	account.Available_ltc = SimAccount["LTC"]
 
-	if !ret {
-		logger.Traceln("okcoin GetAccount failed")
-		return
-	} else {
-		logger.Traceln(userInfo)
+	account.Frozen_cny = "0.0"
+	account.Frozen_btc = "0.0"
+	account.Frozen_ltc = "0.0"
 
-		account.Available_cny = userInfo.Info.Funds.Free.CNY
-		account.Available_btc = userInfo.Info.Funds.Free.BTC
-		account.Available_ltc = userInfo.Info.Funds.Free.LTC
+	ret = true
 
-		account.Frozen_cny = userInfo.Info.Funds.Freezed.CNY
-		account.Frozen_btc = userInfo.Info.Funds.Freezed.BTC
-		account.Frozen_ltc = userInfo.Info.Funds.Freezed.LTC
-
-		logger.Infof("okcoin资产: \n 可用cny:%-10s \tbtc:%-10s \tltc:%-10s \n 冻结cny:%-10s \tbtc:%-10s \tltc:%-10s\n",
-			account.Available_cny,
-			account.Available_btc,
-			account.Available_ltc,
-			account.Frozen_cny,
-			account.Frozen_btc,
-			account.Frozen_ltc)
-		return
-	}
+	return
 }
 
-func (w Okcoin) Buy(tradePrice, tradeAmount string) (buyId string) {
+func (w Simulate) Buy(tradePrice, tradeAmount string) (buyId string) {
 	tradeAPI := w.tradeAPI
 
 	symbol := Option["symbol"]
@@ -132,12 +110,15 @@ func (w Okcoin) Buy(tradePrice, tradeAmount string) (buyId string) {
 		logger.Infoln("执行买入委托失败", tradePrice, tradeAmount)
 	}
 
-	time.Sleep(1 * time.Second)
+	_, ret := w.GetAccount()
+	if !ret {
+		logger.Infoln("GetAccount failed")
+	}
 
 	return buyId
 }
 
-func (w Okcoin) Sell(tradePrice, tradeAmount string) (sellId string) {
+func (w Simulate) Sell(tradePrice, tradeAmount string) (sellId string) {
 	tradeAPI := w.tradeAPI
 	symbol := Option["symbol"]
 	if symbol == "btc_cny" {

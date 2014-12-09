@@ -1,8 +1,11 @@
 package common
 
-//trade interface type and method
+// trade interface type and method
 
 var g_errno int
+var g_backtesting bool
+var g_btPrice float64
+var g_btTime int64
 
 type Account struct {
 	Available_cny string
@@ -24,14 +27,14 @@ type Record struct {
 }
 
 type _MarketOrder struct {
-	Price  float64 //价格
-	Amount float64 //委单量
+	Price  float64 // 价格
+	Amount float64 // 委单量
 }
 
-//price from high to low: asks[0] > .....>asks[9] > bids[0] > ......> bids[9]
+// price from high to low: asks[0] > .....>asks[9] > bids[0] > ......> bids[9]
 type OrderBook struct {
-	Asks [10]_MarketOrder //sell
-	Bids [10]_MarketOrder //buy
+	Asks [10]_MarketOrder // sell
+	Bids [10]_MarketOrder // buy
 }
 
 type Order struct {
@@ -60,4 +63,28 @@ func GetLastError() (errno int) {
 
 func SetLastError(errno int) {
 	g_errno = errno
+}
+
+func GetBacktest() (backtest bool) {
+	return g_backtesting
+}
+
+func SetBacktest(backtest bool) {
+	g_backtesting = backtest
+}
+
+func GetBtPrice() (price float64) {
+	return g_btPrice
+}
+
+func SetBtPrice(price float64) {
+	g_btPrice = price
+}
+
+func GetBtTime() (current int64) {
+	return g_btTime
+}
+
+func SetBtTime(current int64) {
+	g_btTime = current
 }

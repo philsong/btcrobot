@@ -3,6 +3,7 @@ package peatio
 // todo: 懒得搞了，你们玩呗
 
 // https://peatio.com/documents/api_v2 http://demo.peat.io/documents/websocket_api
+
 import (
 	"crypto/hmac"
 	"crypto/sha256"
@@ -48,7 +49,8 @@ type (
 			Low    float64
 			Close  float64
 			Volume float64
-		}*/
+		}
+	*/
 
 	MarketOrder struct {
 		Price  float64
@@ -285,6 +287,7 @@ func (p *iPeatio) __trade(tradeType string, price, amount float64) (int64, error
 	orderId := js.Get("id").MustInt64()
 	return orderId, nil
 }
+
 func (p *iPeatio) Buy(price, amount float64) (int64, error) {
 	return p.__trade("buy", price, amount)
 }

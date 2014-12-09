@@ -30,7 +30,7 @@ func init() {
 	Register("arbitrage", arbitrage)
 }
 
-//arbitrage strategy
+// arbitrage strategy
 func (arbitrage *arbitrageStrategy) Tick(records []Record) bool {
 	const btcslap = 1.8
 	const ltcslap = 0.8

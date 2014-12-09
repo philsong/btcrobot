@@ -47,9 +47,9 @@ func getMACDHistogram(MACDdif, MACDSignal []float64) []float64 {
 	return MACDHistogram
 }
 
-//MACD strategy
+// MACD strategy
 func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
-	//read config
+	// read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
 
@@ -79,7 +79,7 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 		Price = append(Price, v.Close)
 	}
 
-	//compute the indictor
+	// compute the indictor
 	emaShort := EMA(Price, shortEMA)
 	emaLong := EMA(Price, longEMA)
 	MACDdif := getMACDdif(emaShort, emaLong)
@@ -91,7 +91,7 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 		logger.Infof("MACD:d%5.03f\ts%5.03f\tph%5.03f\th%5.03f\tPrice:%5.02f\n", MACDdif[length-1], MACDSignal[length-1], MACDHistogram[length-2], MACDHistogram[length-1], Price[length-1])
 	}
 
-	//macd cross
+	// macd cross
 	if (MACDHistogram[length-2] < -0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) ||
 		(PrevTrade == "sell" && MACDHistogram[length-2] > 0.000001 && MACDHistogram[length-1] > MACDbuyThreshold) {
 		Buy()
@@ -100,7 +100,7 @@ func (macdStrategy *MACDStrategy) Tick(records []Record) bool {
 		Sell()
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 	processStoploss(lastPrice)
 	processTimeout()
 

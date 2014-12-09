@@ -27,14 +27,11 @@ import (
 	"logger"
 	"math/rand"
 	"net/http"
-	//"net/http/cookiejar"
 	"net/url"
 	"os"
 	"regexp"
-	//"runtime"
 	"strconv"
 	"strings"
-	//"time"
 	"util"
 )
 
@@ -349,13 +346,13 @@ func (w *BitvcTrade) SellBTC(price, amount string) string {
 }
 
 func (w *BitvcTrade) BuyLTC(price, amount string) string {
-	//todo
+	// todo
 	buyId := 0
 	return (fmt.Sprintf("%d", buyId))
 }
 
 func (w *BitvcTrade) SellLTC(price, amount string) string {
-	//todo
+	// todo
 	sellId := 0
 	return (fmt.Sprintf("%d", sellId))
 }
@@ -457,17 +454,18 @@ func (w *BitvcTrade) Login() bool {
 	logger.Infoln(req)
 
 	//jar := NewJar()
-	/* how to do compatible like c define?
-	jar, _ := cookiejar.New(nil)
-	fmt.Println("version:", runtime.Version())
-	if runtime.Version() != "go1.3" {
-		w.client = &http.Client{nil, nil, jar}
-	} else {
-		w.client = &http.Client{nil, nil, jar, 10 * time.Second}
-	}
+	/*
+		// how to do compatible like c define?
+		jar, _ := cookiejar.New(nil)
+		fmt.Println("version:", runtime.Version())
+		if runtime.Version() != "go1.3" {
+			w.client = &http.Client{nil, nil, jar}
+		} else {
+			w.client = &http.Client{nil, nil, jar, 10 * time.Second}
+		}
 	*/
-
 	//w.client = new(http.Client)
+
 	resp, err := w.client.Do(req)
 	if err != nil {
 		logger.Fatal(err)
@@ -1024,6 +1022,7 @@ type Buy struct {
 	Amount        string `json:"amount"`
 	Available_cny string `json:"available_cny"`
 }
+
 type Balance struct {
 	Id                    int    `json:"id"`
 	Initialized_cny       int    `json:"initialized_cny"`

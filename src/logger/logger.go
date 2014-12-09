@@ -37,6 +37,7 @@ var (
 	trace_file    = ROOT + "/log/trace.log"
 	error_file    = ROOT + "/log/error.log"
 	fatal_file    = ROOT + "/log/fatal.log"
+	backtest_file string
 )
 
 func init() {
@@ -61,6 +62,22 @@ func NewReport(out io.Writer) *logger {
 	return &logger{
 		Logger: log.New(out, "", log.LstdFlags),
 	}
+}
+
+func SetBacktestFile(filepath string) {
+	backtest_file = filepath
+}
+
+func Backtestf(format string, args ...interface{}) {
+	file, err := os.OpenFile(ROOT+backtest_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		fmt.Println("OpenFile error")
+		return
+	}
+	defer file.Close()
+	message := fmt.Sprintf(format, args...)
+	file.Write([]byte(message))
+	fmt.Printf(message)
 }
 
 func Tradef(format string, args ...interface{}) {
@@ -199,7 +216,6 @@ func Debugf(format string, args ...interface{}) {
 			log.Printf(format, args...)
 		}
 	}
-
 }
 
 func Debugln(args ...interface{}) {
@@ -222,18 +238,15 @@ func Debugln(args ...interface{}) {
 }
 
 func Tracef(format string, args ...interface{}) {
-
 	file, err := os.OpenFile(trace_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return
 	}
 	defer file.Close()
 	New(file).Printf(format, args...)
-
 }
 
 func Traceln(args ...interface{}) {
-
 	file, err := os.OpenFile(trace_file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return

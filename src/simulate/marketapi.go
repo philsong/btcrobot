@@ -16,7 +16,7 @@
   Weibo:http://weibo.com/bocaicfa
 */
 
-package okcoin
+package simulate
 
 import (
 	. "common"
@@ -31,35 +31,7 @@ import (
 	"util"
 )
 
-/*
-	SEE DOC:
-	TRADE API
-	https://www.okcoin.com/t-1000097.html
-
-	行情API
-	https://www.okcoin.com/shequ/themeview.do?tid=1000052&currentPage=1
-
-	// non-official API :P
-	K线数据step单位为second
-	https://www.okcoin.com/kline/period.do?step=60&symbol=okcoinbtccny&nonce=1394955131098
-
-	https://www.okcoin.com/kline/trades.do?since=10625682&symbol=okcoinbtccny&nonce=1394955760557
-
-	https://www.okcoin.com/kline/depth.do?symbol=okcoinbtccny&nonce=1394955767484
-
-	https://www.okcoin.com/real/ticker.do?symbol=0&random=61
-
-	// old kline for btc
-	日数据
-	https://www.okcoin.com/klineData.do?type=3&marketFrom=0
-	5分钟数据
-	https://www.okcoin.com/klineData.do?type=1&marketFrom=0
-
-	// for ltc
-	https://www.okcoin.com/klineData.do?type=3&marketFrom=3
-*/
-
-func (w *Okcoin) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, records []Record) {
+func (w *Simulate) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, records []Record) {
 	var oksymbol string
 	if symbol == "btc_cny" {
 		oksymbol = "okcoinbtccny"

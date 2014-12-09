@@ -33,7 +33,7 @@ type Strategy interface {
 	Tick(records []Record) bool
 }
 
-const timeout = 10 //minute
+const timeout = 10 // minute
 
 var magic int64
 var strategys = make(map[string]Strategy)
@@ -80,9 +80,8 @@ func Register(strategyName string, strategy Strategy) {
 	strategys[strategyName] = strategy
 }
 
-//entry call
+// entry call
 func Tick(tradeAPI TradeAPI, records []Record) bool {
-
 	strategyName := Option["strategy"]
 	strategy, ok := strategys[strategyName]
 	if !ok {
@@ -92,17 +91,18 @@ func Tick(tradeAPI TradeAPI, records []Record) bool {
 
 	if strategyName != "OPENORDER" {
 		length = len(records)
-		//
 		if length == 0 {
 			logger.Errorln("warning:detect exception data", len(records))
 			return false
 		}
 
-		//check exception data in trade center
-		if checkException(records[length-2], records[length-1]) == false {
-			logger.Errorln("detect exception data of trade center",
-				records[length-2].Close, records[length-1].Close, records[length-1].Volumn)
-			return false
+		if Option["tick_interval"] != "1" {
+			// check exception data in trade center
+			if CheckException(records[length-2], records[length-1]) == false {
+				logger.Errorln("detect exception data of trade center",
+					records[length-2].Close, records[length-1].Close, records[length-1].Volumn)
+				return false
+			}
 		}
 
 		lastPrice = records[length-1].Close
@@ -113,8 +113,8 @@ func Tick(tradeAPI TradeAPI, records []Record) bool {
 	return strategy.Tick(records)
 }
 
-//check exception data in trade center
-func checkException(recordPrev, recordNow Record) bool {
+// check exception data in trade center
+func CheckException(recordPrev, recordNow Record) bool {
 	if recordNow.Close > recordPrev.Close+10 && recordNow.Volumn < 1 {
 		return false
 	}
@@ -146,10 +146,17 @@ func getTradePrice(tradeDirection string, price float64) string {
 }
 
 func getOrderPrice() (sell1, buy1 float64, ret bool) {
+	if GetBacktest() {
+		sell1 = GetBtPrice()
+		buy1 = GetBtPrice()
+		ret = true
+		return
+	}
+
 	ret, orderBook := GetOrderBook()
 	if !ret {
 		logger.Infoln("get orderBook failed 1")
-		ret, orderBook = GetOrderBook() //try again
+		ret, orderBook = GetOrderBook() // try again
 		if !ret {
 			logger.Infoln("get orderBook failed 2")
 			return 0, 0, ret
@@ -163,7 +170,7 @@ func getOrderPrice() (sell1, buy1 float64, ret bool) {
 }
 
 func getBuyPrice() (price string, nPrice float64, warning string) {
-	//compute the price
+	// compute the price
 	slippage, err := strconv.ParseFloat(Option["slippage"], 64)
 	if err != nil {
 		logger.Debugln("config item slippage is not float")
@@ -183,7 +190,7 @@ func getBuyPrice() (price string, nPrice float64, warning string) {
 }
 
 func getSellPrice() (price string, nPrice float64, warning string) {
-	//compute the price
+	// compute the price
 	slippage, err := strconv.ParseFloat(Option["slippage"], 64)
 	if err != nil {
 		logger.Debugln("config item slippage is not float")
@@ -221,6 +228,31 @@ func buy(price, amount string) string {
 		return "0"
 	}
 
+	nAmount, err := strconv.ParseFloat(amount, 64)
+	if err != nil {
+		logger.Infoln("amount is not float")
+		return "0"
+	}
+
+	Available_cny := GetAvailable_cny()
+	if Available_cny < nPrice*nAmount {
+		var nMinTradeAmount float64
+		nAmount = Available_cny / nPrice
+		symbol := Option["symbol"]
+		if symbol == "btc_cny" {
+			nMinTradeAmount = 0.1
+		} else {
+			nMinTradeAmount = 0.01
+		}
+		if nAmount < nMinTradeAmount {
+			warning += "没有足够的法币余额"
+			logger.Infoln(warning)
+			PrevTrade = "buy"
+			PrevBuyPirce = nPrice
+			return "0"
+		}
+	}
+
 	var buyID string
 	if Option["enable_trading"] == "1" {
 		buyID = gTradeAPI.Buy(price, amount)
@@ -231,16 +263,18 @@ func buy(price, amount string) string {
 	if buyID != "0" {
 		timestamp := time.Now()
 		magic += 1
-		err := db.SetTx("buy", buyID, timestamp.Unix(), amount, price, magic)
-		if err != nil {
-			fmt.Println("SetTx", err)
+		if !GetBacktest() {
+			err := db.SetTx("buy", buyID, timestamp.Unix(), amount, price, magic)
+			if err != nil {
+				fmt.Println("SetTx", err)
+			}
 		}
 		buyOrders[timestamp] = buyID
 		PrevTrade = "buy"
 		PrevBuyPirce = nPrice
 	}
 
-	{
+	if !GetBacktest() {
 		cmd, id, timestamp, amount, price, magic, err := db.GetTx(buyID)
 		if err != nil {
 			fmt.Println("GetTx", err)
@@ -253,6 +287,26 @@ func buy(price, amount string) string {
 }
 
 func sell(price, amount string) string {
+	Available_coin := GetAvailable_coin()
+	if Available_coin < 0.01 {
+		warning = "没有足够的币"
+		logger.Infoln(warning)
+		PrevTrade = "sell"
+		PrevBuyPirce = 0
+		return "0"
+	}
+
+	nAmount, err := strconv.ParseFloat(amount, 64)
+	if err != nil {
+		logger.Infoln("amount is not float")
+		return "0"
+	}
+
+	if nAmount > Available_coin {
+		nAmount = Available_coin
+		amount = fmt.Sprintf("%02f", nAmount)
+	}
+
 	var sellID string
 	if Option["enable_trading"] == "1" {
 		sellID = gTradeAPI.Sell(price, amount)
@@ -263,13 +317,18 @@ func sell(price, amount string) string {
 	if sellID != "0" {
 		timestamp := time.Now()
 		magic += 1
-		db.SetTx("sell", sellID, timestamp.Unix(), price, amount, magic)
+		if !GetBacktest() {
+			err := db.SetTx("sell", sellID, timestamp.Unix(), price, amount, magic)
+			if err != nil {
+				fmt.Println("SetTx", err)
+			}
+		}
 		sellOrders[timestamp] = sellID
 		PrevTrade = "sell"
 		PrevBuyPirce = 0
 	}
 
-	{
+	if !GetBacktest() {
 		cmd, id, timestamp, amount, price, magic, err := db.GetTx(sellID)
 		if err != nil {
 			fmt.Println("GetTx", err)
@@ -286,13 +345,13 @@ func Buy() string {
 		return "0"
 	}
 
-	//init
+	// init
 	isStoploss = false
 
-	//compute the price
+	// compute the price
 	price, nPrice, warning := getBuyPrice()
 
-	//compute the amount
+	// compute the amount
 	amount := Option["tradeAmount"]
 	nAmount, err := strconv.ParseFloat(amount, 64)
 	if err != nil {
@@ -333,7 +392,23 @@ func Buy() string {
 	}
 
 	logger.Infoln(warning)
-	go email.TriggerTrender(warning)
+
+	var coin string
+	if Option["symbol"] == "btc_cny" {
+		coin = "比特币"
+	} else {
+		coin = "莱特币"
+	}
+
+	if buyID != "0" {
+		if !GetBacktest() {
+			logger.Tradef("在%s，根据策略%s周期%s，以价格%s买入%s个%s\n", Option["tradecenter"], Option["strategy"], Option["tick_interval"], price, amount, coin)
+			go email.TriggerTrender(warning)
+		} else {
+			t := time.Unix(GetBtTime(), 0)
+			logger.Backtestf("%s 在simulate，根据策略%s周期%s，以价格%s买入%s个%s\n", t.Format("2006-01-02 15:04:05"), Option["strategy"], Option["tick_interval"], price, amount, coin)
+		}
+	}
 
 	return buyID
 }
@@ -343,10 +418,10 @@ func Sell() string {
 		return "0"
 	}
 
-	//compute the price
+	// compute the price
 	price, _, warning := getSellPrice()
 
-	//compute the amount
+	// compute the amount
 	Available_coin := GetAvailable_coin()
 	if Available_coin < 0.01 {
 		warning = "没有足够的币"
@@ -378,7 +453,23 @@ func Sell() string {
 	}
 
 	logger.Infoln(warning)
-	go email.TriggerTrender(warning)
+
+	var coin string
+	if Option["symbol"] == "btc_cny" {
+		coin = "比特币"
+	} else {
+		coin = "莱特币"
+	}
+
+	if sellID != "0" {
+		if !GetBacktest() {
+			logger.Tradef("在%s，根据策略%s周期%s，以价格%s卖出%s个%s\n", Option["tradecenter"], Option["strategy"], Option["tick_interval"], price, amount, coin)
+			go email.TriggerTrender(warning)
+		} else {
+			t := time.Unix(GetBtTime(), 0)
+			logger.Backtestf("%s 在simulate，根据策略%s周期%s，以价格%s卖出%s个%s\n", t.Format("2006-01-02 15:04:05"), Option["strategy"], Option["tick_interval"], price, amount, coin)
+		}
+	}
 
 	return sellID
 }
@@ -386,9 +477,11 @@ func Sell() string {
 func CancelOrder(order_id string) bool {
 	return gTradeAPI.CancelOrder(order_id)
 }
+
 func GetAccount() (Account, bool) {
 	return gTradeAPI.GetAccount()
 }
+
 func GetOrderBook() (ret bool, orderBook OrderBook) {
 	return gTradeAPI.GetOrderBook()
 }
@@ -409,7 +502,6 @@ func GetAvailable_cny() float64 {
 		logger.Errorln("Available_cny is not float")
 		return -1
 	}
-	//balance > 0
 	return numAvailable_cny
 }
 
@@ -425,7 +517,6 @@ func GetAvailable_btc() float64 {
 		logger.Errorln("Available_btc is not float")
 		return -1
 	}
-	//nCoins > 0
 	return numAvailable_btc
 }
 
@@ -441,7 +532,6 @@ func GetAvailable_ltc() float64 {
 		logger.Errorln("Available_ltc is not float")
 		return -1
 	}
-	//nCoins > 0
 	return numAvailable_ltc
 }
 
@@ -455,7 +545,7 @@ func GetAvailable_coin() float64 {
 }
 
 //////////////////////////////////
-//common stop loss function
+// common stop loss function
 //////////////////////////////////
 
 func processStoploss(Price float64) bool {
@@ -465,7 +555,7 @@ func processStoploss(Price float64) bool {
 		return false
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 	stoplossPrice := PrevBuyPirce * (1 - stoploss*0.01)
 	if Price <= stoplossPrice {
 		warning := "stop loss, 卖出Sell Out---->"
@@ -480,9 +570,9 @@ func processStoploss(Price float64) bool {
 	return true
 }
 
-//check timeout trade
+// check timeout trade
 func processTimeout() bool {
-	//last cancel failed, recancel
+	// last cancel failed, recancel
 	for tm, id := range recancelbuyOrders {
 		warning := fmt.Sprintf("<-----re-cancel %s-------------->", id)
 		if CancelOrder(id) {
@@ -521,7 +611,7 @@ func processTimeout() bool {
 
 	now := time.Now()
 	if len(buyOrders) != 0 {
-		//todo-
+		// todo
 		logger.Infoln("BuyId len", len(buyOrders))
 		for tm, id := range buyOrders {
 			ret, order := GetOrder(id)
@@ -529,7 +619,6 @@ func processTimeout() bool {
 				continue
 			}
 			if order.Amount == order.Deal_amount {
-
 				buy_average = (buy_amount*buy_average + order.Deal_amount*order.Price) / (buy_amount + order.Deal_amount)
 				logger.Infof("buy_average full=%0.02f,%0.02f,%0.02f\n", buy_average, order.Deal_amount, buy_amount)
 
@@ -541,7 +630,7 @@ func processTimeout() bool {
 					continue
 				}
 
-				if order.Deal_amount > 0.0001 { //部分成交的买卖单
+				if order.Deal_amount > 0.0001 { // 部分成交的买卖单
 					buy_average = (buy_amount*buy_average + order.Deal_amount*order.Price) / (buy_amount + order.Deal_amount)
 					logger.Infof("buy_average partial=%0.02f,%0.02f,%0.02f\n", buy_average, order.Deal_amount, buy_amount)
 					dealOrders[tm] = order
@@ -566,7 +655,7 @@ func processTimeout() bool {
 	}
 
 	if len(sellOrders) != 0 {
-		//todo-
+		// todo
 		logger.Infoln("SellId len", len(sellOrders))
 		for tm, id := range sellOrders {
 			if int64(now.Sub(tm)/time.Second) <= timeout {
@@ -588,7 +677,7 @@ func processTimeout() bool {
 					ret, orderBook := GetOrderBook()
 					if !ret {
 						logger.Infoln("get orderBook failed 1")
-						ret, orderBook = GetOrderBook() //try again
+						ret, orderBook = GetOrderBook() // try again
 						if !ret {
 							logger.Infoln("get orderBook failed 2")
 							return false
@@ -600,7 +689,7 @@ func processTimeout() bool {
 						warning += "[sell Cancel委托成功]"
 
 						delete(sellOrders, tm)
-						//update to delete, start a new order for sell in below
+						// update to delete, start a new order for sell in below
 
 						sell_amount := order.Amount - order.Deal_amount
 
@@ -639,8 +728,8 @@ func processTimeout() bool {
 	return true
 }
 
-//todo:need to think about edge issue carefully
-//compute any period k-line base on 1 minute kline
+// todo:need to think about edge issue carefully
+// compute any period k-line base on 1 minute kline
 func getKLine(records []Record, periods int) (recordsN []Record) {
 	length := len(records)
 	lengthN := length / periods

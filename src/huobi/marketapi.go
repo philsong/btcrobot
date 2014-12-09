@@ -81,7 +81,6 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, records
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-
 		logger.Tracef("HTTP returned status %v", resp)
 		return
 	}
@@ -93,7 +92,6 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, records
 	switch contentEncoding {
 	case "gzip":
 		body = util.DumpGZIP(resp.Body)
-
 	default:
 		bodyByte, err := ioutil.ReadAll(resp.Body)
 		if err != nil {

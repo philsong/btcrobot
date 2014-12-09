@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-type Config struct {
+type NetConfig struct {
 	ConnectTimeout   time.Duration
 	ReadWriteTimeout time.Duration
 }
 
-func TimeoutDialer(config *Config) func(net, addr string) (c net.Conn, err error) {
+func TimeoutDialer(config *NetConfig) func(net, addr string) (c net.Conn, err error) {
 	return func(netw, addr string) (net.Conn, error) {
 		conn, err := net.DialTimeout(netw, addr, config.ConnectTimeout)
 		if err != nil {
@@ -24,7 +24,7 @@ func TimeoutDialer(config *Config) func(net, addr string) (c net.Conn, err error
 
 func NewTimeoutClient(args ...interface{}) *http.Client {
 	// Default configuration
-	config := &Config{
+	config := &NetConfig{
 		ConnectTimeout:   10 * time.Second,
 		ReadWriteTimeout: 10 * time.Second,
 	}

@@ -397,13 +397,13 @@ func (w *PeatioTrade) SellBTC(price, amount string) string {
 }
 
 func (w *PeatioTrade) BuyLTC(price, amount string) string {
-	//todo
+	// todo
 	buyId := 0
 	return (fmt.Sprintf("%d", buyId))
 }
 
 func (w *PeatioTrade) SellLTC(price, amount string) string {
-	//todo
+	// todo
 	sellId := 0
 	return (fmt.Sprintf("%d", sellId))
 }

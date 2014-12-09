@@ -107,9 +107,9 @@ func (emaStrategy *EMAStrategy) is_downcross(emaLast, emaCurr float64) bool {
 	return false
 }
 
-//EMA strategy
+// EMA strategy
 func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
-	//read config
+	// read config
 	shortEMA, _ := strconv.Atoi(Option["shortEMA"])
 	longEMA, _ := strconv.Atoi(Option["longEMA"])
 
@@ -118,7 +118,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 		Price = append(Price, v.Close)
 	}
 
-	//compute the indictor
+	// compute the indictor
 	emaShort := EMA(Price, shortEMA)
 	emaLong := EMA(Price, longEMA)
 	EMAdif := getMACDdif(emaShort, emaLong)
@@ -147,8 +147,6 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	if !ret {
 		logger.Infoln("get order book failed")
 	} else {
-		//logger.Infoln(orderBook)
-
 		askstotal := 0.0
 		for i := 0; i < len(orderBook.Asks); i++ {
 			askstotal += orderBook.Asks[i].Amount
@@ -161,20 +159,19 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 		logger.Infoln("sell:buy", askstotal, bidstotal)
 	}
 
-	//reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
+	// reset LessBuyThreshold LessSellThreshold flag when (^ or V) happen
 	if emaStrategy.LessBuyThreshold && is_down(emaCurr) {
 		emaStrategy.LessBuyThreshold = false
-		emaStrategy.PrevEMACross = "down" //reset
+		emaStrategy.PrevEMACross = "down" // reset
 		logger.Infoln("down->up(EMA diff < buy threshold)->down ^")
-
 	}
 	if emaStrategy.LessSellThreshold && is_up(emaCurr) {
 		emaStrategy.LessSellThreshold = false
-		emaStrategy.PrevEMACross = "up" //reset
+		emaStrategy.PrevEMACross = "up" // reset
 		logger.Infoln("up->down(EMA diff > sell threshold)->up V")
 	}
 
-	//do buy when cross up
+	// do buy when cross up
 	if emaStrategy.is_upcross(emaLast, emaCurr) || emaStrategy.LessBuyThreshold {
 		if Option["enable_trading"] == "1" && PrevTrade != "buy" {
 			emaStrategy.PrevEMACross = "up"
@@ -184,7 +181,7 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 		}
 	}
 
-	//do sell when cross down
+	// do sell when cross down
 	if emaStrategy.is_downcross(emaLast, emaCurr) || emaStrategy.LessSellThreshold {
 		emaStrategy.PrevEMACross = "down"
 		if Option["enable_trading"] == "1" && PrevTrade != "sell" {
@@ -194,17 +191,16 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 		}
 	}
 
-	//EMA cross
+	// EMA cross
 	if (emaStrategy.is_upcross(emaLast, emaCurr) || emaStrategy.LessBuyThreshold) ||
 		(emaStrategy.is_downcross(emaLast, emaCurr) || emaStrategy.LessSellThreshold) {
-
-		//backup the kline data for analyze
+		// backup the kline data for analyze
 		if Config["env"] == "dev" {
 			backup(records[length-1].TimeStr)
 		}
 	}
 
-	//do sell when price is below stoploss point
+	// do sell when price is below stoploss point
 	processStoploss(lastPrice)
 
 	processTimeout()
@@ -212,9 +208,8 @@ func (emaStrategy *EMAStrategy) Tick(records []Record) bool {
 	return true
 }
 
-//for backup the kline file to detect the huobi bug
+// for backup the kline file to detect the huobi bug
 func backup(Time string) {
-
 	oldFile := "cache/TradeKLine_minute.data"
 	newFile := fmt.Sprintf("%s_%s", oldFile, Time)
 	os.Rename(oldFile, newFile)

@@ -21,17 +21,14 @@ import (
 	. "common"
 	. "config"
 	"encoding/json"
-	//"fmt"
 	"io/ioutil"
 	"logger"
 	"net/http"
-	//"strconv"
-	//"strings"
 	"util"
 )
 
 func (w *Peatio) getOrderBook(symbol string) (ret bool, orderBook OrderBook) {
-	//init to false
+	// init to false
 	ret = false
 	req, err := http.NewRequest("GET", Config["peatio_depth_url"], nil)
 	if err != nil {
@@ -83,8 +80,8 @@ func (w *Peatio) getOrderBook(symbol string) (ret bool, orderBook OrderBook) {
 }
 
 type OKMarketOrder struct {
-	Price  float64 //价格
-	Amount float64 //委单量
+	Price  float64 // 价格
+	Amount float64 // 委单量
 }
 
 type _PeatioOrderBook struct {
@@ -129,7 +126,7 @@ func convert2struct(_peatioOrderBook _PeatioOrderBook) (peatioOrderBook PeatioOr
 }
 
 func (w *Peatio) analyzeOrderBook(content string) (ret bool, orderBook OrderBook) {
-	//init to false
+	// init to false
 	ret = false
 	var _peatioOrderBook _PeatioOrderBook
 	if err := json.Unmarshal([]byte(content), &_peatioOrderBook); err != nil {
@@ -146,7 +143,6 @@ func (w *Peatio) analyzeOrderBook(content string) (ret bool, orderBook OrderBook
 		orderBook.Bids[i].Amount = peatioOrderBook.Bids[i].Amount
 	}
 
-	//OrderBook
 	//logger.Infoln(orderBook)
 	ret = true
 	return

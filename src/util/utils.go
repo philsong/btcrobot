@@ -28,14 +28,10 @@ func AddRecord(record, filename string) {
 }
 
 func InterfaceToFloat64(iv interface{}) (retV float64) {
-	//logger.Debugf("iv=%v\n", iv)
-
 	switch ivTo := iv.(type) {
 	case float64:
-		//	logger.Traceln(ivTo, "is float64")
 		retV = ivTo
 	case string:
-		//	logger.Traceln(ivTo, "is string")
 		{
 			var err error
 			retV, err = strconv.ParseFloat(ivTo, 64)
@@ -88,7 +84,25 @@ func randdigit() uint8 {
 	return answers[rand.Intn(len(answers))]
 }
 
-func stringt2float64(in string) float64 {
+func IntegerToString(value int64) (s string) {
+	s = strconv.FormatInt(value, 10)
+	return
+}
+
+func StringToInteger(s string) (value int64) {
+	value, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		value = 0
+	}
+	return
+}
+
+func FloatToString(value float64) (s string) {
+	s = strconv.FormatFloat(value, 'f', -1, 64)
+	return
+}
+
+func StringToFloat(in string) float64 {
 	out, err := strconv.ParseFloat(in, 64)
 	if err != nil {
 		logger.Fatalln("don't know the type, crash!")
@@ -96,4 +110,15 @@ func stringt2float64(in string) float64 {
 	}
 
 	return out
+}
+
+func Exist(filename string) bool {
+	_, err := os.Stat(filename)
+	return err == nil || os.IsExist(err)
+}
+
+func DeleteFile(filepath string) {
+	if Exist(filepath) {
+		os.Remove(filepath)
+	}
 }

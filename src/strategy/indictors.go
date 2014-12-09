@@ -53,7 +53,6 @@ func getEMAdif(emaShort, emaLong []float64) []float64 {
  * @return an array containing the EMA.
 **/
 func EMA(Price []float64, periods int) []float64 {
-
 	var t float64
 	y := 0.0
 	n := float64(periods)

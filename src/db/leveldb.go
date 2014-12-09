@@ -28,6 +28,7 @@ import (
 	"logger"
 	"os"
 	"sync"
+	"util"
 )
 
 const (
@@ -107,16 +108,17 @@ func openDB(dbpath string, create bool) (pbdb *LevelDb, err error) {
 	defer func() {
 		if err == nil {
 			db.lDb = tlDb
-
 			pbdb = &db
 		}
 	}()
 
 	if create == true {
-		err = os.Mkdir(dbpath, 0750)
-		if err != nil {
-			logger.Errorf("mkdir failed %v %v", dbpath, err)
-			//return
+		if !util.Exist(dbpath) {
+			err = os.Mkdir(dbpath, 0750)
+			if err != nil {
+				logger.Errorf("mkdir failed %v %v", dbpath, err)
+				os.Exit(-1)
+			}
 		}
 	} else {
 		_, err = os.Stat(dbpath)
@@ -171,8 +173,8 @@ func openDB(dbpath string, create bool) (pbdb *LevelDb, err error) {
 		fo, ferr := os.Create(verfile)
 		if ferr != nil {
 			// TODO(design) close and delete database?
-			//err = ferr
-			//return
+			err = ferr
+			return
 		}
 		defer fo.Close()
 		err = binary.Write(fo, binary.LittleEndian, dbversion)
@@ -192,7 +194,6 @@ func CreateDB(args ...interface{}) (*LevelDb, error) {
 		return nil, err
 	}
 
-	//fmt.Println(dbpath)
 	// No special setup needed, just OpenBB
 	db, err := openDB(dbpath, true)
 	return db, err

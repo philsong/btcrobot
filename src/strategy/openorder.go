@@ -32,7 +32,6 @@ func init() {
 }
 
 func (oo *OOStrategy) Tick(records []Record) bool {
-
 	const btcslap = 0.5
 	const ltcslap = 0.8
 

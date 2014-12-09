@@ -1,6 +1,6 @@
 package mintpal
 
-//Market
+// Market
 type MarketSummary struct {
 	Status string
 	Count  int
@@ -69,7 +69,7 @@ type marketChartData struct {
 	CoinVolume     string `json:"coin_volume"`
 }
 
-//trading
+// trading
 
 type TradingOrders struct {
 	Status string
