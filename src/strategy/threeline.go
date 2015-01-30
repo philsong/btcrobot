@@ -38,6 +38,15 @@ func init() {
 	Register("THREELINE", threelineStrategy)
 }
 
+func coinName() (coin string) {
+	if Option["symbol"] == "btc_cny" {
+		coin = "比特币"
+	} else {
+		coin = "莱特币"
+	}
+	return
+}
+
 // 三均线交易策略
 func (threelineStrategy *ThreelineStrategy) Buy(price float64) {
 	price = price + StringToFloat(Option["slippage"])

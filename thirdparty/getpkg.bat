@@ -16,6 +16,7 @@ go get -u github.com/codegangsta/martini-contrib/auth
 go get -u github.com/philsong/goleveldb/leveldb
 go get -u github.com/bitly/go-simplejson
 go get -u github.com/philsong/go-bittrex
+go get -u github.com/gorilla/websocket
 
 set GOPATH=%OLDGOPATH%
 
