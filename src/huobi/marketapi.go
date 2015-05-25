@@ -26,7 +26,6 @@ import (
 	"io"
 	"io/ioutil"
 	"logger"
-	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
@@ -58,7 +57,7 @@ func (w *Huobi) AnalyzeKLinePeroid(symbol string, peroid int) (ret bool, records
 		return
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf(Config["hb_kline_url"], peroid, rand.Float64()), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf(Config["hb_kline_url"], peroid), nil)
 	if err != nil {
 		logger.Fatal(err)
 		return

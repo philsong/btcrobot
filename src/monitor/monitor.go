@@ -34,6 +34,7 @@ import (
 )
 
 func marketAPI() (marketAPI MarketAPI) {
+	logger.Infof(Option["datacenter"])
 	if Option["datacenter"] == "huobi" {
 		marketAPI = huobi.NewHuobi()
 	} else if Option["datacenter"] == "okcoin" {
@@ -44,6 +45,7 @@ func marketAPI() (marketAPI MarketAPI) {
 		marketAPI = Bittrex.Manager()
 	} else {
 		logger.Fatalln("Please config the market center...")
+		panic(-1)
 	}
 	return
 }
@@ -63,6 +65,7 @@ func tradeAPI() (tradeAPI TradeAPI) {
 		tradeAPI = simulate.NewSimulate()
 	} else {
 		logger.Fatalln("Please config the exchange center...")
+		panic(0)
 	}
 	return
 }

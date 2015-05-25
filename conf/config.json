@@ -19,7 +19,7 @@
 	
 	"hb_base_url": "https://www.huobi.com/",
 	"hb_api_url": "https://api.huobi.com/api.php",
-	"hb_kline_url": "https://market.huobi.com/market/huobi.php?a=kline&period=%03d&r=%f",
+	"hb_kline_url": "http://api.huobi.com/staticmarket/btc_kline_%03d_json.js",
 	"hb_trade_detail": "http://market.huobi.com/staticmarket/detail.html?jsoncallback=jQuery%s_%d&_=%d",
 
 	"ok_base_url":"https://www.okcoin.cn/",

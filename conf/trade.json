@@ -1,1 +1,12 @@
-{"buyamount":"0.1","buyinterval":"11","buyprice":"100","buytimes":"11","maxbuyamountratio":"11","maxsellamountratio":"10","sellamount":"0.1","sellinterval":"10","sellprice":"75","selltimes":"10"}
+{
+    "buyamount": "0.1",
+    "buyinterval": "11",
+    "buyprice": "100",
+    "buytimes": "11",
+    "maxbuyamountratio": "11",
+    "maxsellamountratio": "10",
+    "sellamount": "0.1",
+    "sellinterval": "10",
+    "sellprice": "75",
+    "selltimes": "10"
+}
