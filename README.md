@@ -3,6 +3,7 @@ BTC/LTC Robot
 ============
 ## Golang BTC/LTC trading bot engine
 
+
 ![btcrobot logo](
 https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/hacking-bitcoin-with-go.png)
 
@@ -19,6 +20,7 @@ https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/ha
   backtesting on historical data. Also look at the code to see what how
   it's working.
 
+## 该项目已经放弃，来玩套利吧 https://github.com/philsong/bitcoin-arbitrage
 ## How You Can Help
 
 ### Donations
