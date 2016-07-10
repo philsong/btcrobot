@@ -18,7 +18,7 @@
 package monitor
 
 import (
-	"Bittrex"
+	"bittrex"
 	"bitvc"
 	. "common"
 	. "config"
