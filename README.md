@@ -20,7 +20,6 @@ https://raw.githubusercontent.com/philsong/btcrobot/master/static/images/demo/ha
   backtesting on historical data. Also look at the code to see what how
   it's working.
 
-## 该项目已经放弃，来玩套利吧 https://github.com/philsong/bitcoin-arbitrage
 ## How You Can Help
 
 ### Donations
@@ -59,8 +58,13 @@ Update:
 
 2014/4/23: EMA、MACD等各种指标和其他策略，在市场深度不够时，已然失效。。。业界其他程序员即使基于robot写了策略，也极少开源，原因就是一旦公开策略，使用人数变多，该策略就失效。即日起本人也不再公开发布新的策略，改变开发方向为专注于该开源框架的完善，然后提供回测和策略接口甚至提供策略交易市场，让用户方便自己实现自己的策略并可回测，及交流。有任何建议及合作都可互相探讨。
 
-2015/5/25: 项目已内部转化为公司买卖币及搬砖模块, 搁置。
+2015/5/25: 项目已内部转化为公司买卖币及搬砖模块。
 
+2016/7/13: 该内部项目已经 开源：
+
+搬砖做市套利： https://github.com/philsong/bitcoin-arbitrage
+
+代理商模型： https://github.com/philsong/bitcoin-broker
 
 ## 使用指南:
 https://github.com/philsong/btcrobot/wiki/%E6%9C%BA%E5%99%A8%E4%BA%BA%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97 
