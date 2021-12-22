@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  comdockerdevenvironments:
+    image: comdockerdevenvironments
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
