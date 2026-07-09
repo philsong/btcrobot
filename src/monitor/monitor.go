@@ -160,13 +160,13 @@ func testHuobiAPI() {
 		if tradeAPI.Cancel_order(buyId) {
 			fmt.Printf("cancel %s success \n", buyId)
 		} else {
-			fmt.Printf("cancel %s falied \n", buyId)
+			fmt.Printf("cancel %s failed \n", buyId)
 		}
 
 		if tradeAPI.Cancel_order(sellId) {
 			fmt.Printf("cancel %s success \n", sellId)
 		} else {
-			fmt.Printf("cancel %s falied \n", sellId)
+			fmt.Printf("cancel %s failed \n", sellId)
 		}
 	}
 
@@ -186,13 +186,13 @@ func testBitVCAPI() {
 			if tradeAPI.Cancel_order(buyId) {
 				fmt.Printf("cancel %s success \n", buyId)
 			} else {
-				fmt.Printf("cancel %s falied \n", buyId)
+				fmt.Printf("cancel %s failed \n", buyId)
 			}
 
 			if tradeAPI.Cancel_order(sellId) {
 				fmt.Printf("cancel %s success \n", sellId)
 			} else {
-				fmt.Printf("cancel %s falied \n", sellId)
+				fmt.Printf("cancel %s failed \n", sellId)
 			}
 		}
 
